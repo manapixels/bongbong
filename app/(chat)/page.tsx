@@ -5,27 +5,21 @@ import { DEFAULT_MODEL_NAME, models } from '@/lib/ai/models';
 import { generateUUID } from '@/lib/utils';
 import { DataStreamHandler } from '@/components/data-stream-handler';
 
-export default async function Page() {
-  const id = generateUUID();
-
-  const cookieStore = await cookies();
-  const modelIdFromCookie = cookieStore.get('model-id')?.value;
-
-  const selectedModelId =
-    models.find((model) => model.id === modelIdFromCookie)?.id ||
-    DEFAULT_MODEL_NAME;
+export default async function ChatPage() {
+  // Use mock user data
+  const user = {
+    id: 'mock-user-id', 
+    email: 'demo@example.com',
+    name: 'Demo User'
+  };
 
   return (
-    <>
-      <Chat
-        key={id}
-        id={id}
-        initialMessages={[]}
-        selectedModelId={selectedModelId}
-        selectedVisibilityType="private"
-        isReadonly={false}
-      />
-      <DataStreamHandler id={id} />
-    </>
+    <Chat
+      id={nanoid()}
+      initialMessages={[]}
+      selectedModelId="claude-3-sonnet"
+      selectedVisibilityType="private"
+      isReadonly={false}
+    />
   );
 }

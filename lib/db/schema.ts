@@ -9,6 +9,7 @@ import {
   primaryKey,
   foreignKey,
   boolean,
+  integer,
 } from 'drizzle-orm/pg-core';
 
 export const user = pgTable('User', {
@@ -113,3 +114,73 @@ export const suggestion = pgTable(
 );
 
 export type Suggestion = InferSelectModel<typeof suggestion>;
+
+export const students = pgTable('students', {
+  id: text('id').primaryKey(),
+  userId: text('user_id').notNull().references(() => users.id),
+  level: integer('level').notNull().default(1),
+  weakAreas: json('weak_areas').$type<string[]>().default([]),
+  strengths: json('strengths').$type<string[]>().default([]),
+  preferredLearningStyle: text('preferred_learning_style').default('numeric'),
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
+  xp: integer('xp').notNull().default(0),
+  coins: integer('coins').notNull().default(0),
+  achievements: json('achievements').$type<string[]>().default([]),
+  lastLoginStreak: integer('last_login_streak').notNull().default(0),
+  lastLoginDate: timestamp('last_login_date'),
+  visualAidsEnabled: boolean('visual_aids_enabled').notNull().default(true),
+  soundEffectsEnabled: boolean('sound_effects_enabled').notNull().default(true),
+});
+
+export const mathProblems = pgTable('math_problems', {
+  id: text('id').primaryKey(),
+  studentId: text('student_id').notNull().references(() => students.id),
+  question: text('question').notNull(),
+  answer: integer('answer').notNull(),
+  category: text('category').notNull(),
+  difficulty: integer('difficulty').notNull(),
+  attemptedAt: timestamp('attempted_at').defaultNow(),
+  isCorrect: boolean('is_correct').notNull(),
+  timeSpent: integer('time_spent').notNull(),
+});
+
+export const studentProgress = pgTable('student_progress', {
+  id: text('id').primaryKey(),
+  studentId: text('student_id').notNull().references(() => students.id),
+  totalProblems: integer('total_problems').notNull().default(0),
+  correctAnswers: integer('correct_answers').notNull().default(0),
+  streaks: integer('streaks').notNull().default(0),
+  categoryProgress: json('category_progress').notNull().default({}),
+  updatedAt: timestamp('updated_at').defaultNow(),
+});
+
+export const achievements = pgTable('achievements', {
+  id: text('id').primaryKey(),
+  name: text('name').notNull(),
+  description: text('description').notNull(),
+  requiredValue: integer('required_value').notNull(),
+  type: text('type').notNull(), // 'streak', 'total_correct', 'speed', etc.
+  rewardCoins: integer('reward_coins').notNull(),
+  rewardXP: integer('reward_xp').notNull(),
+});
+
+export const studentAchievements = pgTable('student_achievements', {
+  studentId: text('student_id').notNull().references(() => students.id),
+  achievementId: text('achievement_id').notNull().references(() => achievements.id),
+  unlockedAt: timestamp('unlocked_at').notNull(),
+  primaryKey: primaryKey({ columns: ['studentId', 'achievementId'] })
+});
+
+export const practiceSession = pgTable('practice_sessions', {
+  id: text('id').primaryKey(),
+  studentId: text('student_id').notNull().references(() => students.id),
+  mode: text('mode').notNull(), // 'practice' or 'test'
+  startedAt: timestamp('started_at').notNull(),
+  endedAt: timestamp('ended_at'),
+  totalQuestions: integer('total_questions').notNull(),
+  correctAnswers: integer('correct_answers').notNull().default(0),
+  averageResponseTime: integer('average_response_time'),
+  xpEarned: integer('xp_earned'),
+  coinsEarned: integer('coins_earned'),
+});

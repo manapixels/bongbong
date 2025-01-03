@@ -20,13 +20,13 @@ export function Chat({
   initialMessages,
   selectedModelId,
   selectedVisibilityType,
-  isReadonly,
+  isReadonly = false
 }: {
   id: string;
   initialMessages: Array<Message>;
   selectedModelId: string;
   selectedVisibilityType: VisibilityType;
-  isReadonly: boolean;
+  isReadonly?: boolean;
 }) {
   const { mutate } = useSWRConfig();
 

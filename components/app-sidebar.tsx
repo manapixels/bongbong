@@ -18,9 +18,17 @@ import {
 import Link from 'next/link';
 import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
 
-export function AppSidebar({ user }: { user: User | undefined }) {
+export function AppSidebar({ user }: { user?: User }) {
   const router = useRouter();
   const { setOpenMobile } = useSidebar();
+
+  const defaultUser = {
+    id: 'mock-user-id',
+    email: 'demo@example.com',
+    name: 'Demo User'
+  };
+
+  const activeUser = user || defaultUser;
 
   return (
     <Sidebar className="group-data-[side=left]:border-r-0">
@@ -59,9 +67,11 @@ export function AppSidebar({ user }: { user: User | undefined }) {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <SidebarHistory user={user} />
+        <SidebarHistory user={activeUser} />
       </SidebarContent>
-      <SidebarFooter>{user && <SidebarUserNav user={user} />}</SidebarFooter>
+      <SidebarFooter>
+        <SidebarUserNav user={activeUser} />
+      </SidebarFooter>
     </Sidebar>
   );
 }

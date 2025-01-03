@@ -17,6 +17,8 @@ import {
   vote,
 } from './schema';
 import { BlockKind } from '@/components/block';
+import { db } from '@/lib/db';
+import { students, studentProgress, achievements, studentAchievements } from '@/lib/db/schema';
 
 // Optionally, if not using email/pass login, you can
 // use the Drizzle adapter for Auth.js / NextAuth
@@ -27,24 +29,18 @@ const client = postgres(process.env.POSTGRES_URL!);
 const db = drizzle(client);
 
 export async function getUser(email: string): Promise<Array<User>> {
-  try {
-    return await db.select().from(user).where(eq(user.email, email));
-  } catch (error) {
-    console.error('Failed to get user from database');
-    throw error;
-  }
+  // Temporarily return mock user data
+  return [{
+    id: 'mock-user-id',
+    email: 'demo@example.com',
+    password: null,
+    createdAt: new Date()
+  }];
 }
 
 export async function createUser(email: string, password: string) {
-  const salt = genSaltSync(10);
-  const hash = hashSync(password, salt);
-
-  try {
-    return await db.insert(user).values({ email, password: hash });
-  } catch (error) {
-    console.error('Failed to create user in database');
-    throw error;
-  }
+  // No-op since we're disabling auth
+  return;
 }
 
 export async function saveChat({
@@ -327,4 +323,77 @@ export async function updateChatVisiblityById({
     console.error('Failed to update chat visibility in database');
     throw error;
   }
+}
+
+export async function getStudentProfile({ userId }: { userId: string }) {
+  const [student] = await db
+    .select()
+    .from(students)
+    .where(eq(students.userId, userId));
+
+  if (!student) {
+    // Create new student profile if it doesn't exist
+    const newStudent = {
+      id: crypto.randomUUID(),
+      userId,
+      level: 1,
+      weakAreas: [],
+      strengths: [],
+      preferredLearningStyle: 'numeric',
+      xp: 0,
+      coins: 0,
+      achievements: [],
+      visualAidsEnabled: true,
+      soundEffectsEnabled: true
+    };
+
+    await db.insert(students).values(newStudent);
+    return newStudent;
+  }
+
+  return student;
+}
+
+export async function getStudentProgress({ userId }: { userId: string }) {
+  const [progress] = await db
+    .select()
+    .from(studentProgress)
+    .where(eq(studentProgress.studentId, userId));
+
+  if (!progress) {
+    // Create new progress record if it doesn't exist
+    const newProgress = {
+      id: crypto.randomUUID(),
+      studentId: userId,
+      totalProblems: 0,
+      correctAnswers: 0,
+      streaks: 0,
+      categoryProgress: {
+        addition: { attempts: 0, success: 0 },
+        subtraction: { attempts: 0, success: 0 },
+        multiplication: { attempts: 0, success: 0 },
+        division: { attempts: 0, success: 0 }
+      }
+    };
+
+    await db.insert(studentProgress).values(newProgress);
+    return newProgress;
+  }
+
+  return progress;
+}
+
+export async function getStudentAchievements({ userId }: { userId: string }) {
+  return db
+    .select({
+      achievement: achievements,
+      unlockedAt: studentAchievements.unlockedAt
+    })
+    .from(studentAchievements)
+    .innerJoin(
+      achievements,
+      eq(achievements.id, studentAchievements.achievementId)
+    )
+    .where(eq(studentAchievements.studentId, userId))
+    .orderBy(studentAchievements.unlockedAt);
 }
