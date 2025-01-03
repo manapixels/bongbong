@@ -17,7 +17,6 @@ import {
   vote,
 } from './schema';
 import { BlockKind } from '@/components/block';
-import { db } from '@/lib/db';
 import { students, studentProgress, achievements, studentAchievements } from '@/lib/db/schema';
 
 // Optionally, if not using email/pass login, you can
@@ -33,8 +32,7 @@ export async function getUser(email: string): Promise<Array<User>> {
   return [{
     id: 'mock-user-id',
     email: 'demo@example.com',
-    password: null,
-    createdAt: new Date()
+    password: null
   }];
 }
 

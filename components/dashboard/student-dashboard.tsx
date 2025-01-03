@@ -13,6 +13,7 @@ import {
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
+import { Progress } from '@/components/ui/progress';
 
 export function StudentDashboard({ studentId }: { studentId: string }) {
   const [timeRange, setTimeRange] = useState<'week' | 'month' | 'year'>('week');

@@ -1,10 +1,23 @@
 import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
 import confetti from 'canvas-confetti';
+
+interface Achievement {
+  id: string;
+  name: string;
+  description: string;
+}
+
+interface TestResults {
+  score: number;
+  timeSpent: number;
+  problemsSolved: number;
+  accuracy: number;
+}
 
 interface MathProblem {
   id: string;
@@ -12,6 +25,8 @@ interface MathProblem {
   answer: number;
   difficulty: number;
   category: 'addition' | 'subtraction' | 'multiplication' | 'division';
+  num1: number;
+  num2: number;
 }
 
 interface StudentProfile {
@@ -20,6 +35,9 @@ interface StudentProfile {
   weakAreas: string[];
   strengths: string[];
   preferredLearningStyle: 'visual' | 'numeric' | 'word-problems';
+  visualAidsEnabled: boolean;
+  xp: number;
+  coins: number;
 }
 
 interface StudentProgress {
@@ -34,6 +52,21 @@ interface MathTrainer extends StudentProfile {
   xp: number;
   coins: number;
 }
+
+const calculateXP = (timeSpent: number, difficulty: number): number => {
+  const baseXP = 10;
+  const timeBonus = Math.max(0, 30 - timeSpent) * 0.5;
+  return Math.round(baseXP * difficulty + timeBonus);
+};
+
+const calculateCoins = (streak: number): number => {
+  return Math.round(10 + (streak * 2));
+};
+
+const playSound = (type: 'correct' | 'wrong') => {
+  const audio = new Audio(`/sounds/${type}.mp3`);
+  audio.play().catch(() => {}); // Ignore errors if sound can't play
+};
 
 export function MathTrainer({ 
   studentId, 
@@ -74,7 +107,18 @@ export function MathTrainer({
         return `🔵`.repeat(problem.num1) + ' + ' + `🔴`.repeat(problem.num2);
       case 'subtraction':
         return `⭐`.repeat(problem.num1) + ' - ' + `⭐`.repeat(problem.num2);
-      // Add more visual representations for other categories
+      case 'multiplication':
+        // Create a grid-like pattern to show multiplication as repeated addition
+        return Array(problem.num1)
+          .fill(`🟦`.repeat(problem.num2))
+          .join(' ');
+      case 'division':
+        // Show total items divided into groups
+        return Array(problem.num2)
+          .fill(`🟨`.repeat(Math.floor(problem.num1 / problem.num2)))
+          .join(' | ');
+      default:
+        return null;
     }
   };
 
@@ -118,7 +162,7 @@ export function MathTrainer({
       toast({
         title: "Correct! 🎉",
         description: `+${xpGained}XP | +${coinsGained}🪙 | Streak: ${streak + 1}`,
-        variant: "success"
+        variant: "default"
       });
     } else {
       setStreak(0);
@@ -126,7 +170,7 @@ export function MathTrainer({
       toast({
         title: "Try again!",
         description: `The correct answer was ${currentProblem.answer}`,
-        variant: "error"
+        variant: "destructive"
       });
     }
 
@@ -149,7 +193,7 @@ export function MathTrainer({
         toast({
           title: "🏆 New Achievement!",
           description: `${achievement.name}: ${achievement.description}`,
-          variant: "success"
+          variant: "default"
         });
       });
     }

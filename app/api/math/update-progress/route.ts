@@ -3,6 +3,7 @@ import { auth } from '@/app/(auth)/auth';
 import { db } from '@/lib/db';
 import { students, studentProgress, achievements, studentAchievements } from '@/lib/db/schema';
 import { eq, and } from 'drizzle-orm';
+import { calculateCoins, calculateXP } from '@/lib/utils/math';
 
 const ACHIEVEMENT_CONDITIONS = {
   SPEED_DEMON: (timeSpent: number) => timeSpent < 5,

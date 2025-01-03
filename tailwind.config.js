@@ -1,6 +1,8 @@
-import type { Config } from 'tailwindcss';
+// @ts-check
+ 
+/** @type {import('next').NextConfig} */
 
-const config: Config = {
+const config = {
   darkMode: ['class'],
   content: [
     './pages/**/*.{js,ts,jsx,tsx,mdx}',

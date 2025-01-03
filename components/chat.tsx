@@ -1,6 +1,6 @@
 'use client';
 
-import type { Attachment, Message } from 'ai';
+import type { Message } from 'ai';
 import { useChat } from 'ai/react';
 import { useState } from 'react';
 import useSWR, { useSWRConfig } from 'swr';
@@ -14,6 +14,31 @@ import { MultimodalInput } from './multimodal-input';
 import { Messages } from './messages';
 import { VisibilityType } from './visibility-selector';
 import { useBlockSelector } from '@/hooks/use-block';
+
+// Define our own Attachment type since it's not exported from 'ai'
+interface Attachment {
+  name: string;
+  type: string;
+  size: number;
+  url: string;
+}
+
+// Create a type for the chat request options
+interface ChatRequestOptions {
+  options?: {
+    body?: any;
+    headers?: Record<string, string>;
+  };
+}
+
+// Add this interface to properly type the chat options
+interface ChatOptions {
+  body?: {
+    id: string;
+    modelId: string;
+  };
+  headers?: Record<string, string>;
+}
 
 export function Chat({
   id,
@@ -44,7 +69,6 @@ export function Chat({
     id,
     body: { id, modelId: selectedModelId },
     initialMessages,
-    experimental_throttle: 100,
     onFinish: () => {
       mutate('/api/history');
     },
@@ -57,6 +81,22 @@ export function Chat({
 
   const [attachments, setAttachments] = useState<Array<Attachment>>([]);
   const isBlockVisible = useBlockSelector((state) => state.isVisible);
+
+  // Wrap setMessages to match the expected type
+  const handleSetMessages = (newMessages: Message[] | ((prev: Message[]) => Message[])) => {
+    setMessages(newMessages as any);
+  };
+
+  // Wrap handleSubmit to match the expected type
+  const handleSubmitWrapper = (
+    event?: { preventDefault?: () => void } | undefined,
+    chatRequestOptions?: ChatRequestOptions
+  ) => {
+    if (event?.preventDefault) {
+      event.preventDefault();
+    }
+    handleSubmit(event as any, chatRequestOptions as any);
+  };
 
   return (
     <>
@@ -73,7 +113,7 @@ export function Chat({
           isLoading={isLoading}
           votes={votes}
           messages={messages}
-          setMessages={setMessages}
+          setMessages={handleSetMessages}
           reload={reload}
           isReadonly={isReadonly}
           isBlockVisible={isBlockVisible}
@@ -85,13 +125,13 @@ export function Chat({
               chatId={id}
               input={input}
               setInput={setInput}
-              handleSubmit={handleSubmit}
+              handleSubmit={handleSubmitWrapper}
               isLoading={isLoading}
               stop={stop}
               attachments={attachments}
               setAttachments={setAttachments}
               messages={messages}
-              setMessages={setMessages}
+              setMessages={handleSetMessages}
               append={append}
             />
           )}
@@ -102,14 +142,14 @@ export function Chat({
         chatId={id}
         input={input}
         setInput={setInput}
-        handleSubmit={handleSubmit}
+        handleSubmit={handleSubmitWrapper}
         isLoading={isLoading}
         stop={stop}
         attachments={attachments}
         setAttachments={setAttachments}
         append={append}
         messages={messages}
-        setMessages={setMessages}
+        setMessages={handleSetMessages}
         reload={reload}
         votes={votes}
         isReadonly={isReadonly}

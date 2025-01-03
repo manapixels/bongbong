@@ -57,11 +57,10 @@ export const vote = pgTable(
       .references(() => message.id),
     isUpvoted: boolean('isUpvoted').notNull(),
   },
-  (table) => {
-    return {
-      pk: primaryKey({ columns: [table.chatId, table.messageId] }),
-    };
-  },
+  (table) => ({
+    pk: primaryKey({ 
+      columns: [table.chatId, table.messageId] }),
+  }),
 );
 
 export type Vote = InferSelectModel<typeof vote>;
@@ -73,18 +72,16 @@ export const document = pgTable(
     createdAt: timestamp('createdAt').notNull(),
     title: text('title').notNull(),
     content: text('content'),
-    kind: varchar('text', { enum: ['text', 'code'] })
+    kind: varchar('kind', { enum: ['text', 'code'] })
       .notNull()
       .default('text'),
     userId: uuid('userId')
       .notNull()
       .references(() => user.id),
   },
-  (table) => {
-    return {
-      pk: primaryKey({ columns: [table.id, table.createdAt] }),
-    };
-  },
+  (table) => ({
+    pk: primaryKey([table.id, table.createdAt])
+  }),
 );
 
 export type Document = InferSelectModel<typeof document>;
@@ -105,11 +102,11 @@ export const suggestion = pgTable(
     createdAt: timestamp('createdAt').notNull(),
   },
   (table) => ({
-    pk: primaryKey({ columns: [table.id] }),
+    pk: primaryKey([table.id]),
     documentRef: foreignKey({
       columns: [table.documentId, table.documentCreatedAt],
-      foreignColumns: [document.id, document.createdAt],
-    }),
+      foreignColumns: [document.id, document.createdAt]
+    })
   }),
 );
 
@@ -117,7 +114,7 @@ export type Suggestion = InferSelectModel<typeof suggestion>;
 
 export const students = pgTable('students', {
   id: text('id').primaryKey(),
-  userId: text('user_id').notNull().references(() => users.id),
+  userId: uuid('user_id').notNull().references(() => user.id),
   level: integer('level').notNull().default(1),
   weakAreas: json('weak_areas').$type<string[]>().default([]),
   strengths: json('strengths').$type<string[]>().default([]),
@@ -151,7 +148,7 @@ export const studentProgress = pgTable('student_progress', {
   totalProblems: integer('total_problems').notNull().default(0),
   correctAnswers: integer('correct_answers').notNull().default(0),
   streaks: integer('streaks').notNull().default(0),
-  categoryProgress: json('category_progress').notNull().default({}),
+  categoryProgress: json('category_progress').$type<Record<string, number>>().default({}),
   updatedAt: timestamp('updated_at').defaultNow(),
 });
 
@@ -169,8 +166,9 @@ export const studentAchievements = pgTable('student_achievements', {
   studentId: text('student_id').notNull().references(() => students.id),
   achievementId: text('achievement_id').notNull().references(() => achievements.id),
   unlockedAt: timestamp('unlocked_at').notNull(),
-  primaryKey: primaryKey({ columns: ['studentId', 'achievementId'] })
-});
+}, (table) => ({
+  pk: primaryKey([table.studentId, table.achievementId])
+}));
 
 export const practiceSession = pgTable('practice_sessions', {
   id: text('id').primaryKey(),
@@ -184,3 +182,10 @@ export const practiceSession = pgTable('practice_sessions', {
   xpEarned: integer('xp_earned'),
   coinsEarned: integer('coins_earned'),
 });
+
+export type Student = InferSelectModel<typeof students>;
+export type MathProblem = InferSelectModel<typeof mathProblems>;
+export type StudentProgress = InferSelectModel<typeof studentProgress>;
+export type Achievement = InferSelectModel<typeof achievements>;
+export type StudentAchievement = InferSelectModel<typeof studentAchievements>;
+export type PracticeSession = InferSelectModel<typeof practiceSession>;

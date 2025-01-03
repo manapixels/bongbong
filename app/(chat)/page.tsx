@@ -15,7 +15,7 @@ export default async function ChatPage() {
 
   return (
     <Chat
-      id={nanoid()}
+      id={generateUUID()}
       initialMessages={[]}
       selectedModelId="claude-3-sonnet"
       selectedVisibilityType="private"
