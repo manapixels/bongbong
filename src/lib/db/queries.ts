@@ -1,8 +1,31 @@
 import { db } from '@/lib/db';
-import { students, studentProgress, mathProblems } from '@/lib/db/schema';
+import { 
+  user,
+  students, 
+  studentProgress, 
+  mathProblems,
+  type User,
+  type Student,
+  type StudentProgress 
+} from '@/lib/db/schema';
 import { eq } from 'drizzle-orm';
 
-export async function getStudentProfile({ userId }: { userId: string }) {
+export async function getUser(email: string): Promise<User[]> {
+  return db
+    .select()
+    .from(user)
+    .where(eq(user.email, email));
+}
+
+export async function createUser(email: string, password: string): Promise<User> {
+  const [newUser] = await db
+    .insert(user)
+    .values({ email, password })
+    .returning();
+  return newUser;
+}
+
+export async function getStudentProfile({ userId }: { userId: string }): Promise<Student | undefined> {
   const [student] = await db
     .select()
     .from(students)
@@ -11,7 +34,7 @@ export async function getStudentProfile({ userId }: { userId: string }) {
   return student;
 }
 
-export async function getStudentProgress({ userId }: { userId: string }) {
+export async function getStudentProgress({ userId }: { userId: string }): Promise<StudentProgress | undefined> {
   const [progress] = await db
     .select()
     .from(studentProgress)
@@ -30,30 +53,31 @@ export async function updateStudentProgress({
   isCorrect: boolean;
   topicId: string;
   timeSpent: number;
-}) {
+}): Promise<StudentProgress> {
   const [progress] = await db
     .select()
     .from(studentProgress)
     .where(eq(studentProgress.studentId, userId));
 
-  // Update progress logic here
+  if (!progress) {
+    throw new Error('Student progress not found');
+  }
+
   const updatedProgress = {
     ...progress,
-    questionsAttempted: progress.totalProblems + 1,
+    totalProblems: progress.totalProblems + 1,
     correctAnswers: progress.correctAnswers + (isCorrect ? 1 : 0),
     categoryProgress: {
-      ...progress.categoryProgress,
-      [topicId]: {
-        attempts: (progress.categoryProgress[topicId]?.attempts || 0) + 1,
-        success: (progress.categoryProgress[topicId]?.success || 0) + (isCorrect ? 1 : 0)
-      }
+      ...(progress.categoryProgress ?? {}),
+      [topicId]: ((progress.categoryProgress?.[topicId] ?? 0) + (isCorrect ? 1 : 0))
     }
   };
 
-  await db
+  const [result] = await db
     .update(studentProgress)
     .set(updatedProgress)
-    .where(eq(studentProgress.studentId, userId));
+    .where(eq(studentProgress.studentId, userId))
+    .returning();
 
-  return updatedProgress;
+  return result;
 } 
