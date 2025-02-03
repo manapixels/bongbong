@@ -3,56 +3,26 @@
 import { useState } from 'react';
 import { ChevronDown, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
-
-interface Topic {
-  id: string;
-  name: string;
-  subtopics: {
-    id: string;
-    name: string;
-  }[];
-}
-
-interface Level {
-  name: string;
-  topics: Topic[];
-}
-
-const MATH_SYLLABUS: Level[] = [
-  {
-    name: 'Primary 1',
-    topics: [
-      {
-        id: 'p1-numbers',
-        name: 'Numbers to 100',
-        subtopics: [
-          { id: 'p1-counting', name: 'Counting to 100' },
-          { id: 'p1-place-value', name: 'Place Values' },
-          { id: 'p1-comparing', name: 'Comparing Numbers' }
-        ]
-      },
-      {
-        id: 'p1-addition',
-        name: 'Addition & Subtraction',
-        subtopics: [
-          { id: 'p1-add-within-100', name: 'Addition within 100' },
-          { id: 'p1-sub-within-100', name: 'Subtraction within 100' }
-        ]
-      }
-    ]
-  },
-  // Add more levels and topics based on the PSLE syllabus
-];
+import { MATH_TOPICS } from '@/lib/math/topics';
 
 export function MathTopicsSidebar() {
-  const [expandedLevels, setExpandedLevels] = useState<string[]>([]);
+  const [expandedLevels, setExpandedLevels] = useState<number[]>([]);
   const [expandedTopics, setExpandedTopics] = useState<string[]>([]);
 
-  const toggleLevel = (levelName: string) => {
+  // Group topics by level
+  const topicsByLevel = MATH_TOPICS.reduce((acc, topic) => {
+    if (!acc[topic.level]) {
+      acc[topic.level] = [];
+    }
+    acc[topic.level].push(topic);
+    return acc;
+  }, {} as Record<number, typeof MATH_TOPICS>);
+
+  const toggleLevel = (level: number) => {
     setExpandedLevels(prev => 
-      prev.includes(levelName) 
-        ? prev.filter(l => l !== levelName)
-        : [...prev, levelName]
+      prev.includes(level) 
+        ? prev.filter(l => l !== level)
+        : [...prev, level]
     );
   };
 
@@ -69,23 +39,23 @@ export function MathTopicsSidebar() {
       <div className="p-4">
         <h2 className="text-lg font-semibold mb-4">Math Topics</h2>
         <div className="space-y-2">
-          {MATH_SYLLABUS.map((level) => (
-            <div key={level.name} className="space-y-1">
+          {Object.entries(topicsByLevel).sort(([a], [b]) => Number(a) - Number(b)).map(([level, topics]) => (
+            <div key={level} className="space-y-1">
               <button
-                onClick={() => toggleLevel(level.name)}
+                onClick={() => toggleLevel(Number(level))}
                 className="flex items-center w-full text-left p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded"
               >
-                {expandedLevels.includes(level.name) ? (
+                {expandedLevels.includes(Number(level)) ? (
                   <ChevronDown className="w-4 h-4 mr-2" />
                 ) : (
                   <ChevronRight className="w-4 h-4 mr-2" />
                 )}
-                {level.name}
+                Primary {level}
               </button>
               
-              {expandedLevels.includes(level.name) && (
+              {expandedLevels.includes(Number(level)) && (
                 <div className="ml-4 space-y-1">
-                  {level.topics.map((topic) => (
+                  {topics.map((topic) => (
                     <div key={topic.id}>
                       <button
                         onClick={() => toggleTopic(topic.id)}
@@ -101,7 +71,7 @@ export function MathTopicsSidebar() {
                       
                       {expandedTopics.includes(topic.id) && (
                         <div className="ml-6 space-y-1">
-                          {topic.subtopics.map((subtopic) => (
+                          {topic.subTopics.map((subtopic) => (
                             <Link
                               key={subtopic.id}
                               href={`/math/practice/${subtopic.id}`}

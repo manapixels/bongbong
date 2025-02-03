@@ -67,15 +67,16 @@ export async function updateStudentProgress({
     ...progress,
     totalProblems: progress.totalProblems + 1,
     correctAnswers: progress.correctAnswers + (isCorrect ? 1 : 0),
-    categoryProgress: {
-      ...(progress.categoryProgress ?? {}),
-      [topicId]: ((progress.categoryProgress?.[topicId] ?? 0) + (isCorrect ? 1 : 0))
-    }
+    updatedAt: new Date()
   };
 
   const [result] = await db
     .update(studentProgress)
-    .set(updatedProgress)
+    .set({
+      totalProblems: updatedProgress.totalProblems,
+      correctAnswers: updatedProgress.correctAnswers,
+      updatedAt: updatedProgress.updatedAt
+    })
     .where(eq(studentProgress.studentId, userId))
     .returning();
 

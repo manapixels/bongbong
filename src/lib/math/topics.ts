@@ -1,124 +1,279 @@
-import { MathTopic, MathCategory } from '@/components/math/topics';
+import { MathTopic, MathCategory } from '@/types/math';
 
 export const MATH_TOPICS: MathTopic[] = [
+  // Primary 1
   {
-    id: 'numbers-to-100000',
-    name: 'Numbers to 100,000',
-    description: 'Learn about numbers up to 100,000',
-    level: 3,
+    id: 'p1-numbers',
+    name: 'Numbers to 20',
+    description: 'Learn about numbers up to 20',
+    level: 1,
     category: MathCategory.NUMBERS,
     subTopics: [
       {
-        id: 'place-values',
-        name: 'Place Values',
+        id: 'numbers-to-20',
+        name: 'Numbers to 20',
         difficulty: 1,
         questionTypes: [
           {
-            id: 'identify-place-value',
-            type: 'mcq',
-            conceptExplanation: [
-              "In our number system, each digit's position represents a value:",
-              "- Ones (rightmost digit)",
-              "- Tens (second from right)",
-              "- Hundreds (third from right)",
-              "- Thousands (fourth from right)",
-              "- Ten thousands (fifth from right)"
-            ],
-            remediationStrategy: "visualPlaceValueChart"
-          }
-        ]
-      }
-    ]
-  },
-  {
-    id: 'whole-numbers-operations',
-    name: 'Operations with Whole Numbers',
-    description: 'Learn about operations with whole numbers',
-    level: 2,
-    category: MathCategory.NUMBERS,
-    subTopics: [
-      {
-        id: 'addition-within-1000',
-        name: 'Addition within 1000',
-        difficulty: 1,
-        questionTypes: [
-          {
-            id: 'basic-addition',
+            id: 'counting-20',
             type: 'numeric',
             conceptExplanation: [
-              "When adding numbers:",
-              "1. Align the numbers by place value",
-              "2. Start from the right (ones column)",
-              "3. Add each column",
-              "4. Carry over when sum is 10 or more"
-            ],
-            remediationStrategy: "columnAddition"
-          },
-          {
-            id: 'word-problems-addition',
-            type: 'word-problem',
-            conceptExplanation: [
-              "For addition word problems:",
-              "1. Identify what is being combined/added",
-              "2. Look for keywords like 'total', 'sum', 'altogether'",
-              "3. Write the numbers and add"
-            ],
-            remediationStrategy: "partWholeModel"
+              "Count objects up to 20",
+              "Recognize and write numbers up to 20",
+              "Compare numbers up to 20"
+            ]
           }
         ]
       }
     ]
   },
   {
-    id: 'fractions',
-    name: 'Fractions',
-    description: 'Learn about fractions',
-    level: 4,
-    category: MathCategory.FRACTIONS,
+    id: 'p1-operations',
+    name: 'Addition and Subtraction',
+    description: 'Basic operations within 20',
+    level: 1,
+    category: MathCategory.OPERATIONS,
     subTopics: [
       {
-        id: 'equivalent-fractions',
-        name: 'Equivalent Fractions',
+        id: 'addition-within-10',
+        name: 'Addition and Subtraction Within 10',
+        difficulty: 1,
+        questionTypes: [
+          {
+            id: 'basic-addition-10',
+            type: 'numeric',
+            conceptExplanation: [
+              "Add numbers within 10",
+              "Use number bonds",
+              "Understand addition as combining sets"
+            ]
+          }
+        ]
+      },
+      {
+        id: 'addition-within-20',
+        name: 'Addition Within 20',
+        difficulty: 1,
+        questionTypes: [
+          {
+            id: 'basic-addition-20',
+            type: 'numeric',
+            conceptExplanation: ["Add numbers within 20"]
+          }
+        ]
+      },
+      {
+        id: 'subtraction-within-20',
+        name: 'Subtraction Within 20',
+        difficulty: 1,
+        questionTypes: [
+          {
+            id: 'basic-subtraction-20',
+            type: 'numeric',
+            conceptExplanation: ["Subtract numbers within 20"]
+          }
+        ]
+      }
+    ]
+  },
+  // Primary 2
+  {
+    id: 'p2-operations',
+    name: 'Advanced Operations',
+    description: 'Multiplication and division concepts',
+    level: 2,
+    category: MathCategory.OPERATIONS,
+    subTopics: [
+      {
+        id: 'multiplication',
+        name: 'Multiplication',
         difficulty: 2,
         questionTypes: [
           {
-            id: 'identify-equivalent',
-            type: 'mcq',
-            conceptExplanation: [
-              "Equivalent fractions are different ways to express the same value:",
-              "1. Multiply/divide both numerator and denominator by same number",
-              "2. Use visual models to see equal parts",
-              "3. Compare using common denominators"
-            ],
-            remediationStrategy: "fractionStrips"
+            id: 'basic-multiplication',
+            type: 'numeric',
+            conceptExplanation: ["Master multiplication with basic numbers"]
+          }
+        ]
+      },
+      {
+        id: 'division',
+        name: 'Division',
+        difficulty: 2,
+        questionTypes: [
+          {
+            id: 'basic-division',
+            type: 'word-problem',
+            conceptExplanation: ["Division made easy: Story-based approach"]
           }
         ]
       }
     ]
   },
   {
-    id: 'ratio-proportion',
-    name: 'Ratio and Proportion',
-    description: 'Learn about ratio and proportion',
+    id: 'p2-fractions',
+    name: 'Fractions',
+    description: 'Introduction to fractions',
+    level: 2,
+    category: MathCategory.FRACTIONS,
+    subTopics: [
+      {
+        id: 'fractions-1',
+        name: 'Fractions 1',
+        difficulty: 2,
+        questionTypes: [
+          {
+            id: 'basic-fractions',
+            type: 'mcq',
+            conceptExplanation: ["Understanding basic fractions"]
+          }
+        ]
+      }
+    ]
+  },
+  // Primary 3
+  {
+    id: 'p3-measurements',
+    name: 'Measurements',
+    description: 'Understanding different measurements',
+    level: 3,
+    category: MathCategory.MEASUREMENT,
+    subTopics: [
+      {
+        id: 'mass',
+        name: 'Mass',
+        difficulty: 2,
+        questionTypes: [
+          {
+            id: 'mass-conversion',
+            type: 'numeric',
+            conceptExplanation: ["Converting between units of mass"]
+          }
+        ]
+      },
+      {
+        id: 'length-mass-volume',
+        name: 'Length, Mass and Volume',
+        difficulty: 2,
+        questionTypes: [
+          {
+            id: 'measurement-conversion',
+            type: 'numeric',
+            conceptExplanation: ["Converting between different units of measurement"]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    id: 'p3-money',
+    name: 'Money',
+    description: 'Working with money',
+    level: 3,
+    category: MathCategory.MONEY,
+    subTopics: [
+      {
+        id: 'money-operations',
+        name: 'Money',
+        difficulty: 2,
+        questionTypes: [
+          {
+            id: 'money-calculations',
+            type: 'word-problem',
+            conceptExplanation: ["Solving problems involving money"]
+          }
+        ]
+      }
+    ]
+  },
+  // Primary 4
+  {
+    id: 'p4-geometry',
+    name: 'Area and Perimeter',
+    description: 'Understanding geometric measurements',
+    level: 4,
+    category: MathCategory.GEOMETRY,
+    subTopics: [
+      {
+        id: 'area-perimeter-1',
+        name: 'Area and Perimeter 1',
+        difficulty: 3,
+        questionTypes: [
+          {
+            id: 'basic-geometry',
+            type: 'numeric',
+            conceptExplanation: ["Calculate area and perimeter of basic shapes"]
+          }
+        ]
+      }
+    ]
+  },
+  // Primary 5
+  {
+    id: 'p5-ratio',
+    name: 'Ratio',
+    description: 'Understanding ratios and proportions',
     level: 5,
     category: MathCategory.RATIO_PROPORTION,
     subTopics: [
       {
-        id: 'bar-model-ratio',
-        name: 'Bar Model for Ratio',
-        difficulty: 2,
+        id: 'ratio-intro',
+        name: 'Ratio: Introduction',
+        difficulty: 3,
         questionTypes: [
           {
-            id: 'ratio-word-problems',
+            id: 'basic-ratio',
             type: 'word-problem',
+            conceptExplanation: ["Understanding basic ratio concepts"]
+          }
+        ]
+      },
+      {
+        id: 'table-rates',
+        name: 'Table Rates',
+        difficulty: 3,
+        questionTypes: [
+          {
+            id: 'rates-calculation',
+            type: 'numeric',
+            conceptExplanation: ["Working with rates in tabular form"]
+          }
+        ]
+      }
+    ]
+  },
+  // Primary 6
+  {
+    id: 'p6-advanced-topics',
+    name: 'Advanced Topics',
+    description: 'PSLE preparation topics',
+    level: 6,
+    category: MathCategory.ADVANCED,
+    subTopics: [
+      {
+        id: 'pie-charts',
+        name: 'Fundamentals of Pie Chart',
+        difficulty: 4,
+        questionTypes: [
+          {
+            id: 'pie-chart-problems',
+            type: 'mcq',
+            conceptExplanation: ["Understanding and interpreting pie charts"]
+          }
+        ]
+      },
+      {
+        id: 'number-patterns',
+        name: 'Number Patterns',
+        difficulty: 4,
+        questionTypes: [
+          {
+            id: 'pattern-recognition',
+            type: 'numeric',
             conceptExplanation: [
-              "Using bar models for ratio problems:",
-              "1. Draw equal bars for each part of ratio",
-              "2. Label known values",
-              "3. Find value of one unit",
-              "4. Solve for unknown values"
-            ],
-            remediationStrategy: "barModelVisualization"
+              "Grouping & Common Difference",
+              "Identifying and continuing number patterns"
+            ]
           }
         ]
       }

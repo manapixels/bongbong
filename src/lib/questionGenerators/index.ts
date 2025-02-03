@@ -1,4 +1,4 @@
-import { MathCategory, QuestionGenerator, Question, MathTopic } from '@/lib/types/math';
+import { MathCategory, QuestionGenerator, Question, MathTopic } from '@/types/math';
 import { ratioQuestionGenerator } from './ratioQuestions';
 import { placeValueQuestionGenerator } from './placeValueQuestions';
 import { additionQuestionGenerator } from './additionQuestions';

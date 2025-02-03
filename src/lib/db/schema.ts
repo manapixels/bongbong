@@ -1,3 +1,4 @@
+import { TopicProgress } from '@/types';
 import type { InferSelectModel } from 'drizzle-orm';
 import {
   pgTable,
@@ -11,7 +12,6 @@ import {
   boolean,
   integer,
 } from 'drizzle-orm/pg-core';
-import { MathCategory } from '@/lib/types/math';
 
 export const user = pgTable('User', {
   id: uuid('id').primaryKey().notNull().defaultRandom(),
@@ -81,7 +81,7 @@ export const document = pgTable(
       .references(() => user.id),
   },
   (table) => ({
-    pk: primaryKey([table.id, table.createdAt])
+    pk: primaryKey({ columns: [table.id] }),
   }),
 );
 
@@ -103,7 +103,7 @@ export const suggestion = pgTable(
     createdAt: timestamp('createdAt').notNull(),
   },
   (table) => ({
-    pk: primaryKey([table.id]),
+    pk: primaryKey({ columns: [table.id] }),
     documentRef: foreignKey({
       columns: [table.documentId, table.documentCreatedAt],
       foreignColumns: [document.id, document.createdAt]
@@ -135,7 +135,7 @@ export const mathProblems = pgTable('math_problems', {
   id: text('id').primaryKey(),
   studentId: text('student_id').notNull().references(() => students.id),
   question: text('question').notNull(),
-  answer: integer('answer').notNull(),
+  answer: text('answer').notNull(),
   category: text('category').notNull(),
   difficulty: integer('difficulty').notNull(),
   attemptedAt: timestamp('attempted_at').defaultNow(),
@@ -147,9 +147,9 @@ export const studentProgress = pgTable('student_progress', {
   id: text('id').primaryKey(),
   studentId: text('student_id').notNull().references(() => students.id),
   totalProblems: integer('total_problems').notNull().default(0),
+  topicProgress: json('topic_progress').$type<TopicProgress[]>().default([]),
   correctAnswers: integer('correct_answers').notNull().default(0),
   streaks: integer('streaks').notNull().default(0),
-  categoryProgress: json('category_progress').$type<Record<string, number>>().default({}),
   updatedAt: timestamp('updated_at').defaultNow(),
 });
 

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useTimer } from './use-timer';
 import { useToast } from '@/hooks/use-toast';
-import type { Question, MathTopic } from '@/components/math/topics';
+import { Question, MathTopic } from '@/types/math';
 
 export function usePracticeSession(topic: MathTopic, studentId: string) {
   const [currentQuestion, setCurrentQuestion] = useState<Question | null>(null);

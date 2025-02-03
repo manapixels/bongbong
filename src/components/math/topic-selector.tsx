@@ -4,8 +4,8 @@ import { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import type { MathTopic } from '@/components/math/topics';
-import type { StudentProgress } from '@/lib/types/progress';
+import { MathTopic } from '@/types/math';
+import type { StudentProgress } from '@/types/progress';
 
 interface TopicSelectorProps {
   topics: MathTopic[];

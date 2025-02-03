@@ -4,6 +4,7 @@ import { mathProblems } from '@/lib/db/schema';
 import { MATH_TOPICS } from '@/lib/math/topics';
 import { selectNextQuestion } from '@/lib/adaptive/questionSelector';
 import { getStudentProgress } from '@/lib/db/queries';
+import { StudentProgress } from '@/types/progress';
 
 export async function GET(request: Request) {
   const session = await auth();
@@ -24,17 +25,39 @@ export async function GET(request: Request) {
   }
 
   try {
-    const progress = await getStudentProgress({ userId: session.user.id });
-    const question = selectNextQuestion(progress, topic);
+    let progress = await getStudentProgress({ userId: session.user.id });
+
+    if (!progress) {
+      // Create default progress if none exists
+      const defaultProgress: StudentProgress = {
+        studentId: session.user.id,
+        totalProblems: 0,
+        correctAnswers: 0,
+        streaks: 0,
+        topicProgress: [],
+        updatedAt: new Date(),
+        id: crypto.randomUUID()
+      };
+
+      // You might want to save this default progress to the database
+      return Response.json(selectNextQuestion(defaultProgress, topic));
+    }
+
+    const transformedProgress: StudentProgress = {
+      ...progress,
+      updatedAt: progress.updatedAt || new Date()
+    };
+
+    const question = selectNextQuestion(transformedProgress, topic);
 
     // Save the generated problem
     await db.insert(mathProblems).values({
-      id: question.id,
+      id: crypto.randomUUID(),
       studentId: session.user.id,
-      category: topic.id,
-      difficulty: topic.level,
       question: question.text,
       answer: question.correctAnswer.toString(),
+      category: topic.category,
+      difficulty: topic.level,
       attemptedAt: new Date(),
       isCorrect: false,
       timeSpent: 0

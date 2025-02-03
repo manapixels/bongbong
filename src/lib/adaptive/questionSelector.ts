@@ -1,16 +1,15 @@
-import type { StudentProgress } from '@/lib/types/progress';
-import type { MathTopic, Question } from '@/components/math/topics';
-import { MathCategory } from '@/components/math/topics';
+import type { StudentProgress } from '@/types/progress';
+import { MathTopic, Question } from '@/types/math';
 import { generateAdditionQuestion, generateFractionQuestion } from '@/lib/questionGenerators/numberOperations';
 import { calculateDifficulty } from '@/lib/utils/math';
 
 export function selectNextQuestion(
-  studentProgress: StudentProgress,
-  currentTopic: MathTopic
+  progress: StudentProgress,
+  topic: MathTopic
 ): Question {
   // Calculate success rate for current topic
-  const topicStats = studentProgress.topicProgress.find(
-    (p) => p.topicId === currentTopic.id
+  const topicStats = progress.topicProgress.find(
+    (p) => p.topicId === topic.id
   );
 
   const successRate = topicStats 
@@ -18,15 +17,15 @@ export function selectNextQuestion(
     : 0.5; // Default to medium difficulty for new topics
 
   // Determine difficulty based on performance
-  const difficulty = calculateDifficulty(currentTopic.level, successRate);
+  const difficulty = calculateDifficulty(topic.level, successRate);
 
   // Get previous mistakes for this topic
-  const previousMistakes = getPreviousMistakes(studentProgress, currentTopic.id);
+  const previousMistakes = getPreviousMistakes(progress, topic.id);
 
   // Select appropriate question generator based on topic ID or subtopic
-  if (currentTopic.id.includes('addition')) {
+  if (topic.id.includes('addition')) {
     return generateAdditionQuestion(difficulty);
-  } else if (currentTopic.id.includes('fraction')) {
+  } else if (topic.id.includes('fraction')) {
     return generateFractionQuestion(difficulty);
   }
 

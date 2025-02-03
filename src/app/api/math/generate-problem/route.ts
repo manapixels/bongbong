@@ -1,69 +1,95 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/app/(auth)/auth';
 
-function generateProblem(profile: any, progress: any) {
-  // Determine which category to focus on based on weak areas
-  const weakCategories = Object.entries(progress.categoryProgress)
-    .filter(([_, stats]: [string, any]) => stats.success / stats.attempts < 0.7)
-    .map(([category]) => category);
-
-  const category = weakCategories.length > 0
-    ? weakCategories[Math.floor(Math.random() * weakCategories.length)]
-    : ['addition', 'subtraction', 'multiplication', 'division'][
-        Math.floor(Math.random() * 4)
-      ];
-
-  // Adjust difficulty based on level and success rate
-  const difficulty = Math.min(profile.level, 10);
-  
-  let num1, num2, answer, question;
-  
-  switch (category) {
-    case 'addition':
-      num1 = Math.floor(Math.random() * (10 * difficulty));
-      num2 = Math.floor(Math.random() * (10 * difficulty));
-      answer = num1 + num2;
-      question = `${num1} + ${num2} = ?`;
-      break;
-    case 'subtraction':
-      num1 = Math.floor(Math.random() * (10 * difficulty));
-      num2 = Math.floor(Math.random() * num1);
-      answer = num1 - num2;
-      question = `${num1} - ${num2} = ?`;
-      break;
-    case 'multiplication':
-      num1 = Math.floor(Math.random() * (5 * difficulty));
-      num2 = Math.floor(Math.random() * (5 * difficulty));
-      answer = num1 * num2;
-      question = `${num1} × ${num2} = ?`;
-      break;
-    case 'division':
-      num2 = Math.floor(Math.random() * (5 * difficulty)) + 1;
-      answer = Math.floor(Math.random() * (5 * difficulty));
-      num1 = num2 * answer;
-      question = `${num1} ÷ ${num2} = ?`;
-      break;
-    default:
-      throw new Error('Invalid category');
-  }
-
-  return {
-    id: crypto.randomUUID(),
-    question,
-    answer,
-    difficulty,
-    category
+interface ProblemGenerationRequest {
+  profile: {
+    preferences: {
+      difficulty: string;
+      topicsEnabled: string[];
+    };
+  };
+  progress: {
+    totalProblems: number;
+    correctAnswers: number;
+    topicStats: Record<string, { total: number; correct: number }>;
   };
 }
 
-export async function POST(req: Request) {
-  const session = await auth();
-  if (!session?.user) {
-    return new Response('Unauthorized', { status: 401 });
+function generateMathProblem(difficulty: string, topics: string[]) {
+  // Select a random topic from enabled topics
+  const topic = topics[Math.floor(Math.random() * topics.length)];
+  
+  // Generate numbers based on difficulty
+  const max = difficulty === 'easy' ? 10 : difficulty === 'medium' ? 50 : 100;
+  
+  let question: string;
+  let answer: number;
+  let num1: number;
+  let num2: number;
+  
+  // Generate different types of problems based on the topic
+  switch (topic) {
+    case 'addition':
+      num1 = Math.floor(Math.random() * max) + 1;
+      num2 = Math.floor(Math.random() * max) + 1;
+      question = `What is ${num1} + ${num2}?`;
+      answer = num1 + num2;
+      break;
+    case 'subtraction':
+      num1 = Math.floor(Math.random() * max) + 1;
+      num2 = Math.floor(Math.random() * num1) + 1; // Ensure num2 is smaller than num1
+      question = `What is ${num1} - ${num2}?`;
+      answer = num1 - num2;
+      break;
+    case 'multiplication':
+      // Use smaller numbers for multiplication
+      const multMax = Math.floor(max / 5);
+      num1 = Math.floor(Math.random() * multMax) + 1;
+      num2 = Math.floor(Math.random() * multMax) + 1;
+      question = `What is ${num1} × ${num2}?`;
+      answer = num1 * num2;
+      break;
+    case 'division':
+      // Generate division problems that result in whole numbers
+      num2 = Math.floor(Math.random() * (max / 10)) + 1;
+      answer = Math.floor(Math.random() * (max / 10)) + 1;
+      num1 = num2 * answer;
+      question = `What is ${num1} ÷ ${num2}?`;
+      break;
+    default:
+      num1 = Math.floor(Math.random() * max) + 1;
+      num2 = Math.floor(Math.random() * max) + 1;
+      question = `What is ${num1} + ${num2}?`;
+      answer = num1 + num2;
   }
+  
+  return {
+    id: Math.random().toString(36).substr(2, 9),
+    question,
+    answer,
+    category: topic,
+  };
+}
 
-  const { profile, progress } = await req.json();
-  const problem = generateProblem(profile, progress);
-
-  return NextResponse.json(problem);
+export async function POST(request: Request) {
+  try {
+    const body: ProblemGenerationRequest = await request.json();
+    
+    const { difficulty, topicsEnabled } = body.profile.preferences;
+    
+    // If no topics are enabled, use default topics
+    const topics = topicsEnabled.length > 0 
+      ? topicsEnabled 
+      : ['addition', 'subtraction', 'multiplication'];
+    
+    const problem = generateMathProblem(difficulty, topics);
+    
+    return NextResponse.json(problem);
+  } catch (error) {
+    console.error('Error generating problem:', error);
+    return NextResponse.json(
+      { error: 'Failed to generate problem' },
+      { status: 500 }
+    );
+  }
 } 

@@ -1,4 +1,4 @@
-import { Question, MathCategory } from '@/components/math/topics';
+import { Question, MathCategory } from '@/types/math';
 
 export function generateAdditionQuestion(level: number): Question {
   const max = Math.pow(10, level) - 1;
@@ -8,14 +8,18 @@ export function generateAdditionQuestion(level: number): Question {
   return {
     id: crypto.randomUUID(),
     text: `${num1} + ${num2} = ?`,
-    correctAnswer: num1 + num2,
+    correctAnswer: (num1 + num2).toString(),
     category: MathCategory.ADDITION,
     difficulty: level,
-    solution: `${num1} + ${num2} = ${num1 + num2}`,
+    solution: {
+      steps: [`${num1} + ${num2} = ${num1 + num2}`],
+      explanation: "Add the numbers together"
+    },
     hints: [
       "Try breaking down the numbers",
       "Start with the ones column"
     ]
+
   };
 }
 
@@ -29,11 +33,15 @@ export function generateFractionQuestion(level: number): Question {
     correctAnswer: (numerator / denominator).toFixed(2),
     category: MathCategory.FRACTIONS,
     difficulty: level,
-    solution: `${numerator} ÷ ${denominator} = ${(numerator / denominator).toFixed(2)}`,
+    solution: {
+      steps: [`${numerator} ÷ ${denominator} = ${(numerator / denominator).toFixed(2)}`],
+      explanation: "Divide the numerator by the denominator"
+    },
     hints: [
       "Divide the numerator by the denominator",
       "Round to 2 decimal places",
       "Use long division if needed"
     ]
+
   };
 } 

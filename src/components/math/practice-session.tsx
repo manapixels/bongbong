@@ -5,7 +5,7 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { ProblemDisplay } from './problem-display';
-import type { MathTopic, Question } from '@/components/math/topics';
+import { MathTopic, Question } from '@/types/math';
 import { useToast } from '@/components/ui/use-toast';
 
 interface PracticeSessionProps {

@@ -5,7 +5,8 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import type { Question } from '@/components/math/topics';
+import { Question } from '@/types/math';
+
 
 interface ProblemDisplayProps {
   problem: Question;
@@ -84,8 +85,10 @@ export function ProblemDisplay({
       {showSolution && (
         <div className="mt-4 p-4 bg-muted rounded-md">
           <h4 className="font-medium">Solution:</h4>
-          <p>{problem.solution}</p>
+          <p>{problem.solution.steps.join('\n')}</p>
+          <p>{problem.solution.explanation}</p>
         </div>
+
       )}
     </Card>
   );
