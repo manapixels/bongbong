@@ -23,4 +23,31 @@ export function gcd(a: number, b: number): number {
 export function simplifyFraction(numerator: number, denominator: number): [number, number] {
   const divisor = gcd(numerator, denominator);
   return [numerator / divisor, denominator / divisor];
+}
+
+export function generateModelMethod(problem: string) {
+  return `
+    1. Draw a bar model:
+       - Whole bar represents: [total/main quantity]
+       - Divide into parts: [show known/unknown quantities]
+       
+    2. Label the parts:
+       - Known values: [fill in given numbers]
+       - Unknown values: [mark with '?']
+       
+    3. Write equations:
+       - Based on bar model relationships
+       - Show step-by-step calculations
+  `;
+}
+
+export function checkDifficulty(studentLevel: string, problemType: string): number {
+  // Returns difficulty level 1-5 based on student's current level and problem type
+  // Used for adaptive learning
+  return 1; // Implement proper difficulty calculation
+}
+
+export function generateHints(problem: string, step: number): string {
+  // Returns progressive hints for each step of problem solving
+  return ''; // Implement hint generation
 } 

@@ -1,5 +1,8 @@
 import { getRandomInt } from '@/lib/utils/math';
 import { MathCategory, QuestionGenerator } from '@/types/math';
+import { singaporeContexts } from './singaporeContexts';
+
+const randomChoice = <T>(arr: T[]): T => arr[getRandomInt(0, arr.length - 1)];
 
 export const measurementQuestionGenerator: QuestionGenerator = {
   generateQuestion: (difficulty: number, previousMistakes: string[]) => {
@@ -32,7 +35,13 @@ export const measurementQuestionGenerator: QuestionGenerator = {
         const fromUnit = unitList[fromIndex];
         const toUnit = unitList[toIndex];
         
-        questionText = `Convert ${value}${fromUnit} to ${toUnit}`;
+        const context = randomChoice([
+          `traveling from ${randomChoice(singaporeContexts.places)} to ${randomChoice(singaporeContexts.places)}`,
+          `measuring ingredients for ${randomChoice(singaporeContexts.food)}`,
+          `distance between ${randomChoice(singaporeContexts.neighborhoods)} and ${randomChoice(singaporeContexts.neighborhoods)}`
+        ]);
+        
+        questionText = `When ${context}, you need to convert ${value}${fromUnit} to ${toUnit}`;
         
         // Simplified conversion factor (would need proper conversion logic in real implementation)
         const factor = Math.pow(10, (toIndex - fromIndex) * (category === 'time' ? 60 : 1000));
@@ -56,7 +65,13 @@ export const measurementQuestionGenerator: QuestionGenerator = {
         const value1 = getRandomInt(1, 10 * difficulty);
         const value2 = getRandomInt(1, 10 * difficulty);
         
-        questionText = `If one item is ${value1}${unit} and another is ${value2}${unit}, what is their total?`;
+        const context = randomChoice([
+          `preparing ${randomChoice(singaporeContexts.food)}`,
+          `${randomChoice(singaporeContexts.transport)} journey`,
+          `${randomChoice(singaporeContexts.activities)}`
+        ]);
+        
+        questionText = `While ${context}, you use ${value1}${unit} and then another ${value2}${unit}. What is the total?`;
         answer = (value1 + value2).toString();
         
         steps = [
@@ -76,7 +91,13 @@ export const measurementQuestionGenerator: QuestionGenerator = {
         const value1 = getRandomInt(1, 10 * difficulty);
         const value2 = getRandomInt(1, 10 * difficulty);
         
-        questionText = `Which is greater: ${value1}${unit} or ${value2}${unit}?`;
+        const context = randomChoice([
+          `${randomChoice(singaporeContexts.hawkerFood)} portions`,
+          `${randomChoice(singaporeContexts.drinks)} servings`,
+          `${randomChoice(singaporeContexts.transport)} distances`
+        ]);
+        
+        questionText = `Comparing ${context}, which is greater: ${value1}${unit} or ${value2}${unit}?`;
         answer = Math.max(value1, value2) + unit;
         
         steps = [

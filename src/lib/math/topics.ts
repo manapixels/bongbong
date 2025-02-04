@@ -1,6 +1,48 @@
 import { MathTopic, MathCategory } from '@/types/math';
 
 export const MATH_TOPICS: MathTopic[] = [
+  {
+    id: 'p1-whole-numbers',
+    name: 'Whole Numbers',
+    description: 'Understanding whole numbers and their operations',
+    level: 1,
+    categories: [MathCategory.NUMBER_SENSE, MathCategory.PLACE_VALUE],
+    subTopics: [
+      {
+        id: 'counting',
+        name: 'Counting and Place Values',
+        difficulty: 1,
+        questionTypes: [
+          {
+            id: 'place-values',
+            type: 'numeric',
+            conceptExplanation: [
+              'Understanding place values',
+              'Comparing and ordering numbers',
+              'Number patterns'
+            ]
+          }
+        ]
+      },
+      {
+        id: 'basic-operations',
+        name: 'Basic Operations',
+        difficulty: 1,
+        questionTypes: [
+          {
+            id: 'four-operations',
+            type: 'numeric',
+            conceptExplanation: [
+              'Addition',
+              'Subtraction',
+              'Multiplication',
+              'Division'
+            ]
+          }
+        ]
+      }
+    ]
+  },
   // Primary 1
   {
     id: 'p1-numbers',
@@ -366,4 +408,10 @@ export const generateSimilarQuestion = (
     solution: "",
     conceptReview: []
   };
-}; 
+};
+
+export function getTopicsByLevel(startLevel: number, endLevel: number): MathTopic[] {
+  return MATH_TOPICS.filter(topic => 
+    topic.level >= startLevel && topic.level <= endLevel
+  );
+} 

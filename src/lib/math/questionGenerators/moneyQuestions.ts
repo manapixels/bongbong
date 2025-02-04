@@ -1,5 +1,9 @@
 import { getRandomInt } from '@/lib/utils/math';
 import { MathCategory, QuestionGenerator } from '@/types/math';
+import { singaporeContexts } from './singaporeContexts';
+
+// Helper function
+const randomChoice = <T>(arr: T[]): T => arr[getRandomInt(0, arr.length - 1)];
 
 export const moneyQuestionGenerator: QuestionGenerator = {
   generateQuestion: (difficulty: number, previousMistakes: string[]) => {
@@ -17,7 +21,10 @@ export const moneyQuestionGenerator: QuestionGenerator = {
         const payment = Math.ceil(cost) + getRandomInt(0, 20);
         const change = Number((payment - cost).toFixed(2));
         
-        questionText = `If something costs $${cost.toFixed(2)} and you pay with $${payment.toFixed(2)}, how much change should you receive?`;
+        const store = randomChoice(singaporeContexts.shopping);
+        const item = randomChoice(singaporeContexts.food);
+        
+        questionText = `At ${store}, a ${item} costs $${cost.toFixed(2)} and you pay with $${payment.toFixed(2)}. How much change should you receive?`;
         answer = change.toFixed(2);
         
         steps = [
@@ -38,7 +45,10 @@ export const moneyQuestionGenerator: QuestionGenerator = {
         const unitPrice = getRandomInt(1, 10) + 0.99;
         const total = Number((quantity * unitPrice).toFixed(2));
         
-        questionText = `If one item costs $${unitPrice.toFixed(2)}, how much will ${quantity} items cost?`;
+        const store = randomChoice(singaporeContexts.shopping);
+        const item = randomChoice([...singaporeContexts.food, ...singaporeContexts.drinks]);
+        
+        questionText = `At ${store}, one ${item} costs $${unitPrice.toFixed(2)}. How much will ${quantity} ${item}s cost?`;
         answer = total.toFixed(2);
         
         steps = [
@@ -61,7 +71,10 @@ export const moneyQuestionGenerator: QuestionGenerator = {
         const discount = Number((originalPrice * (discountPercent / 100)).toFixed(2));
         const finalPrice = Number((originalPrice - discount).toFixed(2));
         
-        questionText = `An item costs $${originalPrice.toFixed(2)}. If there is a ${discountPercent}% discount, what is the final price?`;
+        const store = randomChoice(singaporeContexts.shopping);
+        const festival = randomChoice(singaporeContexts.festivals);
+        
+        questionText = `During ${festival}, ${store} is having a ${discountPercent}% discount on an item that costs $${originalPrice.toFixed(2)}. What is the final price?`;
         answer = finalPrice.toFixed(2);
         
         steps = [

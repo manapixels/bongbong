@@ -14,7 +14,6 @@ export async function POST(request: Request) {
     await updateStudentProgress({
       studentId,
       problemId: questionId,
-      category: topicId,
       isCorrect,
       timeSpent,
     });

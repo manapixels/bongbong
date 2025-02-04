@@ -2,24 +2,27 @@
 
 export interface Model {
   id: string;
-  label: string;
+  name: string;
   apiIdentifier: string;
   description: string;
+  contextWindow: number;
 }
 
 export const models: Array<Model> = [
   {
-    id: 'gpt-4o-mini',
-    label: 'GPT 4o mini',
-    apiIdentifier: 'gpt-4o-mini',
-    description: 'Small model for fast, lightweight tasks',
+    id: 'primary-tutor',
+    name: 'Primary School Tutor',
+    apiIdentifier: 'gpt-4-turbo',
+    description: 'Best for step-by-step explanations and detailed guidance',
+    contextWindow: 128000,
   },
   {
-    id: 'gpt-4o',
-    label: 'GPT 4o',
-    apiIdentifier: 'gpt-4o',
-    description: 'For complex, multi-step tasks',
-  },
+    id: 'quick-helper',
+    name: 'Quick Helper',
+    apiIdentifier: 'gpt-3.5-turbo',
+    description: 'Good for quick practice and simple explanations',
+    contextWindow: 16000,
+  }
 ] as const;
 
-export const DEFAULT_MODEL_NAME: string = 'gpt-4o-mini';
+export const DEFAULT_MODEL_NAME: string = 'primary-tutor';

@@ -1,5 +1,8 @@
 import { getRandomInt } from '@/lib/utils/math';
 import { MathCategory, QuestionGenerator } from '@/types/math';
+import { singaporeContexts } from './singaporeContexts';
+
+const randomChoice = <T>(arr: T[]): T => arr[getRandomInt(0, arr.length - 1)];
 
 export const additionQuestionGenerator: QuestionGenerator = {
   generateQuestion: (difficulty: number, previousMistakes: string[]) => {
@@ -8,14 +11,23 @@ export const additionQuestionGenerator: QuestionGenerator = {
     const num2 = getRandomInt(maxNum / 10, maxNum);
     
     const wordProblemTemplates = [
-      `John has ${num1} marbles and gets ${num2} more. How many marbles does he have now?`,
-      `A store sold ${num1} items in the morning and ${num2} items in the afternoon. How many items were sold in total?`,
-      `There are ${num1} red flowers and ${num2} blue flowers in a garden. How many flowers are there altogether?`
+      {
+        template: `${randomChoice(singaporeContexts.shopping)} sold ${num1} items in the morning and ${num2} items in the afternoon. How many items were sold in total?`,
+        context: 'shopping'
+      },
+      {
+        template: `A ${randomChoice(singaporeContexts.transport)} carried ${num1} passengers in the morning and ${num2} passengers in the evening from ${randomChoice(singaporeContexts.places)}. How many passengers were carried in total?`,
+        context: 'transport'
+      },
+      {
+        template: `At ${randomChoice(singaporeContexts.places)}, there are ${num1} ${randomChoice(singaporeContexts.food)} and ${num2} ${randomChoice(singaporeContexts.drinks)} sold. How many items were sold altogether?`,
+        context: 'food'
+      }
     ];
     
     const useWordProblem = difficulty > 1 && Math.random() > 0.5;
     const questionText = useWordProblem ? 
-      wordProblemTemplates[getRandomInt(0, wordProblemTemplates.length - 1)] :
+      randomChoice(wordProblemTemplates).template :
       `${num1} + ${num2} = ?`;
     
     const answer = num1 + num2;

@@ -1,5 +1,8 @@
 import { getRandomInt } from '@/lib/utils/math';
 import { MathCategory, QuestionGenerator } from '@/types/math';
+import { singaporeContexts } from './singaporeContexts';
+
+const randomChoice = <T>(arr: T[]): T => arr[getRandomInt(0, arr.length - 1)];
 
 export const geometryQuestionGenerator: QuestionGenerator = {
   generateQuestion: (difficulty: number, previousMistakes: string[]) => {
@@ -26,8 +29,16 @@ export const geometryQuestionGenerator: QuestionGenerator = {
         const area = side * side;
         const perimeter = 4 * side;
         
+        const place = randomChoice(singaporeContexts.places);
+        const location = randomChoice([
+          `playground at ${place}`,
+          `garden at ${place}`,
+          `courtyard at ${randomChoice(singaporeContexts.schools)}`,
+          `activity area at ${randomChoice(singaporeContexts.schools)}`
+        ]);
+        
         if (type === 'area') {
-          questionText = `Find the area of a square with side length ${side} units.`;
+          questionText = `The ${location} is a square with side length ${side} meters. What is its area?`;
           answer = area.toString();
           steps = [
             'For a square, area = side × side',
@@ -40,7 +51,7 @@ export const geometryQuestionGenerator: QuestionGenerator = {
             `${side} × ${side}`
           ];
         } else {
-          questionText = `Find the perimeter of a square with side length ${side} units.`;
+          questionText = `A square ${location} has sides of ${side} meters each. What is its perimeter?`;
           answer = perimeter.toString();
           steps = [
             'For a square, perimeter = 4 × side',
@@ -62,8 +73,16 @@ export const geometryQuestionGenerator: QuestionGenerator = {
         const area = length * width;
         const perimeter = 2 * (length + width);
         
+        const place = randomChoice(singaporeContexts.places);
+        const location = randomChoice([
+          `classroom at ${randomChoice(singaporeContexts.schools)}`,
+          `study area at ${place}`,
+          `food court at ${place}`,
+          `swimming pool at ${randomChoice(singaporeContexts.neighborhoods)}`
+        ]);
+        
         if (type === 'area') {
-          questionText = `Find the area of a rectangle with length ${length} units and width ${width} units.`;
+          questionText = `A rectangular ${location} is ${length} meters long and ${width} meters wide. What is its area?`;
           answer = area.toString();
           steps = [
             'For a rectangle, area = length × width',
@@ -76,7 +95,7 @@ export const geometryQuestionGenerator: QuestionGenerator = {
             `${length} × ${width}`
           ];
         } else {
-          questionText = `Find the perimeter of a rectangle with length ${length} units and width ${width} units.`;
+          questionText = `A rectangular ${location} has length ${length} meters and width ${width} meters. What is its perimeter?`;
           answer = perimeter.toString();
           steps = [
             'For a rectangle, perimeter = 2 × (length + width)',
@@ -99,8 +118,16 @@ export const geometryQuestionGenerator: QuestionGenerator = {
         const area = Math.round(Math.PI * radius * radius);
         const circumference = Math.round(2 * Math.PI * radius);
         
+        const place = randomChoice(singaporeContexts.places);
+        const location = randomChoice([
+          `fountain at ${place}`,
+          `circular garden at ${place}`,
+          `roundabout near ${place}`,
+          `circular plaza at ${randomChoice(singaporeContexts.neighborhoods)}`
+        ]);
+        
         if (type === 'area') {
-          questionText = `Find the area of a circle with radius ${radius} units (use π ≈ 3.14, round to nearest whole number).`;
+          questionText = `The ${location} has a radius of ${radius} meters. What is its area? (use π ≈ 3.14, round to nearest whole number)`;
           answer = area.toString();
           steps = [
             'For a circle, area = π × radius²',
@@ -114,7 +141,7 @@ export const geometryQuestionGenerator: QuestionGenerator = {
             'Multiply by π (3.14)'
           ];
         } else {
-          questionText = `Find the circumference of a circle with radius ${radius} units (use π ≈ 3.14, round to nearest whole number).`;
+          questionText = `The ${location} has a radius of ${radius} meters. What is its circumference? (use π ≈ 3.14, round to nearest whole number)`;
           answer = circumference.toString();
           steps = [
             'For a circle, circumference = 2 × π × radius',

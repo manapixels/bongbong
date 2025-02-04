@@ -34,5 +34,13 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
     }
   };
 
+  // Add cleanup if you add any event listeners
+  useEffect(() => {
+    // Add any cleanup logic here if needed
+    return () => {
+      // Cleanup
+    };
+  }, [key]);
+
   return [storedValue, setValue] as const;
 } 

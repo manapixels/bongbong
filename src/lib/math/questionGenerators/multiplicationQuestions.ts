@@ -1,5 +1,8 @@
 import { getRandomInt } from '@/lib/utils/math';
 import { MathCategory, QuestionGenerator } from '@/types/math';
+import { singaporeContexts } from './singaporeContexts';
+
+const randomChoice = <T>(arr: T[]): T => arr[getRandomInt(0, arr.length - 1)];
 
 export const multiplicationQuestionGenerator: QuestionGenerator = {
   generateQuestion: (difficulty: number, previousMistakes: string[]) => {
@@ -7,7 +10,26 @@ export const multiplicationQuestionGenerator: QuestionGenerator = {
     const num1 = getRandomInt(2, maxNum);
     const num2 = getRandomInt(2, maxNum);
     
-    const questionText = `${num1} × ${num2} = ?`;
+    const wordProblems = [
+      {
+        template: `Each ${randomChoice(singaporeContexts.activities)} costs $${num1}. How much will ${num2} sessions cost in total?`,
+        context: 'activities'
+      },
+      {
+        template: `At ${randomChoice(singaporeContexts.shopping)}, each ${randomChoice(singaporeContexts.drinks)} costs $${num1}. How much will ${num2} drinks cost?`,
+        context: 'shopping'
+      },
+      {
+        template: `A ${randomChoice(singaporeContexts.transport)} from ${randomChoice(singaporeContexts.neighborhoods)} to ${randomChoice(singaporeContexts.places)} costs $${num1}. How much will ${num2} trips cost?`,
+        context: 'transport'
+      }
+    ];
+    
+    const useWordProblem = difficulty > 1 && Math.random() > 0.5;
+    const questionText = useWordProblem ? 
+      randomChoice(wordProblems).template :
+      `${num1} × ${num2} = ?`;
+    
     const answer = num1 * num2;
     
     return {

@@ -11,20 +11,24 @@ interface ApplicationError extends Error {
 }
 
 export const fetcher = async (url: string) => {
-  const res = await fetch(url);
+  try {
+    const res = await fetch(url);
 
-  if (!res.ok) {
-    const error = new Error(
-      'An error occurred while fetching the data.',
-    ) as ApplicationError;
+    if (!res.ok) {
+      const error = new Error(
+        'An error occurred while fetching the data.',
+      ) as ApplicationError;
 
-    error.info = await res.json();
-    error.status = res.status;
+      error.info = await res.json();
+      error.status = res.status;
+      throw error;
+    }
 
-    throw error;
+    return res.json();
+  } catch (err) {
+    console.error('Fetch error:', err);
+    throw err;
   }
-
-  return res.json();
 };
 
 export function getLocalStorage(key: string) {

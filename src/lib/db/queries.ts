@@ -51,14 +51,12 @@ export async function updateStudentProgress({
   problemId: string;
   isCorrect: boolean;
   timeSpent: number;
-
 }) {
   return await db.insert(studentProgress).values({
     studentId,
     problemId,
     isCorrect,
     timeSpent,
-
   });
 }
 
