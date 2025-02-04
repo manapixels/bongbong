@@ -43,6 +43,13 @@
       "when": 1738554923214,
       "tag": "0005_salty_karma",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1738647948226,
+      "tag": "0006_melodic_madripoor",
+      "breakpoints": true
     }
   ]
 }

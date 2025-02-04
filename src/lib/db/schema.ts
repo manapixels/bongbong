@@ -7,7 +7,6 @@ import {
   uuid,
   text,
   primaryKey,
-  foreignKey,
   boolean,
   integer,
 } from 'drizzle-orm/pg-core';
@@ -27,12 +26,20 @@ export const mathProblems = pgTable('math_problems', {
   question: text('question').notNull(),
   answer: integer('answer').notNull(),
   category: text('category').notNull(),
-  difficulty: text('difficulty').notNull(),
+  difficulty: integer('difficulty').notNull(),
 });
 
 export const students = pgTable('students', {
   id: uuid('id').primaryKey().defaultRandom(),
   userId: uuid('user_id').references(() => user.id),
+});
+
+export const topics = pgTable('topics', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  name: text('name').notNull(),
+  category: text('category').notNull(), // Will store MathCategory values
+  description: text('description'),
+  level: integer('level').notNull(), // 1-6 for Primary levels
 });
 
 export const studentProgress = pgTable('student_progress', {

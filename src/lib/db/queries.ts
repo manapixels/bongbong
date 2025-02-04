@@ -1,14 +1,15 @@
-import { eq, and, sql } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
 import { db } from '@/lib/db';
 import { 
   user,
   students, 
   studentProgress, 
-  mathProblems,
 } from '@/lib/db/schema';
-import type { Problem } from '@/types/math';
+import type { MathTopic, Problem } from '@/types/math';
 import { StudentProgress } from '@/types/progress';
 import { Student, User } from '@/types';
+import { selectNextQuestion } from '../math/questionGenerators';
+import { MATH_TOPICS } from '../math/topics';
 
 export async function getUser(email: string): Promise<User[]> {
   return db
@@ -60,18 +61,61 @@ export async function updateStudentProgress({
   });
 }
 
-export async function generateProblem(difficulty: string, topics: string[]): Promise<Problem> {
-  // Get a random problem matching the difficulty and topics
-  const problem = await db
-    .select()
-    .from(mathProblems)
-    .where(
-      and(
-        eq(mathProblems.difficulty, difficulty),
-        sql`${mathProblems.category} = ANY(${topics})`
-      )
-    )
-    .limit(1);
+export async function generateProblem(
+  difficulty: number, 
+  topics: string[], 
+  progress: StudentProgress
+): Promise<Problem> {
+  if (!topics || topics.length === 0) {
+    throw new Error('No topics provided');
+  }
 
-  return problem[0];
+  // Find the topic the student needs most practice with
+  const topicStats = progress?.topicProgress || [];
+  
+  // Calculate success rates for each enabled topic
+  const topicSuccessRates = topics.map(topicId => {
+    const stats = topicStats.find(p => p.topicId === topicId);
+    if (!stats) {
+      return { 
+        topicId, 
+        successRate: 0, // New topics should be prioritized
+        totalAttempts: 0 
+      };
+    }
+
+    return { 
+      topicId,
+      successRate: stats.questionsAttempted > 0 
+        ? stats.correctAnswers / stats.questionsAttempted 
+        : 0,
+      totalAttempts: stats.questionsAttempted
+    };
+  });
+
+  // Sort by success rate and prioritize less attempted topics
+  topicSuccessRates.sort((a, b) => {
+    // If success rates are significantly different, use that
+    if (Math.abs(a.successRate - b.successRate) > 0.2) {
+      return a.successRate - b.successRate;
+    }
+    // Otherwise, prefer topics with fewer attempts
+    return a.totalAttempts - b.totalAttempts;
+  });
+
+  const topic: MathTopic = MATH_TOPICS.find(t => topics.includes(t.id)) || MATH_TOPICS[0];
+
+  // Generate the question using selectNextQuestion
+  const question = selectNextQuestion(progress, topic);
+  
+  // Ensure the return type matches Problem
+
+  return {
+    ...question,
+    id: question.id || crypto.randomUUID(),
+    question: question.text,
+    answer: Number(question.correctAnswer),
+    category: question.category,
+    difficulty: question.difficulty,
+  };
 } 

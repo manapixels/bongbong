@@ -7,7 +7,8 @@ export async function POST(request: Request) {
     
     const problem = await generateProblem(
       profile.preferences.difficulty,
-      profile.preferences.topicsEnabled
+      profile.preferences.topicsEnabled,
+      progress
     );
 
     if (!problem) {
