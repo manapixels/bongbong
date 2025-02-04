@@ -1,14 +1,14 @@
+import { eq, and, sql } from 'drizzle-orm';
 import { db } from '@/lib/db';
 import { 
   user,
   students, 
   studentProgress, 
   mathProblems,
-  type User,
-  type Student,
-  type StudentProgress 
 } from '@/lib/db/schema';
-import { eq } from 'drizzle-orm';
+import type { Problem } from '@/types/math';
+import { StudentProgress } from '@/types/progress';
+import { Student, User } from '@/types';
 
 export async function getUser(email: string): Promise<User[]> {
   return db
@@ -25,12 +25,10 @@ export async function createUser(email: string, password: string): Promise<User>
   return newUser;
 }
 
-export async function getStudentProfile({ userId }: { userId: string }): Promise<Student | undefined> {
-  const [student] = await db
-    .select()
-    .from(students)
-    .where(eq(students.userId, userId));
-  
+export async function getStudentProfile(studentId: string): Promise<Student | undefined> {
+  const student = await db.query.students.findFirst({
+    where: eq(students.id, studentId),
+  });
   return student;
 }
 
@@ -44,41 +42,38 @@ export async function getStudentProgress({ userId }: { userId: string }): Promis
 }
 
 export async function updateStudentProgress({
-  userId,
+  studentId,
+  problemId,
   isCorrect,
-  topicId,
-  timeSpent
+  timeSpent,
 }: {
-  userId: string;
+  studentId: string;
+  problemId: string;
   isCorrect: boolean;
-  topicId: string;
   timeSpent: number;
-}): Promise<StudentProgress> {
-  const [progress] = await db
+
+}) {
+  return await db.insert(studentProgress).values({
+    studentId,
+    problemId,
+    isCorrect,
+    timeSpent,
+
+  });
+}
+
+export async function generateProblem(difficulty: string, topics: string[]): Promise<Problem> {
+  // Get a random problem matching the difficulty and topics
+  const problem = await db
     .select()
-    .from(studentProgress)
-    .where(eq(studentProgress.studentId, userId));
+    .from(mathProblems)
+    .where(
+      and(
+        eq(mathProblems.difficulty, difficulty),
+        sql`${mathProblems.category} = ANY(${topics})`
+      )
+    )
+    .limit(1);
 
-  if (!progress) {
-    throw new Error('Student progress not found');
-  }
-
-  const updatedProgress = {
-    ...progress,
-    totalProblems: progress.totalProblems + 1,
-    correctAnswers: progress.correctAnswers + (isCorrect ? 1 : 0),
-    updatedAt: new Date()
-  };
-
-  const [result] = await db
-    .update(studentProgress)
-    .set({
-      totalProblems: updatedProgress.totalProblems,
-      correctAnswers: updatedProgress.correctAnswers,
-      updatedAt: updatedProgress.updatedAt
-    })
-    .where(eq(studentProgress.studentId, userId))
-    .returning();
-
-  return result;
+  return problem[0];
 } 

@@ -1,5 +1,5 @@
 import { getRandomInt } from '@/lib/utils/math';
-import { MathCategory, QuestionGenerator } from '@/lib/types';
+import { MathCategory, QuestionGenerator } from '@/types/math';
 
 export const placeValueQuestionGenerator: QuestionGenerator = {
   generateQuestion: (difficulty: number, previousMistakes: string[]) => {
@@ -23,6 +23,7 @@ export const placeValueQuestionGenerator: QuestionGenerator = {
       solution: {
         steps: [
           `Identify the digit in the ${places[placeIndex]} place: ${digit}`,
+
           `Multiply ${digit} by ${Math.pow(10, placeIndex)} (the place value)`,
           `${digit} × ${Math.pow(10, placeIndex)} = ${value}`
         ],

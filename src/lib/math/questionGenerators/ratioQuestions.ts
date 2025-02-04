@@ -1,6 +1,6 @@
 import { getRandomInt } from '@/lib/utils/math';
 import crypto from 'crypto';
-import { MathCategory, QuestionGenerator } from '@/lib/types';
+import { MathCategory, QuestionGenerator } from '@/types/math';
 
 export const ratioQuestionGenerator: QuestionGenerator = {
   generateQuestion: (difficulty: number, previousMistakes: string[]) => {

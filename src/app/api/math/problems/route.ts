@@ -1,10 +1,10 @@
 import { auth } from '@/app/(auth)/auth';
 import { db } from '@/lib/db';
-import { mathProblems } from '@/lib/db/schema';
+import { mathProblems, studentProgress } from '@/lib/db/schema';
 import { MATH_TOPICS } from '@/lib/math/topics';
-import { selectNextQuestion } from '@/lib/adaptive/questionSelector';
+import { selectNextQuestion } from '@/lib/math/questionGenerators';
 import { getStudentProgress } from '@/lib/db/queries';
-import { StudentProgress } from '@/types/progress';
+import type { StudentProgress } from '@/types/progress';
 
 export async function GET(request: Request) {
   const session = await auth();
@@ -28,39 +28,41 @@ export async function GET(request: Request) {
     let progress = await getStudentProgress({ userId: session.user.id });
 
     if (!progress) {
-      // Create default progress if none exists
+      // Create a progress record that matches the schema
       const defaultProgress: StudentProgress = {
+        id: crypto.randomUUID(),
         studentId: session.user.id,
-        totalProblems: 0,
-        correctAnswers: 0,
-        streaks: 0,
+        problemId: null,
+        isCorrect: false,
+        timeSpent: null,
         topicProgress: [],
-        updatedAt: new Date(),
-        id: crypto.randomUUID()
+        createdAt: new Date()
       };
 
-      // You might want to save this default progress to the database
       return Response.json(selectNextQuestion(defaultProgress, topic));
     }
 
-    const transformedProgress: StudentProgress = {
-      ...progress,
-      updatedAt: progress.updatedAt || new Date()
-    };
+    // No need for transformation since we're using the correct type
+    const question = selectNextQuestion(progress, topic);
 
-    const question = selectNextQuestion(transformedProgress, topic);
+    // First save the problem
+    const [savedProblem] = await db.insert(mathProblems).values({
+      id: crypto.randomUUID(),
+      question: question.text,
+      answer: parseInt(question.correctAnswer.toString()),
+      difficulty: topic.level.toString(),
+      category: topic.categories[0]
+    }).returning();
 
-    // Save the generated problem
-    await db.insert(mathProblems).values({
+
+    // Then create an initial progress entry for this problem
+    await db.insert(studentProgress).values({
       id: crypto.randomUUID(),
       studentId: session.user.id,
-      question: question.text,
-      answer: question.correctAnswer.toString(),
-      category: topic.category,
-      difficulty: topic.level,
-      attemptedAt: new Date(),
+      problemId: savedProblem.id,
       isCorrect: false,
-      timeSpent: 0
+      timeSpent: 0,
+      createdAt: new Date()
     });
 
     return Response.json(question);

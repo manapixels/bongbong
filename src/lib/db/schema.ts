@@ -1,4 +1,3 @@
-import { TopicProgress } from '@/types';
 import type { InferSelectModel } from 'drizzle-orm';
 import {
   pgTable,
@@ -13,6 +12,7 @@ import {
   integer,
 } from 'drizzle-orm/pg-core';
 
+// ==================== User Management ====================
 export const user = pgTable('User', {
   id: uuid('id').primaryKey().notNull().defaultRandom(),
   email: varchar('email', { length: 64 }).notNull(),
@@ -21,138 +21,36 @@ export const user = pgTable('User', {
 
 export type User = InferSelectModel<typeof user>;
 
-export const chat = pgTable('Chat', {
-  id: uuid('id').primaryKey().notNull().defaultRandom(),
-  createdAt: timestamp('createdAt').notNull(),
-  title: text('title').notNull(),
-  userId: uuid('userId')
-    .notNull()
-    .references(() => user.id),
-  visibility: varchar('visibility', { enum: ['public', 'private'] })
-    .notNull()
-    .default('private'),
+// ==================== Math Learning System ====================
+export const mathProblems = pgTable('math_problems', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  question: text('question').notNull(),
+  answer: integer('answer').notNull(),
+  category: text('category').notNull(),
+  difficulty: text('difficulty').notNull(),
 });
-
-export type Chat = InferSelectModel<typeof chat>;
-
-export const message = pgTable('Message', {
-  id: uuid('id').primaryKey().notNull().defaultRandom(),
-  chatId: uuid('chatId')
-    .notNull()
-    .references(() => chat.id),
-  role: varchar('role').notNull(),
-  content: json('content').notNull(),
-  createdAt: timestamp('createdAt').notNull(),
-});
-
-export type Message = InferSelectModel<typeof message>;
-
-export const vote = pgTable(
-  'Vote',
-  {
-    chatId: uuid('chatId')
-      .notNull()
-      .references(() => chat.id),
-    messageId: uuid('messageId')
-      .notNull()
-      .references(() => message.id),
-    isUpvoted: boolean('isUpvoted').notNull(),
-  },
-  (table) => ({
-    pk: primaryKey({ 
-      columns: [table.chatId, table.messageId] }),
-  }),
-);
-
-export type Vote = InferSelectModel<typeof vote>;
-
-export const document = pgTable(
-  'Document',
-  {
-    id: uuid('id').notNull().defaultRandom(),
-    createdAt: timestamp('createdAt').notNull(),
-    title: text('title').notNull(),
-    content: text('content'),
-    kind: varchar('kind', { enum: ['text', 'code'] })
-      .notNull()
-      .default('text'),
-    userId: uuid('userId')
-      .notNull()
-      .references(() => user.id),
-  },
-  (table) => ({
-    pk: primaryKey({ columns: [table.id] }),
-  }),
-);
-
-export type Document = InferSelectModel<typeof document>;
-
-export const suggestion = pgTable(
-  'Suggestion',
-  {
-    id: uuid('id').notNull().defaultRandom(),
-    documentId: uuid('documentId').notNull(),
-    documentCreatedAt: timestamp('documentCreatedAt').notNull(),
-    originalText: text('originalText').notNull(),
-    suggestedText: text('suggestedText').notNull(),
-    description: text('description'),
-    isResolved: boolean('isResolved').notNull().default(false),
-    userId: uuid('userId')
-      .notNull()
-      .references(() => user.id),
-    createdAt: timestamp('createdAt').notNull(),
-  },
-  (table) => ({
-    pk: primaryKey({ columns: [table.id] }),
-    documentRef: foreignKey({
-      columns: [table.documentId, table.documentCreatedAt],
-      foreignColumns: [document.id, document.createdAt]
-    })
-  }),
-);
-
-export type Suggestion = InferSelectModel<typeof suggestion>;
 
 export const students = pgTable('students', {
-  id: text('id').primaryKey(),
-  userId: uuid('user_id').notNull().references(() => user.id),
-  level: integer('level').notNull().default(1),
-  weakAreas: json('weak_areas').$type<string[]>().default([]),
-  strengths: json('strengths').$type<string[]>().default([]),
-  preferredLearningStyle: text('preferred_learning_style').default('numeric'),
-  createdAt: timestamp('created_at').defaultNow(),
-  updatedAt: timestamp('updated_at').defaultNow(),
-  xp: integer('xp').notNull().default(0),
-  coins: integer('coins').notNull().default(0),
-  achievements: json('achievements').$type<string[]>().default([]),
-  lastLoginStreak: integer('last_login_streak').notNull().default(0),
-  lastLoginDate: timestamp('last_login_date'),
-  visualAidsEnabled: boolean('visual_aids_enabled').notNull().default(true),
-  soundEffectsEnabled: boolean('sound_effects_enabled').notNull().default(true),
-});
-
-export const mathProblems = pgTable('math_problems', {
-  id: text('id').primaryKey(),
-  studentId: text('student_id').notNull().references(() => students.id),
-  question: text('question').notNull(),
-  answer: text('answer').notNull(),
-  category: text('category').notNull(),
-  difficulty: integer('difficulty').notNull(),
-  attemptedAt: timestamp('attempted_at').defaultNow(),
-  isCorrect: boolean('is_correct').notNull(),
-  timeSpent: integer('time_spent').notNull(),
+  id: uuid('id').primaryKey().defaultRandom(),
+  userId: uuid('user_id').references(() => user.id),
 });
 
 export const studentProgress = pgTable('student_progress', {
-  id: text('id').primaryKey(),
-  studentId: text('student_id').notNull().references(() => students.id),
-  totalProblems: integer('total_problems').notNull().default(0),
-  topicProgress: json('topic_progress').$type<TopicProgress[]>().default([]),
-  correctAnswers: integer('correct_answers').notNull().default(0),
-  streaks: integer('streaks').notNull().default(0),
-  updatedAt: timestamp('updated_at').defaultNow(),
+  id: uuid('id').primaryKey().defaultRandom(),
+  studentId: uuid('student_id').references(() => students.id),
+  problemId: uuid('problem_id').references(() => mathProblems.id),
+  isCorrect: boolean('is_correct').notNull(),
+  timeSpent: integer('time_spent'),
+  createdAt: timestamp('created_at').defaultNow(),
+  topicProgress: json('topic_progress').$type<{
+    topicId: string;
+    questionsAttempted: number;
+    correctAnswers: number;
+    mistakes: string[];
+  }[]>()
 });
 
+// ==================== Achievement System ====================
 export const achievements = pgTable('achievements', {
   id: text('id').primaryKey(),
   name: text('name').notNull(),
@@ -171,6 +69,7 @@ export const studentAchievements = pgTable('student_achievements', {
   pk: primaryKey(table.studentId, table.achievementId)
 }));
 
+// ==================== Practice Sessions ====================
 export const practiceSession = pgTable('practice_sessions', {
   id: text('id').primaryKey(),
   studentId: text('student_id').notNull().references(() => students.id),
@@ -183,10 +82,3 @@ export const practiceSession = pgTable('practice_sessions', {
   xpEarned: integer('xp_earned'),
   coinsEarned: integer('coins_earned'),
 });
-
-export type Student = InferSelectModel<typeof students>;
-export type MathProblem = InferSelectModel<typeof mathProblems>;
-export type StudentProgress = InferSelectModel<typeof studentProgress>;
-export type Achievement = InferSelectModel<typeof achievements>;
-export type StudentAchievement = InferSelectModel<typeof studentAchievements>;
-export type PracticeSession = InferSelectModel<typeof practiceSession>;

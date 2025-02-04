@@ -7,7 +7,7 @@ export const MATH_TOPICS: MathTopic[] = [
     name: 'Numbers to 20',
     description: 'Learn about numbers up to 20',
     level: 1,
-    category: MathCategory.NUMBERS,
+    categories: [MathCategory.NUMBER_SENSE, MathCategory.PLACE_VALUE],
     subTopics: [
       {
         id: 'numbers-to-20',
@@ -32,7 +32,7 @@ export const MATH_TOPICS: MathTopic[] = [
     name: 'Addition and Subtraction',
     description: 'Basic operations within 20',
     level: 1,
-    category: MathCategory.OPERATIONS,
+    categories: [MathCategory.ADDITION, MathCategory.SUBTRACTION],
     subTopics: [
       {
         id: 'addition-within-10',
@@ -82,7 +82,7 @@ export const MATH_TOPICS: MathTopic[] = [
     name: 'Advanced Operations',
     description: 'Multiplication and division concepts',
     level: 2,
-    category: MathCategory.OPERATIONS,
+    categories: [MathCategory.MULTIPLICATION, MathCategory.DIVISION],
     subTopics: [
       {
         id: 'multiplication',
@@ -115,10 +115,11 @@ export const MATH_TOPICS: MathTopic[] = [
     name: 'Fractions',
     description: 'Introduction to fractions',
     level: 2,
-    category: MathCategory.FRACTIONS,
+    categories: [MathCategory.FRACTIONS],
     subTopics: [
       {
         id: 'fractions-1',
+
         name: 'Fractions 1',
         difficulty: 2,
         questionTypes: [
@@ -137,7 +138,7 @@ export const MATH_TOPICS: MathTopic[] = [
     name: 'Measurements',
     description: 'Understanding different measurements',
     level: 3,
-    category: MathCategory.MEASUREMENT,
+    categories: [MathCategory.MEASUREMENT],
     subTopics: [
       {
         id: 'mass',
@@ -170,10 +171,11 @@ export const MATH_TOPICS: MathTopic[] = [
     name: 'Money',
     description: 'Working with money',
     level: 3,
-    category: MathCategory.MONEY,
+    categories: [MathCategory.MONEY],
     subTopics: [
       {
         id: 'money-operations',
+
         name: 'Money',
         difficulty: 2,
         questionTypes: [
@@ -192,7 +194,7 @@ export const MATH_TOPICS: MathTopic[] = [
     name: 'Area and Perimeter',
     description: 'Understanding geometric measurements',
     level: 4,
-    category: MathCategory.GEOMETRY,
+    categories: [MathCategory.GEOMETRY],
     subTopics: [
       {
         id: 'area-perimeter-1',
@@ -214,10 +216,11 @@ export const MATH_TOPICS: MathTopic[] = [
     name: 'Ratio',
     description: 'Understanding ratios and proportions',
     level: 5,
-    category: MathCategory.RATIO_PROPORTION,
+    categories: [MathCategory.RATIO_PROPORTION],
     subTopics: [
       {
         id: 'ratio-intro',
+
         name: 'Ratio: Introduction',
         difficulty: 3,
         questionTypes: [
@@ -248,7 +251,7 @@ export const MATH_TOPICS: MathTopic[] = [
     name: 'Advanced Topics',
     description: 'PSLE preparation topics',
     level: 6,
-    category: MathCategory.ADVANCED,
+    categories: [MathCategory.ALGEBRA, MathCategory.RATIO_PROPORTION],
     subTopics: [
       {
         id: 'pie-charts',

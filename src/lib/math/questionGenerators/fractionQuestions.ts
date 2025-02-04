@@ -1,4 +1,4 @@
-import { MathCategory, QuestionGenerator, Question } from '@/lib/types';
+import { MathCategory, QuestionGenerator } from '@/types/math';
 import { getRandomInt } from '@/lib/utils/math';
 
 export const fractionQuestionGenerator: QuestionGenerator = {

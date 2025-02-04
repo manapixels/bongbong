@@ -1,15 +1,8 @@
 import { MathCategory } from './math';
+import type { InferSelectModel } from 'drizzle-orm';
+import { studentProgress } from '@/lib/db/schema';
 
-export interface StudentProgress {
-  id: string;
-  studentId: string;
-  totalProblems: number;
-  correctAnswers: number;
-  streaks: number;
-  topicProgress: TopicProgress[] | null;
-  updatedAt: Date;
-}
-
+export type StudentProgress = InferSelectModel<typeof studentProgress>;
 
 export interface TopicProgress {
   topicId: string;

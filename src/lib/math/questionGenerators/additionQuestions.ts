@@ -1,5 +1,5 @@
 import { getRandomInt } from '@/lib/utils/math';
-import { MathCategory, QuestionGenerator } from '@/lib/types';
+import { MathCategory, QuestionGenerator } from '@/types/math';
 
 export const additionQuestionGenerator: QuestionGenerator = {
   generateQuestion: (difficulty: number, previousMistakes: string[]) => {
@@ -28,6 +28,7 @@ export const additionQuestionGenerator: QuestionGenerator = {
       solution: {
         steps: [
           `Align the numbers by place value:`,
+
           `  ${num1}`,
           `+ ${num2}`,
           `------`,

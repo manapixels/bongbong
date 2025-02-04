@@ -1,12 +1,32 @@
+import type { InferSelectModel } from 'drizzle-orm';
+import { mathProblems, practiceSession as dbPracticeSession } from '@/lib/db/schema';
+
 export enum MathCategory {
-  NUMBERS = 'numbers',
-  OPERATIONS = 'operations',
+  // Basic Number Operations
+  ADDITION = 'addition',
+  SUBTRACTION = 'subtraction',
+  MULTIPLICATION = 'multiplication',
+  DIVISION = 'division',
+  
+  // Number Concepts
+  PLACE_VALUE = 'place_value',
+  NUMBER_SENSE = 'number_sense',
+  
+  // Fractions & Decimals
   FRACTIONS = 'fractions',
+  DECIMALS = 'decimals',
+  
+  // Measurement & Geometry
   MEASUREMENT = 'measurement',
   GEOMETRY = 'geometry',
-  MONEY = 'money',
+  
+  // Advanced Topics
   RATIO_PROPORTION = 'ratio_proportion',
-  ADVANCED = 'advanced'
+  ALGEBRA = 'algebra',
+  
+  // Money & Real World
+  MONEY = 'money',
+  WORD_PROBLEMS = 'word_problems'
 }
 
 export type QuestionType = 'mcq' | 'numeric' | 'word-problem';
@@ -30,7 +50,7 @@ export interface MathTopic {
   name: string;
   description: string;
   level: number; // 1-6 for Primary 1-6
-  category: MathCategory;
+  categories: MathCategory[];
   subTopics: SubTopic[];
 }
 
@@ -46,11 +66,11 @@ export interface PracticeQuestion {
   subTopicId: string;
 }
 
-export interface PracticeSession {
-  id: string;
-  userId: string;
-  topicId: string;
-  subTopicId: string;
+export type Problem = InferSelectModel<typeof mathProblems>;
+
+export type DBPracticeSession = InferSelectModel<typeof dbPracticeSession>;
+
+export interface PracticeSession extends DBPracticeSession {
   questions: PracticeQuestion[];
   currentQuestionIndex: number;
   answers: {
@@ -59,8 +79,6 @@ export interface PracticeSession {
     isCorrect: boolean;
     timeSpent: number;
   }[];
-  startedAt: Date;
-  completedAt?: Date;
 }
 
 export interface RemediationExample {
@@ -96,5 +114,19 @@ export interface Question {
 
 export interface QuestionGenerator {
   generateQuestion: (difficulty: number, previousMistakes: string[]) => Question;
+}
+
+export interface StudentProfile {
+  id: string;
+  preferences: {
+    difficulty: string;
+    topicsEnabled: string[];
+  };
+}
+
+export interface Progress {
+  totalProblems: number;
+  correctAnswers: number;
+  topicStats: Record<string, { total: number; correct: number }>;
 } 
 

@@ -43,7 +43,6 @@ async function unlockAchievement(studentId: string, achievementId: string) {
 
   if (!existing) {
     await db.insert(studentAchievements).values({
-      id: crypto.randomUUID(),
       studentId,
       achievementId,
       unlockedAt: new Date()
