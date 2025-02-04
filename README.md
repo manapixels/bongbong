@@ -1,37 +1,102 @@
+# BongBong Math Trainer
 
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app) and designed to be fun and easy to get your hands dirty with the AI SDK.
+A Next.js application for interactive math practice, built with PostgreSQL and Docker.
 
-## Getting Started
+## Prerequisites
 
-First, run the development server:
+Make sure you have the following installed:
+- [Node.js](https://nodejs.org/) (v18 or higher)
+- [Docker](https://www.docker.com/get-started)
+- [Docker Compose](https://docs.docker.com/compose/install/) (usually comes with Docker Desktop)
 
+## Setup
+
+1. Clone the repository:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone <repository-url>
+cd bongbong
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Install dependencies:
+```bash
+npm install
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+3. Set up environment variables:
+```bash
+# Copy the example env file and modify if needed
+cp .env.example .env.local
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+4. Start the PostgreSQL database:
+```bash
+npm run docker:up
+```
 
-## Learn More
+5. Set up the database schema:
+```bash
+# Generate migrations
+npm run db:generate
 
-To learn more about Next.js, take a look at the following resources:
+# Push schema changes to database
+npm run db:push
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+# Run migrations
+npm run db:migrate
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+6. Start the development server:
+```bash
+npm run dev
+```
 
-## Deploy on Vercel
+The application should now be running at [http://localhost:3000](http://localhost:3000)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Available Scripts
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+### Database Commands
+- `npm run docker:up` - Start the PostgreSQL container
+- `npm run docker:down` - Stop the PostgreSQL container
+- `npm run docker:reset` - Reset the database (removes all data)
+- `npm run db:generate` - Generate new migrations
+- `npm run db:push` - Push schema changes to database
+- `npm run db:pull` - Pull database schema
+- `npm run db:check` - Check for schema changes
+- `npm run db:studio` - Open Drizzle Studio to view/edit data
+- `npm run db:migrate` - Run database migrations
+
+### Development Commands
+- `npm run dev` - Start the development server
+- `npm run build` - Build the application
+- `npm run start` - Start the production server
+- `npm run lint` - Run linting
+
+## Database Structure
+
+The application uses PostgreSQL with the following main tables:
+- `students` - Stores student profiles and preferences
+- `math_problems` - Stores math problems and their solutions
+- `student_progress` - Tracks student attempts and progress
+
+## Troubleshooting
+
+1. If the database connection fails:
+   - Check if Docker is running
+   - Ensure port 5432 is not in use
+   - Try resetting the database: `npm run docker:reset`
+
+2. If migrations fail:
+   - Remove the migrations folder: `rm -rf src/lib/db/migrations`
+   - Regenerate migrations: `npm run db:generate`
+   - Push changes: `npm run db:push`
+
+## Contributing
+
+1. Create a feature branch
+2. Make your changes
+3. Run tests and linting
+4. Submit a pull request
+
+## License
+
+[MIT](LICENSE)
