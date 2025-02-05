@@ -21,6 +21,7 @@ export function TopicSelector({
   const [selectedLevel, setSelectedLevel] = useState<number>(1);
 
   const getTopicProgress = (topicId: string) => {
+    if (!studentProgress.topicProgress) return 0;
     const progress = studentProgress.topicProgress.find(p => p.topicId === topicId);
     if (!progress) return 0;
     return (progress.correctAnswers / progress.questionsAttempted) * 100;
