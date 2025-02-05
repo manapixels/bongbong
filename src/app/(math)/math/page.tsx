@@ -6,12 +6,33 @@ import { MATH_TOPICS } from '@/types/math';
 
 export default async function MathPage() {
   const session = await auth();
-  if (!session?.user) {
+  if (!session?.user?.id) {
     redirect('/login');
   }
 
-  const studentProfile = await getStudentProfile({ userId: session.user.id });
+  const studentProfile = await getStudentProfile(session.user.id);
   const progress = await getStudentProgress({ userId: session.user.id });
+
+  if (!progress) {
+    // Create a default progress object that matches the schema
+    const defaultProgress = {
+      id: crypto.randomUUID(),
+      studentId: session.user.id,
+      problemId: null,
+      isCorrect: false,
+      timeSpent: null,
+      createdAt: null,
+      topicProgress: null
+    };
+    
+    return (
+      <PracticeLayout
+        studentId={session.user.id}
+        topics={MATH_TOPICS}
+        studentProgress={defaultProgress}
+      />
+    );
+  }
 
   return (
     <PracticeLayout
