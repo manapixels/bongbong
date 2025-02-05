@@ -46,7 +46,7 @@ export function MathTrainerSettings({
             checked={settings.soundEffectsEnabled}
             onCheckedChange={(checked) => {
               onUpdate({ soundEffectsEnabled: checked });
-              soundManager.setEnabled(checked);
+              soundManager?.toggleSound(checked);
             }}
           />
         </div>
