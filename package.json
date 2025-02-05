@@ -19,7 +19,7 @@
     "db:seed": "npx tsx src/lib/db/seed.ts"
   },
   "dependencies": {
-    "@ai-sdk/openai": "^0.0.40",
+    "@ai-sdk/openai": "^1.1.9",
     "@auth/drizzle-adapter": "^1.7.4",
     "@codemirror/view": "^6.36.2",
     "@radix-ui/react-dialog": "^1.0.5",
@@ -30,7 +30,7 @@
     "@radix-ui/react-switch": "^1.1.0",
     "@radix-ui/react-tabs": "^1.1.2",
     "@radix-ui/react-toast": "^1.2.4",
-    "ai": "^3.3.0",
+    "ai": "^4.1.18",
     "bcrypt-ts": "^5.0.3",
     "canvas-confetti": "^1.9.3",
     "class-variance-authority": "^0.7.0",

@@ -6,7 +6,7 @@ A Next.js application for interactive math practice, built with PostgreSQL and D
 
 Make sure you have the following installed:
 - [Node.js](https://nodejs.org/) (v18 or higher)
-- [pnpm](https://pnpm.io/installation) (v8 or higher)
+- [npm](https://www.npmjs.com/get-npm) (v8 or higher)
 - [Docker](https://www.docker.com/get-started)
 - [Docker Compose](https://docs.docker.com/compose/install/) (usually comes with Docker Desktop)
 
@@ -20,7 +20,7 @@ cd bongbong
 
 2. Install dependencies:
 ```bash
-pnpm install
+npm install
 ```
 
 3. Set up environment variables:
@@ -31,24 +31,24 @@ cp .env.example .env.local
 
 4. Start the PostgreSQL database:
 ```bash
-pnpm docker:up
+npm docker:up
 ```
 
 5. Set up the database schema:
 ```bash
 # Generate migrations
-pnpm db:generate
+npm db:generate
 
 # Push schema changes to database
-pnpm db:push
+npm db:push
 
 # Run migrations
-pnpm db:migrate
+npm db:migrate
 ```
 
 6. Start the development server:
 ```bash
-pnpm dev
+npm dev
 ```
 
 The application should now be running at [http://localhost:3000](http://localhost:3000)
@@ -56,21 +56,21 @@ The application should now be running at [http://localhost:3000](http://localhos
 ## Available Scripts
 
 ### Database Commands
-- `pnpm docker:up` - Start the PostgreSQL container
-- `pnpm docker:down` - Stop the PostgreSQL container
-- `pnpm docker:reset` - Reset the database (removes all data)
-- `pnpm db:generate` - Generate new migrations
-- `pnpm db:push` - Push schema changes to database
-- `pnpm db:pull` - Pull database schema
-- `pnpm db:check` - Check for schema changes
-- `pnpm db:studio` - Open Drizzle Studio to view/edit data
-- `pnpm db:migrate` - Run database migrations
+- `npm docker:up` - Start the PostgreSQL container
+- `npm docker:down` - Stop the PostgreSQL container
+- `npm docker:reset` - Reset the database (removes all data)
+- `npm db:generate` - Generate new migrations
+- `npm db:push` - Push schema changes to database
+- `npm db:pull` - Pull database schema
+- `npm db:check` - Check for schema changes
+- `npm db:studio` - Open Drizzle Studio to view/edit data
+- `npm db:migrate` - Run database migrations
 
 ### Development Commands
-- `pnpm dev` - Start the development server
-- `pnpm build` - Build the application
-- `pnpm start` - Start the production server
-- `pnpm lint` - Run linting
+- `npm dev` - Start the development server
+- `npm build` - Build the application
+- `npm start` - Start the production server
+- `npm lint` - Run linting
 
 ## Database Structure
 
@@ -84,12 +84,12 @@ The application uses PostgreSQL with the following main tables:
 1. If the database connection fails:
    - Check if Docker is running
    - Ensure port 5432 is not in use
-   - Try resetting the database: `pnpm docker:reset`
+   - Try resetting the database: `npm docker:reset`
 
 2. If migrations fail:
    - Remove the migrations folder: `rm -rf src/lib/db/migrations`
-   - Regenerate migrations: `pnpm db:generate`
-   - Push changes: `pnpm db:push`
+   - Regenerate migrations: `npm db:generate`
+   - Push changes: `npm db:push`
 
 ## Contributing
 

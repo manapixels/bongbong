@@ -1,8 +1,8 @@
-import type { Experimental_LanguageModelV1Middleware } from 'ai';
+import type { LanguageModelV1Middleware } from 'ai';
 import { type NextRequest, NextResponse } from 'next/server';
-import { MATH_TOPICS } from '../math/topics';
+import { MATH_TOPICS } from '@/types/math';
 
-export const customMiddleware: Experimental_LanguageModelV1Middleware = {};
+export const customMiddleware: LanguageModelV1Middleware = {};
 
 export async function educationMiddleware(req: NextRequest) {
   // Add type safety for headers

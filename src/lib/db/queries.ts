@@ -6,10 +6,11 @@ import {
   studentProgress, 
 } from '@/lib/db/schema';
 import type { MathTopic, Problem } from '@/types/math';
+import { MATH_TOPICS } from '@/types/math';
 import { StudentProgress } from '@/types/progress';
 import { Student, User } from '@/types';
-import { selectNextQuestion } from '../math/questionGenerators';
-import { MATH_TOPICS } from '../math/topics';
+import { selectNextQuestion } from '@/lib/math/questionGenerators';
+
 
 export async function getUser(email: string): Promise<User[]> {
   return db
