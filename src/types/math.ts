@@ -19,14 +19,39 @@ export enum MathCategory {
   // Measurement & Geometry
   MEASUREMENT = 'measurement',
   GEOMETRY = 'geometry',
+  LENGTH = 'length',
+  MASS = 'mass',
+  VOLUME = 'volume',
+  TIME = 'time',
+  AREA = 'area',
+  PERIMETER = 'perimeter',
+  ANGLES = 'angles',
   
   // Advanced Topics
   RATIO_PROPORTION = 'ratio_proportion',
   ALGEBRA = 'algebra',
+  PERCENTAGE = 'percentage',
+  RATE = 'rate',
   
   // Money & Real World
   MONEY = 'money',
-  WORD_PROBLEMS = 'word_problems'
+  WORD_PROBLEMS = 'word_problems',
+  
+  // Statistics & Data
+  STATISTICS = 'statistics',
+  DATA_ANALYSIS = 'data_analysis',
+  GRAPHS = 'graphs',
+  
+  // Shapes & Space
+  SHAPES_2D = 'shapes_2d',
+  SHAPES_3D = 'shapes_3d',
+  SYMMETRY = 'symmetry',
+  
+  // Numbers & Operations
+  FACTORS = 'factors',
+  MULTIPLES = 'multiples',
+  MENTAL_CALCULATION = 'mental_calculation',
+  ORDER_OF_OPERATIONS = 'order_of_operations'
 }
 
 export const MathTopics = [
