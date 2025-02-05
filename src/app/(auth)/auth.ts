@@ -16,6 +16,7 @@ export const {
   auth,
   signIn,
   signOut,
+  handlers: { GET, POST },
 } = NextAuth({
   ...authConfig,
   adapter: DrizzleAdapter(db),
