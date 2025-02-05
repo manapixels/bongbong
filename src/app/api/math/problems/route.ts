@@ -8,7 +8,7 @@ import type { StudentProgress } from '@/types/progress';
 
 export async function GET(request: Request) {
   const session = await auth();
-  if (!session?.user) {
+  if (!session?.user?.id) {
     return new Response('Unauthorized', { status: 401 });
   }
 
@@ -35,8 +35,8 @@ export async function GET(request: Request) {
         problemId: null,
         isCorrect: false,
         timeSpent: null,
-        topicProgress: [],
-        createdAt: new Date()
+        createdAt: new Date(),
+        topicProgress: []
       };
 
       return Response.json(selectNextQuestion(defaultProgress, topic));
@@ -47,13 +47,11 @@ export async function GET(request: Request) {
 
     // First save the problem
     const [savedProblem] = await db.insert(mathProblems).values({
-      id: crypto.randomUUID(),
       question: question.text,
       answer: parseInt(question.correctAnswer.toString()),
-      difficulty: topic.level.toString(),
-      category: topic.categories[0]
+      difficulty: question.difficulty,
+      category: topic.subStrand
     }).returning();
-
 
     // Then create an initial progress entry for this problem
     await db.insert(studentProgress).values({
