@@ -31,15 +31,17 @@ export default function Page() {
     }
   }, [state.status, router]);
 
-  const handleSubmit = async (formData: FormData) => {
+  const handleSubmit = (formData: FormData) => {
     setEmail(formData.get('email') as string);
     setState({ status: 'in_progress' });
-    try {
-      const result = await login(state, formData);
-      setState(result);
-    } catch (error) {
-      setState({ status: 'failed' });
-    }
+    
+    login(state, formData)
+      .then((result) => {
+        setState(result);
+      })
+      .catch(() => {
+        setState({ status: 'failed' });
+      });
   };
 
   return (
