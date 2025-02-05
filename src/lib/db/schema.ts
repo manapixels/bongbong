@@ -37,7 +37,7 @@ export const students = pgTable('students', {
 export const topics = pgTable('topics', {
   id: uuid('id').primaryKey().defaultRandom(),
   name: text('name').notNull(),
-  category: text('category').notNull(), // Will store MathCategory values
+  category: text('category').notNull(), // Will store MathSubStrand values
   description: text('description'),
   level: integer('level').notNull(), // 1-6 for Primary levels
 });

@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useActionState, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
 import { AuthForm } from '@/components/auth-form';
@@ -16,12 +16,9 @@ export default function Page() {
   const [email, setEmail] = useState('');
   const [isSuccessful, setIsSuccessful] = useState(false);
 
-  const [state, formAction] = useActionState<RegisterActionState, FormData>(
-    register,
-    {
-      status: 'idle',
-    },
-  );
+  const [state, setState] = useState<RegisterActionState>({
+    status: 'idle',
+  });
 
   useEffect(() => {
     if (state.status === 'user_exists') {
@@ -37,9 +34,15 @@ export default function Page() {
     }
   }, [state, router]);
 
-  const handleSubmit = (formData: FormData) => {
+  const handleSubmit = async (formData: FormData) => {
     setEmail(formData.get('email') as string);
-    formAction(formData);
+    setState({ status: 'in_progress' });
+    try {
+      const result = await register(state, formData);
+      setState(result);
+    } catch (error) {
+      setState({ status: 'failed' });
+    }
   };
 
   return (

@@ -5,7 +5,6 @@ import { additionQuestionGenerator } from './additionQuestions';
 import { subtractionQuestionGenerator } from './subtractionQuestions';
 import { multiplicationQuestionGenerator } from './multiplicationQuestions';
 import { divisionQuestionGenerator } from './divisionQuestions';
-import { placeValueQuestionGenerator } from './placeValueQuestions';
 import { numberSenseQuestionGenerator } from './numberSenseQuestions';
 import { fractionQuestionGenerator } from './fractionQuestions';
 import { decimalQuestionGenerator } from './decimalQuestions';
@@ -14,7 +13,6 @@ import { geometryQuestionGenerator } from './geometryQuestions';
 import { ratioQuestionGenerator } from './ratioQuestions';
 import { algebraQuestionGenerator } from './algebraQuestions';
 import { moneyQuestionGenerator } from './moneyQuestions';
-import { wordProblemQuestionGenerator } from './wordProblemQuestions';
 
 // Moved from questionSelector.ts
 export function selectNextQuestion(
@@ -77,8 +75,6 @@ export function generateQuestion(
       return divisionQuestionGenerator.generateQuestion(difficulty, previousMistakes);
 
     // Number Concepts
-    case 'place_value':
-      return placeValueQuestionGenerator.generateQuestion(difficulty, previousMistakes);
     case 'number_sense':
       return numberSenseQuestionGenerator.generateQuestion(difficulty, previousMistakes);
 
@@ -100,11 +96,9 @@ export function generateQuestion(
     case 'algebra':
       return algebraQuestionGenerator.generateQuestion(difficulty, previousMistakes);
 
-    // Money & Word Problems
+    // Money
     case 'money':
       return moneyQuestionGenerator.generateQuestion(difficulty, previousMistakes);
-    case 'word_problems':
-      return wordProblemQuestionGenerator.generateQuestion(difficulty, previousMistakes);
 
     default:
       throw new Error(`No question generator for topic: ${topic.id}`);
@@ -119,7 +113,6 @@ export const questionGenerators = {
   'division': divisionQuestionGenerator,
 
   // Number Concepts
-  'place_value': placeValueQuestionGenerator,
   'number_sense': numberSenseQuestionGenerator,
 
   // Fractions & Decimals
@@ -134,9 +127,8 @@ export const questionGenerators = {
   'ratio_proportion': ratioQuestionGenerator,
   'algebra': algebraQuestionGenerator,
 
-  // Money & Word Problems
+  // Money
   'money': moneyQuestionGenerator,
-  'word_problems': wordProblemQuestionGenerator,
 } as const;
 
 export type QuestionType = keyof typeof questionGenerators; 

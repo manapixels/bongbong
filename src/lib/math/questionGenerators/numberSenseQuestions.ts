@@ -1,5 +1,5 @@
 import { getRandomInt } from '@/lib/utils/math';
-import { MathCategory, QuestionGenerator } from '@/types/math';
+import { MathSubStrand, Question, QuestionGenerator } from '@/types/math';
 
 export const numberSenseQuestionGenerator: QuestionGenerator = {
   generateQuestion: (difficulty: number, previousMistakes: string[]) => {
@@ -82,13 +82,22 @@ export const numberSenseQuestionGenerator: QuestionGenerator = {
       id: `number-sense-${type}-${Date.now()}`,
       text: questionText,
       correctAnswer: answer,
-      category: MathCategory.NUMBER_SENSE,
+      category: MathSubStrand.WHOLE_NUMBERS,
       solution: {
         steps,
         explanation
       },
+
       hints,
       difficulty
     };
+  },
+  generateSimilarQuestion: (originalQuestion: Question, variation: 'easier' | 'harder' | 'same' = 'same') => {
+    // For now, just generate a new question with the same difficulty
+    return numberSenseQuestionGenerator.generateQuestion(
+      originalQuestion.difficulty * (variation === 'harder' ? 1.2 : variation === 'easier' ? 0.8 : 1),
+      []
+    );
+
   }
 }; 

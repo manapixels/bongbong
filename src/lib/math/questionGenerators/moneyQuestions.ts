@@ -1,5 +1,5 @@
 import { getRandomInt } from '@/lib/utils/math';
-import { MathCategory, QuestionGenerator } from '@/types/math';
+import { MathSubStrand, Question, QuestionGenerator } from '@/types/math';
 import { singaporeContexts } from './singaporeContexts';
 
 // Helper function
@@ -94,7 +94,7 @@ export const moneyQuestionGenerator: QuestionGenerator = {
       id: `money-${type}-${Date.now()}`,
       text: questionText,
       correctAnswer: answer,
-      category: MathCategory.MONEY,
+      category: MathSubStrand.MONEY,
       solution: {
         steps,
         explanation: steps.join('. ')
@@ -102,5 +102,13 @@ export const moneyQuestionGenerator: QuestionGenerator = {
       hints,
       difficulty
     };
+  },
+  generateSimilarQuestion: (originalQuestion: Question, variation: 'easier' | 'harder' | 'same' = 'same') => {
+    // For now, just generate a new question with the same difficulty
+    return moneyQuestionGenerator.generateQuestion(
+      originalQuestion.difficulty * (variation === 'harder' ? 1.2 : variation === 'easier' ? 0.8 : 1),
+      []
+    );
+
   }
 }; 

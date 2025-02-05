@@ -1,4 +1,4 @@
-import { MathCategory } from './math';
+import { MathSubStrand } from './math';
 import type { InferSelectModel } from 'drizzle-orm';
 import { studentProgress } from '@/lib/db/schema';
 
@@ -15,7 +15,7 @@ export interface TopicProgress {
 
 export interface UserProgress {
   userId: string;
-  category: MathCategory;
+  category: MathSubStrand;
   difficulty: number;
   correctAnswers: number;
   totalAttempts: number;
@@ -24,7 +24,7 @@ export interface UserProgress {
 }
 
 export interface ProgressUpdate {
-  category: MathCategory;
+  category: MathSubStrand;
   isCorrect: boolean;
   questionId: string;
 } 
