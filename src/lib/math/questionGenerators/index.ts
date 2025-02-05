@@ -1,5 +1,5 @@
 import type { StudentProgress } from '@/types/progress';
-import { MathTopic, Question, MathCategory } from '@/types/math';
+import { MathTopic, Question } from '@/types/math';
 import { calculateDifficulty } from '@/lib/utils/math';
 import { additionQuestionGenerator } from './additionQuestions';
 import { subtractionQuestionGenerator } from './subtractionQuestions';

@@ -2,7 +2,7 @@ import { auth } from '@/app/(auth)/auth';
 import { redirect } from 'next/navigation';
 import { PracticeLayout } from '@/components/math/practice-layout';
 import { getStudentProfile, getStudentProgress } from '@/lib/db/queries';
-import { MATH_TOPICS } from '@/lib/math/topics';
+import { MATH_TOPICS } from '@/types/math';
 
 export default async function MathPage() {
   const session = await auth();

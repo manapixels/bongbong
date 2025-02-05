@@ -1,5 +1,5 @@
 import { getRandomInt } from '@/lib/utils/math';
-import { MathCategory, QuestionGenerator } from '@/types/math';
+import { QuestionGenerator, Question, MathSubStrand } from '@/types/math';
 import { singaporeContexts } from './singaporeContexts';
 
 const randomChoice = <T>(arr: T[]): T => arr[getRandomInt(0, arr.length - 1)];
@@ -161,7 +161,7 @@ export const geometryQuestionGenerator: QuestionGenerator = {
       id: `geometry-${shape}-${type}-${Date.now()}`,
       text: questionText,
       correctAnswer: answer,
-      category: MathCategory.GEOMETRY,
+      category: MathSubStrand.GEOMETRY,
       solution: {
         steps,
         explanation: steps.join('. ')
@@ -169,5 +169,13 @@ export const geometryQuestionGenerator: QuestionGenerator = {
       hints,
       difficulty
     };
+  },
+
+  generateSimilarQuestion: (originalQuestion: Question, variation: 'easier' | 'harder' | 'same' = 'same') => {
+    // For now, just generate a new question with the same difficulty
+    return geometryQuestionGenerator.generateQuestion(
+      originalQuestion.difficulty * (variation === 'harder' ? 1.2 : variation === 'easier' ? 0.8 : 1),
+      []
+    );
   }
 }; 

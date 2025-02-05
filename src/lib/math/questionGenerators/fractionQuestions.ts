@@ -1,5 +1,5 @@
-import { MathCategory, QuestionGenerator } from '@/types/math';
 import { getRandomInt } from '@/lib/utils/math';
+import { QuestionGenerator, Question, MathSubStrand } from '@/types/math';
 
 export const fractionQuestionGenerator: QuestionGenerator = {
   generateQuestion: (difficulty: number, previousMistakes: string[]) => {
@@ -18,7 +18,7 @@ export const fractionQuestionGenerator: QuestionGenerator = {
       id: `equivalent-fraction-${numerator}-${denominator}-${multiplier}`,
       text: questionText,
       correctAnswer: `${equivNum}/${equivDenom}`,
-      category: MathCategory.FRACTIONS,
+      category: MathSubStrand.FRACTIONS,
       solution: {
         steps: [
           `Start with the fraction ${numerator}/${denominator}`,
@@ -36,4 +36,12 @@ export const fractionQuestionGenerator: QuestionGenerator = {
       difficulty
     };
   },
+
+  generateSimilarQuestion: (originalQuestion: Question, variation: 'easier' | 'harder' | 'same' = 'same') => {
+    // For now, just generate a new question with the same difficulty
+    return fractionQuestionGenerator.generateQuestion(
+      originalQuestion.difficulty * (variation === 'harder' ? 1.2 : variation === 'easier' ? 0.8 : 1),
+      []
+    );
+  }
 }; 

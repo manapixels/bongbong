@@ -1,7 +1,7 @@
 import { auth } from '@/app/(auth)/auth';
 import { db } from '@/lib/db';
 import { mathProblems, studentProgress } from '@/lib/db/schema';
-import { MATH_TOPICS } from '@/lib/math/topics';
+import { MATH_TOPICS } from '@/types/math';
 import { selectNextQuestion } from '@/lib/math/questionGenerators';
 import { getStudentProgress } from '@/lib/db/queries';
 import type { StudentProgress } from '@/types/progress';

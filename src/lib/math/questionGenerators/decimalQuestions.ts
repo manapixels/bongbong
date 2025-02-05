@@ -1,5 +1,5 @@
 import { getRandomInt } from '@/lib/utils/math';
-import { MathCategory, QuestionGenerator } from '@/types/math';
+import { QuestionGenerator, Question, MathSubStrand } from '@/types/math';
 
 export const decimalQuestionGenerator: QuestionGenerator = {
   generateQuestion: (difficulty: number, previousMistakes: string[]) => {
@@ -76,7 +76,7 @@ export const decimalQuestionGenerator: QuestionGenerator = {
       id: `decimal-${type}-${Date.now()}`,
       text: questionText,
       correctAnswer: answer,
-      category: MathCategory.DECIMALS,
+      category: MathSubStrand.DECIMALS,
       solution: {
         steps,
         explanation: steps.join('. ')
@@ -84,5 +84,13 @@ export const decimalQuestionGenerator: QuestionGenerator = {
       hints,
       difficulty
     };
+  },
+
+  generateSimilarQuestion: (originalQuestion: Question, variation: 'easier' | 'harder' | 'same' = 'same') => {
+    // For now, just generate a new question with the same difficulty
+    return decimalQuestionGenerator.generateQuestion(
+      originalQuestion.difficulty * (variation === 'harder' ? 1.2 : variation === 'easier' ? 0.8 : 1),
+      []
+    );
   }
 }; 

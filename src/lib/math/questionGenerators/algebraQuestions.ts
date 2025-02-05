@@ -1,5 +1,5 @@
 import { getRandomInt } from '@/lib/utils/math';
-import { MathCategory, QuestionGenerator } from '@/types/math';
+import { QuestionGenerator, Question, MathSubStrand } from '@/types/math';
 
 export const algebraQuestionGenerator: QuestionGenerator = {
   generateQuestion: (difficulty: number, previousMistakes: string[]) => {
@@ -84,7 +84,7 @@ export const algebraQuestionGenerator: QuestionGenerator = {
       id: `algebra-${type}-${Date.now()}`,
       text: questionText,
       correctAnswer: answer,
-      category: MathCategory.ALGEBRA,
+      category: MathSubStrand.ALGEBRA,
       solution: {
         steps,
         explanation: steps.join('. ')
@@ -92,5 +92,13 @@ export const algebraQuestionGenerator: QuestionGenerator = {
       hints,
       difficulty
     };
+  },
+
+  generateSimilarQuestion: (originalQuestion: Question, variation: 'easier' | 'harder' | 'same' = 'same') => {
+    // For now, just generate a new question with the same difficulty
+    return algebraQuestionGenerator.generateQuestion(
+      originalQuestion.difficulty * (variation === 'harder' ? 1.2 : variation === 'easier' ? 0.8 : 1),
+      []
+    );
   }
 }; 

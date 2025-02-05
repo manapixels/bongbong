@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { ChevronDown, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
-import { MATH_TOPICS } from '@/lib/math/topics';
+import { MATH_TOPICS } from '@/types/math';
 
 export function MathTopicsSidebar() {
   const [expandedLevels, setExpandedLevels] = useState<number[]>([]);
