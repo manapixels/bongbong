@@ -3,13 +3,14 @@
 import { Card } from "@/components/ui/card"
 import { type CoreMessage } from 'ai';
 import { useState } from 'react';
-import { continueTextConversation } from '@/app/actions';
+import { continueMathTutoring } from '@/app/actions';
 import { readStreamableValue } from 'ai/rsc';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { IconArrowUp } from '@/components/ui/icons';
-import  Link from "next/link";
+import Link from "next/link";
 import AboutCard from "@/components/cards/aboutcard";
+
 export const maxDuration = 30;
 
 export default function Chat() {
@@ -24,7 +25,7 @@ export default function Chat() {
     ];
     setMessages(newMessages);
     setInput('');
-    const result = await continueTextConversation(newMessages);
+    const result = await continueMathTutoring(newMessages);
     for await (const content of readStreamableValue(result)) {
       setMessages([
         ...newMessages,
@@ -37,7 +38,7 @@ export default function Chat() {
   }
   
   return (    
-    <div className="group w-full overflow-auto ">
+    <div className="group w-full overflow-auto">
       {messages.length <= 0 ? ( 
         <AboutCard />  
       ) 
@@ -52,7 +53,7 @@ export default function Chat() {
           ))}
         </div>
       )}
-      <div className="fixed inset-x-0 bottom-10 w-full ">
+      <div className="fixed inset-x-0 bottom-10 w-full">
         <div className="w-full max-w-xl mx-auto">
           <Card className="p-2">
             <form onSubmit={handleSubmit}>
