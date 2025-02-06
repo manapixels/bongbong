@@ -21,6 +21,7 @@ async function seedTopics(): Promise<void> {
       }))
     );
     console.log('Topics seeded successfully');
+    process.exit(0);
   } catch (error: unknown) {
     console.error(
       'Error seeding topics:',

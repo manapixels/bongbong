@@ -16,6 +16,9 @@ export const user = pgTable('User', {
   id: uuid('id').primaryKey().notNull().defaultRandom(),
   email: varchar('email', { length: 64 }).notNull(),
   password: varchar('password', { length: 64 }),
+  isStudent: boolean('is_student').notNull().default(false),
+  xpPoints: integer('xp_points').notNull().default(0),
+  coins: integer('coins').notNull().default(0),
 });
 
 export type User = InferSelectModel<typeof user>;
@@ -27,11 +30,6 @@ export const mathProblems = pgTable('math_problems', {
   answer: integer('answer').notNull(),
   category: text('category').notNull(),
   difficulty: integer('difficulty').notNull(),
-});
-
-export const students = pgTable('students', {
-  id: uuid('id').primaryKey().defaultRandom(),
-  userId: uuid('user_id').references(() => user.id),
 });
 
 export const topics = pgTable('topics', {
@@ -56,7 +54,7 @@ export const topics = pgTable('topics', {
 
 export const studentProgress = pgTable('student_progress', {
   id: uuid('id').primaryKey().defaultRandom(),
-  studentId: uuid('student_id').references(() => students.id),
+  userId: uuid('user_id').references(() => user.id),
   problemId: uuid('problem_id').references(() => mathProblems.id),
   isCorrect: boolean('is_correct').notNull(),
   timeSpent: integer('time_spent'),
@@ -85,25 +83,22 @@ export const achievements = pgTable('achievements', {
 export const studentAchievements = pgTable(
   'student_achievements',
   {
-    studentId: text('student_id')
+    userId: uuid('user_id')
       .notNull()
-      .references(() => students.id),
+      .references(() => user.id),
     achievementId: text('achievement_id')
       .notNull()
       .references(() => achievements.id),
     unlockedAt: timestamp('unlocked_at').notNull(),
   },
   (table) => ({
-    pk: primaryKey(table.studentId, table.achievementId),
+    pk: primaryKey(table.userId, table.achievementId),
   })
 );
-
 // ==================== Practice Sessions ====================
-export const practiceSession = pgTable('practice_sessions', {
-  id: text('id').primaryKey(),
-  studentId: text('student_id')
-    .notNull()
-    .references(() => students.id),
+export const practiceSessions = pgTable('practice_sessions', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  userId: uuid('user_id').references(() => user.id),
   mode: text('mode').notNull(), // 'practice' or 'test'
   startedAt: timestamp('started_at').notNull(),
   endedAt: timestamp('ended_at'),

@@ -17,7 +17,7 @@ export default async function MathPage() {
     // Create a default progress object that matches the schema
     const defaultProgress = {
       id: crypto.randomUUID(),
-      studentId: session.user.id,
+      userId: session.user.id,
       problemId: null,
       isCorrect: false,
       timeSpent: null,

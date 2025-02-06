@@ -31,20 +31,14 @@ export async function checkAndUnlockAchievements(
 }
 
 async function unlockAchievement(studentId: string, achievementId: string) {
-  const [existing] = await db
-    .select()
-    .from(studentAchievements)
-    .where(
-      and(
-        eq(studentAchievements.studentId, studentId),
-        eq(studentAchievements.achievementId, achievementId)
-      )
-    );
+  const existingAchievement = await db.query.studentAchievements.findFirst({
+    where: eq(studentAchievements.userId, studentId),
+  });
 
-  if (!existing) {
+  if (!existingAchievement) {
     await db.insert(studentAchievements).values({
-      studentId,
-      achievementId,
+      userId: studentId,
+      achievementId: achievementId,
       unlockedAt: new Date(),
     });
   }

@@ -1,7 +1,7 @@
 import type { InferSelectModel } from 'drizzle-orm';
 import {
   mathProblems,
-  practiceSession as dbPracticeSession,
+  practiceSessions as dbPracticeSessions,
 } from '@/lib/db/schema';
 
 export const enum MathStrand {
@@ -70,7 +70,7 @@ export interface PracticeQuestion {
 
 export type Problem = InferSelectModel<typeof mathProblems>;
 
-export type DBPracticeSession = InferSelectModel<typeof dbPracticeSession>;
+export type DBPracticeSession = InferSelectModel<typeof dbPracticeSessions>;
 
 export interface PracticeSession extends DBPracticeSession {
   questions: PracticeQuestion[];
@@ -190,7 +190,7 @@ export const MATH_TOPICS: MathTopic[] = [
   // PRIMARY 1
   {
     id: 'p1-whole-numbers',
-    name: 'P1 Whole Numbers',
+    name: 'Whole Numbers',
     level: 1,
     strand: MathStrand.NUMBER_AND_ALGEBRA,
     subStrand: MathSubStrand.WHOLE_NUMBERS,
@@ -244,7 +244,7 @@ export const MATH_TOPICS: MathTopic[] = [
   },
   {
     id: 'p1-money',
-    name: 'P1 Money',
+    name: 'Money',
     level: 1,
     strand: MathStrand.NUMBER_AND_ALGEBRA,
     subStrand: MathSubStrand.MONEY,
@@ -262,7 +262,7 @@ export const MATH_TOPICS: MathTopic[] = [
   },
   {
     id: 'p1-length',
-    name: 'P1 Length',
+    name: 'Length',
     level: 1,
     strand: MathStrand.MEASUREMENT_AND_GEOMETRY,
     subStrand: MathSubStrand.MEASUREMENT,
@@ -293,7 +293,7 @@ export const MATH_TOPICS: MathTopic[] = [
   },
   {
     id: 'p1-geometry',
-    name: 'P1 Geometry',
+    name: 'Geometry',
     level: 1,
     strand: MathStrand.MEASUREMENT_AND_GEOMETRY,
     subStrand: MathSubStrand.GEOMETRY,
@@ -318,7 +318,7 @@ export const MATH_TOPICS: MathTopic[] = [
   },
   {
     id: 'p1-data-representation-and-interpretation',
-    name: 'P1 Data Representation and Interpretation',
+    name: 'Data Representation and Interpretation',
     level: 1,
     strand: MathStrand.STATISTICS,
     subStrand: MathSubStrand.DATA_REPRESENTATION_AND_INTERPRETATION,
@@ -334,7 +334,7 @@ export const MATH_TOPICS: MathTopic[] = [
   // PRIMARY 2
   {
     id: 'p2-whole-numbers',
-    name: 'P2 Whole Numbers',
+    name: 'Whole Numbers',
     level: 2,
     strand: MathStrand.NUMBER_AND_ALGEBRA,
     subStrand: MathSubStrand.WHOLE_NUMBERS,
@@ -405,7 +405,7 @@ export const MATH_TOPICS: MathTopic[] = [
   },
   {
     id: 'p2-money',
-    name: 'P2 Money',
+    name: 'Money',
     level: 2,
     strand: MathStrand.NUMBER_AND_ALGEBRA,
     subStrand: MathSubStrand.MONEY,
@@ -425,7 +425,7 @@ export const MATH_TOPICS: MathTopic[] = [
   },
   {
     id: 'p2-measurement',
-    name: 'P2 Measurement',
+    name: 'Measurement',
     level: 2,
     strand: MathStrand.MEASUREMENT_AND_GEOMETRY,
     subStrand: MathSubStrand.MEASUREMENT,
@@ -458,7 +458,7 @@ export const MATH_TOPICS: MathTopic[] = [
   },
   {
     id: 'p2-geometry',
-    name: 'P2 Geometry',
+    name: 'Geometry',
     level: 2,
     strand: MathStrand.MEASUREMENT_AND_GEOMETRY,
     subStrand: MathSubStrand.GEOMETRY,
@@ -483,7 +483,7 @@ export const MATH_TOPICS: MathTopic[] = [
   },
   {
     id: 'p2-data-representation-and-interpretation',
-    name: 'P2 Data Representation and Interpretation',
+    name: 'Data Representation and Interpretation',
     level: 2,
     strand: MathStrand.STATISTICS,
     subStrand: MathSubStrand.DATA_REPRESENTATION_AND_INTERPRETATION,
@@ -501,7 +501,7 @@ export const MATH_TOPICS: MathTopic[] = [
   // PRIMARY 3
   {
     id: 'p3-whole-numbers',
-    name: 'P3 Whole Numbers',
+    name: 'Whole Numbers',
     level: 3,
     strand: MathStrand.NUMBER_AND_ALGEBRA,
     subStrand: MathSubStrand.WHOLE_NUMBERS,
@@ -543,7 +543,7 @@ export const MATH_TOPICS: MathTopic[] = [
   },
   {
     id: 'p3-fractions',
-    name: 'P3 Fractions',
+    name: 'Fractions',
     level: 3,
     strand: MathStrand.NUMBER_AND_ALGEBRA,
     subStrand: MathSubStrand.FRACTIONS,
@@ -620,7 +620,7 @@ export const MATH_TOPICS: MathTopic[] = [
   },
   {
     id: 'p3-area-and-volume',
-    name: 'P3 Area and Volume',
+    name: 'Area and Volume',
     level: 3,
     strand: MathStrand.MEASUREMENT_AND_GEOMETRY,
     subStrand: MathSubStrand.AREA_AND_VOLUME,
@@ -643,7 +643,7 @@ export const MATH_TOPICS: MathTopic[] = [
   },
   {
     id: 'p3-geometry',
-    name: 'P3 Geometry',
+    name: 'Geometry',
     level: 3,
     strand: MathStrand.MEASUREMENT_AND_GEOMETRY,
     subStrand: MathSubStrand.GEOMETRY,
@@ -671,7 +671,7 @@ export const MATH_TOPICS: MathTopic[] = [
   },
   {
     id: 'p3-data-representation-and-interpretation',
-    name: 'P3 Data Representation and Interpretation',
+    name: 'Data Representation and Interpretation',
     level: 3,
     strand: MathStrand.STATISTICS,
     subStrand: MathSubStrand.DATA_REPRESENTATION_AND_INTERPRETATION,
@@ -690,7 +690,7 @@ export const MATH_TOPICS: MathTopic[] = [
   // PRIMARY 4
   {
     id: 'p4-whole-numbers',
-    name: 'P4 Whole Numbers',
+    name: 'Whole Numbers',
     level: 4,
     strand: MathStrand.NUMBER_AND_ALGEBRA,
     subStrand: MathSubStrand.WHOLE_NUMBERS,
@@ -888,7 +888,7 @@ export const MATH_TOPICS: MathTopic[] = [
   },
   {
     id: 'p4-tables-graphs',
-    name: 'P4 Tables and Graphs',
+    name: 'Tables and Graphs',
     level: 4,
     strand: MathStrand.STATISTICS,
     subStrand: MathSubStrand.DATA_REPRESENTATION_AND_INTERPRETATION,
@@ -924,7 +924,7 @@ export const MATH_TOPICS: MathTopic[] = [
   },
   {
     id: 'p5-four-operations',
-    name: 'P5 Four Operations',
+    name: 'Four Operations',
     level: 5,
     strand: MathStrand.NUMBER_AND_ALGEBRA,
     subStrand: MathSubStrand.WHOLE_NUMBERS,
@@ -973,7 +973,7 @@ export const MATH_TOPICS: MathTopic[] = [
   },
   {
     id: 'p5-decimals',
-    name: 'P5 Decimals',
+    name: 'Decimals',
     level: 5,
     strand: MathStrand.NUMBER_AND_ALGEBRA,
     subStrand: MathSubStrand.DECIMALS,
@@ -991,7 +991,7 @@ export const MATH_TOPICS: MathTopic[] = [
   },
   {
     id: 'p5-percentage',
-    name: 'P5 Percentage',
+    name: 'Percentage',
     level: 5,
     strand: MathStrand.NUMBER_AND_ALGEBRA,
     subStrand: MathSubStrand.PERCENTAGE,
@@ -1011,7 +1011,7 @@ export const MATH_TOPICS: MathTopic[] = [
   },
   {
     id: 'p5-rate',
-    name: 'P5 Rate',
+    name: 'Rate',
     level: 5,
     strand: MathStrand.NUMBER_AND_ALGEBRA,
     subStrand: MathSubStrand.RATE,
@@ -1031,7 +1031,7 @@ export const MATH_TOPICS: MathTopic[] = [
   },
   {
     id: 'p5-area-and-volume',
-    name: 'P5 Area and Volume',
+    name: 'Area and Volume',
     level: 5,
     strand: MathStrand.MEASUREMENT_AND_GEOMETRY,
     subStrand: MathSubStrand.AREA_AND_VOLUME,
@@ -1063,7 +1063,7 @@ export const MATH_TOPICS: MathTopic[] = [
   },
   {
     id: 'p5-geometry',
-    name: 'P5 Geometry',
+    name: 'Geometry',
     level: 5,
     strand: MathStrand.MEASUREMENT_AND_GEOMETRY,
     subStrand: MathSubStrand.GEOMETRY,
@@ -1107,7 +1107,7 @@ export const MATH_TOPICS: MathTopic[] = [
   // Primary 6
   {
     id: 'p6-fractions',
-    name: 'P6 Fractions',
+    name: 'Fractions',
     level: 6,
     strand: MathStrand.NUMBER_AND_ALGEBRA,
     subStrand: MathSubStrand.FRACTIONS,
@@ -1125,7 +1125,7 @@ export const MATH_TOPICS: MathTopic[] = [
   },
   {
     id: 'p6-percentage',
-    name: 'P6 Percentage',
+    name: 'Percentage',
     level: 6,
     strand: MathStrand.NUMBER_AND_ALGEBRA,
     subStrand: MathSubStrand.PERCENTAGE,
@@ -1143,7 +1143,7 @@ export const MATH_TOPICS: MathTopic[] = [
   },
   {
     id: 'p6-ratio',
-    name: 'P6 Ratio',
+    name: 'Ratio',
     level: 6,
     strand: MathStrand.NUMBER_AND_ALGEBRA,
     subStrand: MathSubStrand.RATIO,
@@ -1167,7 +1167,7 @@ export const MATH_TOPICS: MathTopic[] = [
   },
   {
     id: 'p6-algebra',
-    name: 'P6 Algebra',
+    name: 'Algebra',
     level: 6,
     strand: MathStrand.NUMBER_AND_ALGEBRA,
     subStrand: MathSubStrand.ALGEBRA,
@@ -1188,7 +1188,7 @@ export const MATH_TOPICS: MathTopic[] = [
   },
   {
     id: 'p6-area-and-volume',
-    name: 'P6 Area and Volume',
+    name: 'Area and Volume',
     level: 6,
     strand: MathStrand.MEASUREMENT_AND_GEOMETRY,
     subStrand: MathSubStrand.AREA_AND_VOLUME,
@@ -1220,7 +1220,7 @@ export const MATH_TOPICS: MathTopic[] = [
   },
   {
     id: 'p6-special-quadrilaterals',
-    name: 'P6 Special Quadrilaterals',
+    name: 'Special Quadrilaterals',
     level: 6,
     strand: MathStrand.MEASUREMENT_AND_GEOMETRY,
     subStrand: MathSubStrand.GEOMETRY,
@@ -1237,7 +1237,7 @@ export const MATH_TOPICS: MathTopic[] = [
   },
   {
     id: 'p6-data-analysis',
-    name: 'P6 Data Analysis',
+    name: 'Data Analysis',
     level: 6,
     strand: MathStrand.STATISTICS,
     subStrand: MathSubStrand.DATA_ANALYSIS,

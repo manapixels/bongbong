@@ -2,9 +2,9 @@ import { NextResponse } from 'next/server';
 import { auth } from '@/app/(auth)/auth';
 import { db } from '@/lib/db';
 import {
-  practiceSession,
+  practiceSessions,
   mathProblems,
-  students,
+  user,
   studentProgress,
   studentAchievements,
   achievements,
@@ -39,8 +39,8 @@ export async function GET(
   // Get student data
   const [student] = await db
     .select()
-    .from(students)
-    .where(eq(students.id, params.studentId));
+    .from(user)
+    .where(eq(user.id, params.studentId));
 
   if (!student) {
     return new Response('Student not found', { status: 404 });
@@ -49,11 +49,11 @@ export async function GET(
   // Get practice sessions
   const sessions = await db
     .select()
-    .from(practiceSession)
+    .from(practiceSessions)
     .where(
       and(
-        eq(practiceSession.studentId, params.studentId),
-        gte(practiceSession.startedAt, startDate)
+        eq(practiceSessions.userId, params.studentId),
+        gte(practiceSessions.startedAt, startDate)
       )
     );
 
@@ -63,7 +63,7 @@ export async function GET(
     .from(studentProgress)
     .where(
       and(
-        eq(studentProgress.studentId, params.studentId),
+        eq(studentProgress.userId, params.studentId),
         gte(studentProgress.createdAt, startDate)
       )
     );
@@ -77,7 +77,7 @@ export async function GET(
   // Calculate XP and level from achievements
   const achievementsWithRewards = await db
     .select({
-      studentId: studentAchievements.studentId,
+      userId: studentAchievements.userId,
       achievementId: studentAchievements.achievementId,
       unlockedAt: studentAchievements.unlockedAt,
       rewardXP: achievements.rewardXP,
@@ -87,7 +87,7 @@ export async function GET(
       achievements,
       eq(studentAchievements.achievementId, achievements.id)
     )
-    .where(eq(studentAchievements.studentId, params.studentId));
+    .where(eq(studentAchievements.userId, params.studentId));
 
   const totalXP = achievementsWithRewards.reduce(
     (total, achievement) => total + (achievement.rewardXP || 0),
@@ -109,7 +109,7 @@ export async function GET(
 }
 
 function calculatePerformanceData(
-  sessions: (typeof practiceSession.$inferSelect)[]
+  sessions: (typeof practiceSessions.$inferSelect)[]
 ) {
   // Group sessions by date and calculate average performance
   const grouped = sessions.reduce(

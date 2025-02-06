@@ -1,10 +1,10 @@
 import { eq } from 'drizzle-orm';
 import { db } from '@/lib/db';
-import { user, students, studentProgress } from '@/lib/db/schema';
+import { user, studentProgress } from '@/lib/db/schema';
 import type { MathTopic, Problem } from '@/types/math';
 import { MATH_TOPICS } from '@/types/math';
 import { StudentProgress } from '@/types/progress';
-import { Student, User } from '@/types';
+import { User } from '@/types';
 import { selectNextQuestion } from '@/lib/math/questionGenerators';
 
 export async function getUser(email: string): Promise<User[]> {
@@ -24,9 +24,9 @@ export async function createUser(
 
 export async function getStudentProfile(
   studentId: string
-): Promise<Student | undefined> {
-  const student = await db.query.students.findFirst({
-    where: eq(students.id, studentId),
+): Promise<User | undefined> {
+  const student = await db.query.user.findFirst({
+    where: eq(user.id, studentId),
   });
   return student;
 }
@@ -39,24 +39,24 @@ export async function getStudentProgress({
   const [progress] = await db
     .select()
     .from(studentProgress)
-    .where(eq(studentProgress.studentId, userId));
+    .where(eq(studentProgress.userId, userId));
 
   return progress;
 }
 
 export async function updateStudentProgress({
-  studentId,
+  userId,
   problemId,
   isCorrect,
   timeSpent,
 }: {
-  studentId: string;
+  userId: string;
   problemId: string;
   isCorrect: boolean;
   timeSpent: number;
 }) {
   return await db.insert(studentProgress).values({
-    studentId,
+    userId,
     problemId,
     isCorrect,
     timeSpent,

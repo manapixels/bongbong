@@ -31,7 +31,7 @@ export async function GET(request: Request) {
       // Create a progress record that matches the schema
       const defaultProgress: StudentProgress = {
         id: crypto.randomUUID(),
-        studentId: session.user.id,
+        userId: session.user.id,
         problemId: null,
         isCorrect: false,
         timeSpent: null,
@@ -59,7 +59,7 @@ export async function GET(request: Request) {
     // Then create an initial progress entry for this problem
     await db.insert(studentProgress).values({
       id: crypto.randomUUID(),
-      studentId: session.user.id,
+      userId: session.user.id,
       problemId: savedProblem.id,
       isCorrect: false,
       timeSpent: 0,

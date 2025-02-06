@@ -10,15 +10,10 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const { studentId, questionId, topicId, isCorrect, timeSpent } = body;
+    const { userId, questionId, topicId, isCorrect, timeSpent } = body;
 
     // Validate required fields
-    if (
-      !studentId ||
-      !questionId ||
-      !topicId ||
-      typeof isCorrect !== 'boolean'
-    ) {
+    if (!userId || !questionId || !topicId || typeof isCorrect !== 'boolean') {
       return NextResponse.json(
         { error: 'Missing required fields' },
         { status: 400 }
@@ -26,7 +21,7 @@ export async function POST(request: Request) {
     }
 
     await updateStudentProgress({
-      studentId,
+      userId,
       problemId: questionId,
       isCorrect,
       timeSpent: timeSpent || 0,
