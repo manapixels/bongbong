@@ -16,7 +16,7 @@ export const fetcher = async (url: string) => {
 
     if (!res.ok) {
       const error = new Error(
-        'An error occurred while fetching the data.',
+        'An error occurred while fetching the data.'
       ) as ApplicationError;
 
       error.info = await res.json();
@@ -44,4 +44,4 @@ export function generateUUID(): string {
     const v = c === 'x' ? r : (r & 0x3) | 0x8;
     return v.toString(16);
   });
-} 
+}

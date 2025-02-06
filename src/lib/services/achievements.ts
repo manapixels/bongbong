@@ -45,7 +45,7 @@ async function unlockAchievement(studentId: string, achievementId: string) {
     await db.insert(studentAchievements).values({
       studentId,
       achievementId,
-      unlockedAt: new Date()
+      unlockedAt: new Date(),
     });
   }
-} 
+}

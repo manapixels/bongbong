@@ -17,4 +17,4 @@ export interface AchievementProgress {
 export interface UserAchievement extends Achievement {
   unlockedAt?: Date;
   progress?: AchievementProgress;
-} 
+}

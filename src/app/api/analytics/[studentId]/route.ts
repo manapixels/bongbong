@@ -1,7 +1,14 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/app/(auth)/auth';
 import { db } from '@/lib/db';
-import { practiceSession, mathProblems, students, studentProgress, studentAchievements, achievements } from '@/lib/db/schema';
+import {
+  practiceSession,
+  mathProblems,
+  students,
+  studentProgress,
+  studentAchievements,
+  achievements,
+} from '@/lib/db/schema';
 import { eq, and, gte, sum } from 'drizzle-orm';
 
 export async function GET(
@@ -73,13 +80,19 @@ export async function GET(
       studentId: studentAchievements.studentId,
       achievementId: studentAchievements.achievementId,
       unlockedAt: studentAchievements.unlockedAt,
-      rewardXP: achievements.rewardXP
+      rewardXP: achievements.rewardXP,
     })
     .from(studentAchievements)
-    .innerJoin(achievements, eq(studentAchievements.achievementId, achievements.id))
+    .innerJoin(
+      achievements,
+      eq(studentAchievements.achievementId, achievements.id)
+    )
     .where(eq(studentAchievements.studentId, params.studentId));
 
-  const totalXP = achievementsWithRewards.reduce((total, achievement) => total + (achievement.rewardXP || 0), 0);
+  const totalXP = achievementsWithRewards.reduce(
+    (total, achievement) => total + (achievement.rewardXP || 0),
+    0
+  );
   const level = Math.floor(totalXP / 1000) + 1;
   const xpProgress = totalXP % 1000;
 
@@ -91,67 +104,77 @@ export async function GET(
     performanceData,
     categoryData,
     weakAreas,
-    recommendations
+    recommendations,
   });
 }
 
-function calculatePerformanceData(sessions: typeof practiceSession.$inferSelect[]) {
+function calculatePerformanceData(
+  sessions: (typeof practiceSession.$inferSelect)[]
+) {
   // Group sessions by date and calculate average performance
-  const grouped = sessions.reduce((acc, session) => {
-    const date = new Date(session.startedAt).toLocaleDateString();
-    if (!acc[date]) {
-      acc[date] = {
-        accuracy: 0,
-        speed: 0,
-        count: 0
-      };
-    }
-    acc[date].accuracy += session.correctAnswers / session.totalQuestions;
-    acc[date].speed += session.averageResponseTime || 0;
-    acc[date].count++;
-    return acc;
-  }, {} as Record<string, { accuracy: number; speed: number; count: number }>);
+  const grouped = sessions.reduce(
+    (acc, session) => {
+      const date = new Date(session.startedAt).toLocaleDateString();
+      if (!acc[date]) {
+        acc[date] = {
+          accuracy: 0,
+          speed: 0,
+          count: 0,
+        };
+      }
+      acc[date].accuracy += session.correctAnswers / session.totalQuestions;
+      acc[date].speed += session.averageResponseTime || 0;
+      acc[date].count++;
+      return acc;
+    },
+    {} as Record<string, { accuracy: number; speed: number; count: number }>
+  );
 
   return Object.entries(grouped).map(([date, data]) => ({
     date,
     accuracy: (data.accuracy / data.count) * 100,
-    speed: data.speed / data.count
+    speed: data.speed / data.count,
   }));
 }
 
-function calculateCategoryData(progress: typeof studentProgress.$inferSelect[]) {
-  const categoryStats = progress.reduce((acc, entry) => {
-    if (!entry.topicProgress) return acc;
+function calculateCategoryData(
+  progress: (typeof studentProgress.$inferSelect)[]
+) {
+  const categoryStats = progress.reduce(
+    (acc, entry) => {
+      if (!entry.topicProgress) return acc;
 
-    entry.topicProgress.forEach(topic => {
-      if (!acc[topic.topicId]) {
-        acc[topic.topicId] = {
-          questionsAttempted: 0,
-          correctAnswers: 0
-        };
-      }
-      acc[topic.topicId].questionsAttempted += topic.questionsAttempted;
-      acc[topic.topicId].correctAnswers += topic.correctAnswers;
-    });
-    return acc;
-  }, {} as Record<string, { questionsAttempted: number; correctAnswers: number }>);
+      entry.topicProgress.forEach((topic) => {
+        if (!acc[topic.topicId]) {
+          acc[topic.topicId] = {
+            questionsAttempted: 0,
+            correctAnswers: 0,
+          };
+        }
+        acc[topic.topicId].questionsAttempted += topic.questionsAttempted;
+        acc[topic.topicId].correctAnswers += topic.correctAnswers;
+      });
+      return acc;
+    },
+    {} as Record<string, { questionsAttempted: number; correctAnswers: number }>
+  );
 
   return Object.entries(categoryStats).map(([category, stats]) => ({
     category,
     accuracy: (stats.correctAnswers / stats.questionsAttempted) * 100,
-    total: stats.questionsAttempted
+    total: stats.questionsAttempted,
   }));
 }
 
-function findWeakAreas(progress: typeof studentProgress.$inferSelect[]) {
+function findWeakAreas(progress: (typeof studentProgress.$inferSelect)[]) {
   const categoryStats = calculateCategoryData(progress);
   return categoryStats
-    .filter(stat => stat.accuracy < 70)
-    .map(stat => stat.category);
+    .filter((stat) => stat.accuracy < 70)
+    .map((stat) => stat.category);
 }
 
 function generateRecommendations(weakAreas: string[]) {
-  return weakAreas.map(area => {
+  return weakAreas.map((area) => {
     const topic = area.toLowerCase().replace(/-/g, ' ');
     return `Focus on improving your ${topic} skills with more practice questions.`;
   });

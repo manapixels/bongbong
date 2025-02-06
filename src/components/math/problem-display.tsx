@@ -7,7 +7,6 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Question } from '@/types/math';
 
-
 interface ProblemDisplayProps {
   problem: Question;
   onAnswer: (answer: string) => void;
@@ -19,7 +18,7 @@ export function ProblemDisplay({
   problem,
   onAnswer,
   isCorrect,
-  showSolution
+  showSolution,
 }: ProblemDisplayProps) {
   const [answer, setAnswer] = useState('');
   const [currentHint, setCurrentHint] = useState(0);
@@ -29,8 +28,8 @@ export function ProblemDisplay({
       <div className="flex justify-between items-start">
         <h3 className="text-xl font-semibold">{problem.text}</h3>
         {isCorrect !== undefined && (
-          <Badge variant={isCorrect ? "secondary" : "destructive"}>
-            {isCorrect ? "Correct!" : "Try Again"}
+          <Badge variant={isCorrect ? 'secondary' : 'destructive'}>
+            {isCorrect ? 'Correct!' : 'Try Again'}
           </Badge>
         )}
       </div>
@@ -44,8 +43,8 @@ export function ProblemDisplay({
               onClick={() => onAnswer(option)}
               className={
                 showSolution && option === problem.correctAnswer
-                  ? "border-green-500"
-                  : ""
+                  ? 'border-green-500'
+                  : ''
               }
             >
               {option}
@@ -68,9 +67,9 @@ export function ProblemDisplay({
         <div className="mt-4">
           <Button
             variant="ghost"
-            onClick={() => setCurrentHint((prev) => 
-              (prev + 1) % problem.hints.length
-            )}
+            onClick={() =>
+              setCurrentHint((prev) => (prev + 1) % problem.hints.length)
+            }
           >
             Need a hint?
           </Button>
@@ -88,8 +87,7 @@ export function ProblemDisplay({
           <p>{problem.solution.steps.join('\n')}</p>
           <p>{problem.solution.explanation}</p>
         </div>
-
       )}
     </Card>
   );
-} 
+}

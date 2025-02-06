@@ -14,12 +14,12 @@ export async function GET(request: Request) {
 
   const { searchParams } = new URL(request.url);
   const topicId = searchParams.get('topicId');
-  
+
   if (!topicId) {
     return new Response('Topic ID is required', { status: 400 });
   }
 
-  const topic = MATH_TOPICS.find(t => t.id === topicId);
+  const topic = MATH_TOPICS.find((t) => t.id === topicId);
   if (!topic) {
     return new Response('Topic not found', { status: 404 });
   }
@@ -36,7 +36,7 @@ export async function GET(request: Request) {
         isCorrect: false,
         timeSpent: null,
         createdAt: new Date(),
-        topicProgress: []
+        topicProgress: [],
       };
 
       return Response.json(selectNextQuestion(defaultProgress, topic));
@@ -46,12 +46,15 @@ export async function GET(request: Request) {
     const question = selectNextQuestion(progress, topic);
 
     // First save the problem
-    const [savedProblem] = await db.insert(mathProblems).values({
-      question: question.text,
-      answer: parseInt(question.correctAnswer.toString()),
-      difficulty: question.difficulty,
-      category: topic.subStrand
-    }).returning();
+    const [savedProblem] = await db
+      .insert(mathProblems)
+      .values({
+        question: question.text,
+        answer: parseInt(question.correctAnswer.toString()),
+        difficulty: question.difficulty,
+        category: topic.subStrand,
+      })
+      .returning();
 
     // Then create an initial progress entry for this problem
     await db.insert(studentProgress).values({
@@ -60,7 +63,7 @@ export async function GET(request: Request) {
       problemId: savedProblem.id,
       isCorrect: false,
       timeSpent: 0,
-      createdAt: new Date()
+      createdAt: new Date(),
     });
 
     return Response.json(question);
@@ -68,4 +71,4 @@ export async function GET(request: Request) {
     console.error('Error generating question:', error);
     return new Response('Internal Server Error', { status: 500 });
   }
-} 
+}

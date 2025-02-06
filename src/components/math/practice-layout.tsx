@@ -16,7 +16,7 @@ interface PracticeLayoutProps {
 export function PracticeLayout({
   studentId,
   topics,
-  studentProgress
+  studentProgress,
 }: PracticeLayoutProps) {
   const [selectedTopic, setSelectedTopic] = useState<MathTopic | null>(null);
 
@@ -44,4 +44,4 @@ export function PracticeLayout({
       </div>
     </div>
   );
-} 
+}

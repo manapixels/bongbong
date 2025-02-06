@@ -16,26 +16,30 @@ interface TopicSelectorProps {
 export function TopicSelector({
   topics,
   studentProgress,
-  onSelectTopic
+  onSelectTopic,
 }: TopicSelectorProps) {
   const [selectedLevel, setSelectedLevel] = useState<number>(1);
 
   const getTopicProgress = (topicId: string) => {
     if (!studentProgress.topicProgress) return 0;
-    const progress = studentProgress.topicProgress.find(p => p.topicId === topicId);
+    const progress = studentProgress.topicProgress.find(
+      (p) => p.topicId === topicId
+    );
     if (!progress) return 0;
     return (progress.correctAnswers / progress.questionsAttempted) * 100;
   };
 
-  const filteredTopics = topics.filter(topic => topic.level === selectedLevel);
+  const filteredTopics = topics.filter(
+    (topic) => topic.level === selectedLevel
+  );
 
   return (
     <div className="space-y-6">
       <div className="flex gap-2">
-        {[1, 2, 3, 4, 5, 6].map(level => (
+        {[1, 2, 3, 4, 5, 6].map((level) => (
           <Button
             key={level}
-            variant={selectedLevel === level ? "default" : "outline"}
+            variant={selectedLevel === level ? 'default' : 'outline'}
             onClick={() => setSelectedLevel(level)}
           >
             P{level}
@@ -44,7 +48,7 @@ export function TopicSelector({
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {filteredTopics.map(topic => (
+        {filteredTopics.map((topic) => (
           <Card
             key={topic.id}
             className="p-4 cursor-pointer hover:border-primary transition-colors"
@@ -60,4 +64,4 @@ export function TopicSelector({
       </div>
     </div>
   );
-} 
+}

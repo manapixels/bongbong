@@ -24,7 +24,7 @@ export function selectNextQuestion(
     (p) => p.topicId === topic.id
   );
 
-  const successRate = topicStats 
+  const successRate = topicStats
     ? topicStats.correctAnswers / topicStats.questionsAttempted
     : 0.5; // Default to medium difficulty for new topics
 
@@ -38,8 +38,13 @@ export function selectNextQuestion(
   return generateQuestion(topic, difficulty, previousMistakes);
 }
 
-function getPreviousMistakes(progress: StudentProgress, topicId: string): string[] {
-  const topicProgress = progress.topicProgress?.find(p => p.topicId === topicId);
+function getPreviousMistakes(
+  progress: StudentProgress,
+  topicId: string
+): string[] {
+  const topicProgress = progress.topicProgress?.find(
+    (p) => p.topicId === topicId
+  );
   return topicProgress?.mistakes || [];
 }
 
@@ -51,54 +56,90 @@ export function generateQuestion(
   switch (topic.id) {
     // Basic Number Operations
     case 'addition': {
-      const question = additionQuestionGenerator.generateQuestion(difficulty, previousMistakes);
+      const question = additionQuestionGenerator.generateQuestion(
+        difficulty,
+        previousMistakes
+      );
       return {
         ...question,
-        correctAnswer: String(question.correctAnswer)
+        correctAnswer: String(question.correctAnswer),
       };
     }
     case 'subtraction': {
-      const question = subtractionQuestionGenerator.generateQuestion(difficulty, previousMistakes);
+      const question = subtractionQuestionGenerator.generateQuestion(
+        difficulty,
+        previousMistakes
+      );
       return {
         ...question,
-        correctAnswer: String(question.correctAnswer)
+        correctAnswer: String(question.correctAnswer),
       };
     }
     case 'multiplication': {
-      const question = multiplicationQuestionGenerator.generateQuestion(difficulty, previousMistakes);
+      const question = multiplicationQuestionGenerator.generateQuestion(
+        difficulty,
+        previousMistakes
+      );
       return {
         ...question,
-        correctAnswer: String(question.correctAnswer)
+        correctAnswer: String(question.correctAnswer),
       };
     }
     case 'division':
-      return divisionQuestionGenerator.generateQuestion(difficulty, previousMistakes);
+      return divisionQuestionGenerator.generateQuestion(
+        difficulty,
+        previousMistakes
+      );
 
     // Number Concepts
     case 'number_sense':
-      return numberSenseQuestionGenerator.generateQuestion(difficulty, previousMistakes);
+      return numberSenseQuestionGenerator.generateQuestion(
+        difficulty,
+        previousMistakes
+      );
 
     // Fractions & Decimals
     case 'fractions':
-      return fractionQuestionGenerator.generateQuestion(difficulty, previousMistakes);
+      return fractionQuestionGenerator.generateQuestion(
+        difficulty,
+        previousMistakes
+      );
     case 'decimals':
-      return decimalQuestionGenerator.generateQuestion(difficulty, previousMistakes);
+      return decimalQuestionGenerator.generateQuestion(
+        difficulty,
+        previousMistakes
+      );
 
     // Measurement & Geometry
     case 'measurement':
-      return measurementQuestionGenerator.generateQuestion(difficulty, previousMistakes);
+      return measurementQuestionGenerator.generateQuestion(
+        difficulty,
+        previousMistakes
+      );
     case 'geometry':
-      return geometryQuestionGenerator.generateQuestion(difficulty, previousMistakes);
+      return geometryQuestionGenerator.generateQuestion(
+        difficulty,
+        previousMistakes
+      );
 
     // Advanced Topics
     case 'ratio_proportion':
-      return ratioQuestionGenerator.generateQuestion(difficulty, previousMistakes);
+      return ratioQuestionGenerator.generateQuestion(
+        difficulty,
+        previousMistakes
+      );
     case 'algebra':
-      return algebraQuestionGenerator.generateQuestion(difficulty, previousMistakes);
+      return algebraQuestionGenerator.generateQuestion(
+        difficulty,
+        previousMistakes
+      );
 
     // Money
     case 'money':
-      return moneyQuestionGenerator.generateQuestion(difficulty, previousMistakes);
+      return moneyQuestionGenerator.generateQuestion(
+        difficulty,
+        previousMistakes
+      );
 
     default:
       throw new Error(`No question generator for topic: ${topic.id}`);
@@ -107,28 +148,28 @@ export function generateQuestion(
 
 export const questionGenerators = {
   // Basic Number Operations
-  'addition': additionQuestionGenerator,
-  'subtraction': subtractionQuestionGenerator,
-  'multiplication': multiplicationQuestionGenerator,
-  'division': divisionQuestionGenerator,
+  addition: additionQuestionGenerator,
+  subtraction: subtractionQuestionGenerator,
+  multiplication: multiplicationQuestionGenerator,
+  division: divisionQuestionGenerator,
 
   // Number Concepts
-  'number_sense': numberSenseQuestionGenerator,
+  number_sense: numberSenseQuestionGenerator,
 
   // Fractions & Decimals
-  'fractions': fractionQuestionGenerator,
-  'decimals': decimalQuestionGenerator,
+  fractions: fractionQuestionGenerator,
+  decimals: decimalQuestionGenerator,
 
   // Measurement & Geometry
-  'measurement': measurementQuestionGenerator,
-  'geometry': geometryQuestionGenerator,
+  measurement: measurementQuestionGenerator,
+  geometry: geometryQuestionGenerator,
 
   // Advanced Topics
-  'ratio_proportion': ratioQuestionGenerator,
-  'algebra': algebraQuestionGenerator,
+  ratio_proportion: ratioQuestionGenerator,
+  algebra: algebraQuestionGenerator,
 
   // Money
-  'money': moneyQuestionGenerator,
+  money: moneyQuestionGenerator,
 } as const;
 
-export type QuestionType = keyof typeof questionGenerators; 
+export type QuestionType = keyof typeof questionGenerators;

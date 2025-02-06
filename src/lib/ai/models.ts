@@ -22,7 +22,7 @@ export const models: Array<Model> = [
     apiIdentifier: 'gpt-3.5-turbo',
     description: 'Good for quick practice and simple explanations',
     contextWindow: 16000,
-  }
+  },
 ] as const;
 
 export const DEFAULT_MODEL_NAME: string = 'primary-tutor';

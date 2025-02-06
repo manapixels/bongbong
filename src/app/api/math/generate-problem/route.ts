@@ -4,7 +4,7 @@ import { generateProblem } from '@/lib/db/queries';
 export async function POST(request: Request) {
   try {
     const { profile, progress } = await request.json();
-    
+
     const problem = await generateProblem(
       profile.preferences.difficulty,
       profile.preferences.topicsEnabled,
@@ -12,10 +12,7 @@ export async function POST(request: Request) {
     );
 
     if (!problem) {
-      return NextResponse.json(
-        { error: 'No problem found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: 'No problem found' }, { status: 404 });
     }
 
     return NextResponse.json(problem);
@@ -26,4 +23,4 @@ export async function POST(request: Request) {
       { status: 500 }
     );
   }
-} 
+}

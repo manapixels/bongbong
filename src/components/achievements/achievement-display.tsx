@@ -15,16 +15,16 @@ interface AchievementDisplayProps {
   newAchievements?: string[];
 }
 
-export function AchievementDisplay({ 
+export function AchievementDisplay({
   achievements,
-  newAchievements = []
+  newAchievements = [],
 }: AchievementDisplayProps) {
   useEffect(() => {
     if (newAchievements.length > 0) {
       confetti({
         particleCount: 100,
         spread: 70,
-        origin: { y: 0.6 }
+        origin: { y: 0.6 },
       });
     }
   }, [newAchievements]);
@@ -34,7 +34,7 @@ export function AchievementDisplay({
       <h3 className="text-lg font-semibold">Achievements</h3>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {achievements.map((achievement) => (
-          <Card 
+          <Card
             key={achievement.id}
             className={`p-4 ${
               newAchievements.includes(achievement.name)
@@ -49,11 +49,13 @@ export function AchievementDisplay({
                   {achievement.description}
                 </p>
               </div>
-              <Badge variant={
-                newAchievements.includes(achievement.name)
-                  ? 'default'
-                  : 'secondary'
-              }>
+              <Badge
+                variant={
+                  newAchievements.includes(achievement.name)
+                    ? 'default'
+                    : 'secondary'
+                }
+              >
                 {new Date(achievement.unlockedAt).toLocaleDateString()}
               </Badge>
             </div>
@@ -62,4 +64,4 @@ export function AchievementDisplay({
       </div>
     </div>
   );
-} 
+}

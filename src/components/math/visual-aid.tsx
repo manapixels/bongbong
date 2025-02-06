@@ -4,7 +4,7 @@ import { Card } from '@/components/ui/card';
 import {
   generatePlaceValueChart,
   generateFractionVisual,
-  generateBarModel
+  generateBarModel,
 } from '@/lib/utils/visualHelpers';
 
 interface VisualAidProps {
@@ -39,9 +39,5 @@ export function VisualAid({ type, data }: VisualAidProps) {
   const visual = getVisual();
   if (!visual) return null;
 
-  return (
-    <Card className="p-4 font-mono whitespace-pre">
-      {visual}
-    </Card>
-  );
-} 
+  return <Card className="p-4 font-mono whitespace-pre">{visual}</Card>;
+}

@@ -5,6 +5,7 @@ A Next.js application for interactive math practice, built with PostgreSQL and D
 ## Prerequisites
 
 Make sure you have the following installed:
+
 - [Node.js](https://nodejs.org/) (v18 or higher)
 - [npm](https://www.npmjs.com/get-npm) (v8 or higher)
 - [Docker](https://www.docker.com/get-started)
@@ -13,28 +14,33 @@ Make sure you have the following installed:
 ## Setup
 
 1. Clone the repository:
+
 ```bash
 git clone <repository-url>
 cd bongbong
 ```
 
 2. Install dependencies:
+
 ```bash
 npm install
 ```
 
 3. Set up environment variables:
+
 ```bash
 # Copy the example env file and modify if needed
 cp .env.example .env.local
 ```
 
 4. Start the PostgreSQL database:
+
 ```bash
 npm docker:up
 ```
 
 5. Set up the database schema:
+
 ```bash
 # Generate migrations
 npm db:generate
@@ -47,6 +53,7 @@ npm db:migrate
 ```
 
 6. Start the development server:
+
 ```bash
 npm dev
 ```
@@ -56,6 +63,7 @@ The application should now be running at [http://localhost:3000](http://localhos
 ## Available Scripts
 
 ### Database Commands
+
 - `npm docker:up` - Start the PostgreSQL container
 - `npm docker:down` - Stop the PostgreSQL container
 - `npm docker:reset` - Reset the database (removes all data)
@@ -67,6 +75,7 @@ The application should now be running at [http://localhost:3000](http://localhos
 - `npm db:migrate` - Run database migrations
 
 ### Development Commands
+
 - `npm dev` - Start the development server
 - `npm build` - Build the application
 - `npm start` - Start the production server
@@ -75,6 +84,7 @@ The application should now be running at [http://localhost:3000](http://localhos
 ## Database Structure
 
 The application uses PostgreSQL with the following main tables:
+
 - `students` - Stores student profiles and preferences
 - `math_problems` - Stores math problems and their solutions
 - `student_progress` - Tracks student attempts and progress
@@ -82,6 +92,7 @@ The application uses PostgreSQL with the following main tables:
 ## Troubleshooting
 
 1. If the database connection fails:
+
    - Check if Docker is running
    - Ensure port 5432 is not in use
    - Try resetting the database: `npm docker:reset`

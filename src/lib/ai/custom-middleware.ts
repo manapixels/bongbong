@@ -8,7 +8,7 @@ export async function educationMiddleware(req: NextRequest) {
   // Add type safety for headers
   const studentLevel = req.headers.get('x-student-level') as string | null;
   const topicArea = req.headers.get('x-topic-area') as string | null;
-  
+
   // Add validation
   if (studentLevel && !isValidLevel(studentLevel)) {
     return NextResponse.json(
@@ -30,21 +30,23 @@ export async function educationMiddleware(req: NextRequest) {
     level: studentLevel ?? 'default',
     topic: topicArea ?? 'default',
     curriculum: MATH_TOPICS,
-    adaptiveLevel: calculateAdaptiveLevel(studentLevel ?? 'default', topicArea ?? 'default')
+    adaptiveLevel: calculateAdaptiveLevel(
+      studentLevel ?? 'default',
+      topicArea ?? 'default'
+    ),
   };
-
 
   // Attach to request for AI processing
   const newRequest = new Request(req.url, {
     ...req,
     headers: {
       ...req.headers,
-      'x-education-context': JSON.stringify(context)
-    }
+      'x-education-context': JSON.stringify(context),
+    },
   });
 
   return NextResponse.next({
-    request: newRequest
+    request: newRequest,
   });
 }
 

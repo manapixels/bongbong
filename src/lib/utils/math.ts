@@ -1,4 +1,7 @@
-export function calculateDifficulty(baseLevel: number, successRate: number): number {
+export function calculateDifficulty(
+  baseLevel: number,
+  successRate: number
+): number {
   // Adjust difficulty based on success rate
   // successRate of 0.8+ increases difficulty
   // successRate below 0.6 decreases difficulty
@@ -20,7 +23,10 @@ export function gcd(a: number, b: number): number {
   return b === 0 ? a : gcd(b, a % b);
 }
 
-export function simplifyFraction(numerator: number, denominator: number): [number, number] {
+export function simplifyFraction(
+  numerator: number,
+  denominator: number
+): [number, number] {
   const divisor = gcd(numerator, denominator);
   return [numerator / divisor, denominator / divisor];
 }
@@ -41,7 +47,10 @@ export function generateModelMethod(problem: string) {
   `;
 }
 
-export function checkDifficulty(studentLevel: string, problemType: string): number {
+export function checkDifficulty(
+  studentLevel: string,
+  problemType: string
+): number {
   // Returns difficulty level 1-5 based on student's current level and problem type
   // Used for adaptive learning
   return 1; // Implement proper difficulty calculation
@@ -50,4 +59,4 @@ export function checkDifficulty(studentLevel: string, problemType: string): numb
 export function generateHints(problem: string, step: number): string {
   // Returns progressive hints for each step of problem solving
   return ''; // Implement hint generation
-} 
+}

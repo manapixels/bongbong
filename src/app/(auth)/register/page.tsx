@@ -37,7 +37,7 @@ export default function Page() {
   const handleSubmit = (formData: FormData) => {
     setEmail(formData.get('email') as string);
     setState({ status: 'in_progress' });
-    
+
     register(state, formData)
       .then((result) => {
         setState(result);

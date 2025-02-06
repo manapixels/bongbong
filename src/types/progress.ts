@@ -27,4 +27,4 @@ export interface ProgressUpdate {
   category: MathSubStrand;
   isCorrect: boolean;
   questionId: string;
-} 
+}

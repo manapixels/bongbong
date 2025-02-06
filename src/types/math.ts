@@ -1,10 +1,13 @@
 import type { InferSelectModel } from 'drizzle-orm';
-import { mathProblems, practiceSession as dbPracticeSession } from '@/lib/db/schema';
+import {
+  mathProblems,
+  practiceSession as dbPracticeSession,
+} from '@/lib/db/schema';
 
 export const enum MathStrand {
   NUMBER_AND_ALGEBRA = 'number-and-algebra',
   MEASUREMENT_AND_GEOMETRY = 'measurement-and-geometry',
-  STATISTICS = 'statistics'
+  STATISTICS = 'statistics',
 }
 
 export const enum MathSubStrand {
@@ -16,16 +19,16 @@ export const enum MathSubStrand {
   PERCENTAGE = 'percentage',
   RATIO = 'ratio',
   ALGEBRA = 'algebra',
-  
+
   // Measurement and Geometry sub-strands
   MEASUREMENT = 'measurement',
   GEOMETRY = 'geometry',
   AREA_AND_VOLUME = 'area-and-volume',
-  
+
   // Statistics sub-strands
   DATA_REPRESENTATION_AND_INTERPRETATION = 'data-representation-and-interpretation',
   DATA_ANALYSIS = 'data-analysis',
-  RATE = 'rate'
+  RATE = 'rate',
 }
 
 export type QuestionType = 'mcq' | 'numeric' | 'word-problem';
@@ -96,45 +99,47 @@ export const REMEDIATION_STRATEGIES: Record<string, RemediationStrategy> = {
   barModelVisualization: {
     type: 'visualization',
     steps: [
-      "1. Read the problem carefully and identify the ratio relationship",
-      "2. Draw bars of equal length for each part",
-      "3. Label the known values",
-      "4. Divide to find the unit value",
-      "5. Multiply to find the answer"
+      '1. Read the problem carefully and identify the ratio relationship',
+      '2. Draw bars of equal length for each part',
+      '3. Label the known values',
+      '4. Divide to find the unit value',
+      '5. Multiply to find the answer',
     ],
     examples: [
       {
-        problem: "The ratio of boys to girls in a class is 3:2. If there are 30 students in total, how many are boys?",
-        solution: "18 boys",
+        problem:
+          'The ratio of boys to girls in a class is 3:2. If there are 30 students in total, how many are boys?',
+        solution: '18 boys',
         explanation: [
-          "1. Total parts in ratio = 3 + 2 = 5 parts",
-          "2. Each part = 30 ÷ 5 = 6 students",
-          "3. Boys = 3 parts = 3 × 6 = 18 boys"
-        ]
-      }
-    ]
+          '1. Total parts in ratio = 3 + 2 = 5 parts',
+          '2. Each part = 30 ÷ 5 = 6 students',
+          '3. Boys = 3 parts = 3 × 6 = 18 boys',
+        ],
+      },
+    ],
   },
   partWholeModel: {
     type: 'visualization',
     steps: [
-      "1. Identify the whole (total)",
-      "2. Identify the parts",
-      "3. Draw rectangles to represent parts",
-      "4. Label known values",
-      "5. Find unknown values"
+      '1. Identify the whole (total)',
+      '2. Identify the parts',
+      '3. Draw rectangles to represent parts',
+      '4. Label known values',
+      '5. Find unknown values',
     ],
     examples: [
       {
-        problem: "John has 12 red marbles and 8 blue marbles. How many marbles does he have in total?",
-        solution: "20 marbles",
+        problem:
+          'John has 12 red marbles and 8 blue marbles. How many marbles does he have in total?',
+        solution: '20 marbles',
         explanation: [
-          "1. Draw rectangle for red marbles (12)",
-          "2. Draw rectangle for blue marbles (8)",
-          "3. Whole = 12 + 8 = 20 marbles"
-        ]
-      }
-    ]
-  }
+          '1. Draw rectangle for red marbles (12)',
+          '2. Draw rectangle for blue marbles (8)',
+          '3. Whole = 12 + 8 = 20 marbles',
+        ],
+      },
+    ],
+  },
 };
 
 export interface Solution {
@@ -157,8 +162,14 @@ export interface Question {
 }
 
 export interface QuestionGenerator {
-  generateQuestion: (difficulty: number, previousMistakes: string[]) => Question;
-  generateSimilarQuestion: (originalQuestion: Question, variation?: 'easier' | 'harder' | 'same') => Question;
+  generateQuestion: (
+    difficulty: number,
+    previousMistakes: string[]
+  ) => Question;
+  generateSimilarQuestion: (
+    originalQuestion: Question,
+    variation?: 'easier' | 'harder' | 'same'
+  ) => Question;
 }
 
 export interface StudentProfile {
@@ -195,7 +206,7 @@ export const MATH_TOPICS: MathTopic[] = [
           'Comparing the number of objects in two or more sets',
           'Comparing and ordering numbers',
           'Patterns in number sequences',
-          'Ordinal numbers (first, second, up to tenth) and symbols (1st, 2nd, 3rd, etc.)'
+          'Ordinal numbers (first, second, up to tenth) and symbols (1st, 2nd, 3rd, etc.)',
         ],
       },
       {
@@ -220,19 +231,16 @@ export const MATH_TOPICS: MathTopic[] = [
         objectives: [
           'Concepts of multiplication',
           'Use of ×',
-          'Multiplying within 40'
+          'Multiplying within 40',
         ],
       },
       {
         id: 'division',
         name: 'Division',
         difficulty: 1,
-        objectives: [
-          'Concepts of division',
-          'Dividing within 20'
-        ],
-      }
-    ]
+        objectives: ['Concepts of division', 'Dividing within 20'],
+      },
+    ],
   },
   {
     id: 'p1-money',
@@ -247,10 +255,10 @@ export const MATH_TOPICS: MathTopic[] = [
         difficulty: 1,
         objectives: [
           'Counting amount of money in cents up to $1',
-          'Counting amount of money in dollars up to $100'
+          'Counting amount of money in dollars up to $100',
         ],
-      }
-    ]
+      },
+    ],
   },
   {
     id: 'p1-length',
@@ -267,7 +275,7 @@ export const MATH_TOPICS: MathTopic[] = [
           'Measuring length in centimetres',
           'Use of abbreviation cm',
           'Comparing and ordering lengths in cm',
-          'Measuring and drawing a line segment to the nearest cm'
+          'Measuring and drawing a line segment to the nearest cm',
         ],
       },
       {
@@ -278,10 +286,10 @@ export const MATH_TOPICS: MathTopic[] = [
           'Telling time to 5 minutes',
           'Use of "am" and "pm"',
           'Use of abbreviations h and min',
-          'Duration of one hour/half hour'
+          'Duration of one hour/half hour',
         ],
-      }
-    ]
+      },
+    ],
   },
   {
     id: 'p1-geometry',
@@ -290,7 +298,6 @@ export const MATH_TOPICS: MathTopic[] = [
     strand: MathStrand.MEASUREMENT_AND_GEOMETRY,
     subStrand: MathSubStrand.GEOMETRY,
     subTopics: [
-
       {
         id: 'geometry-2d-shapes',
         name: 'Geometry 2D Shapes',
@@ -304,10 +311,10 @@ export const MATH_TOPICS: MathTopic[] = [
           'Identifying, naming, describing and classifying 2D shape (quarter circle)',
           'Forming different 2D figures with rectangle, square, triangle, circle, half circle and quarter circle',
           'Identifying the 2D shapes that make up a given figure',
-          'Copying figures on dot grid or square grid'
+          'Copying figures on dot grid or square grid',
         ],
-      }
-    ]
+      },
+    ],
   },
   {
     id: 'p1-data-representation-and-interpretation',
@@ -320,11 +327,9 @@ export const MATH_TOPICS: MathTopic[] = [
         id: 'picture-graphs',
         name: 'Picture Graphs',
         difficulty: 1,
-        objectives: [
-          'Reading and interpreting data from picture graphs'
-        ],
-      }
-    ]
+        objectives: ['Reading and interpreting data from picture graphs'],
+      },
+    ],
   },
   // PRIMARY 2
   {
@@ -344,7 +349,7 @@ export const MATH_TOPICS: MathTopic[] = [
           'Reading and writing numbers in numerals and in words',
           'Comparing and ordering numbers',
           'Patterns in number sequences',
-          'Odd and even numbers'
+          'Odd and even numbers',
         ],
       },
       {
@@ -353,7 +358,7 @@ export const MATH_TOPICS: MathTopic[] = [
         difficulty: 2,
         objectives: [
           'Addition and subtraction algorithms (up to 3 digits)',
-          'Mental calculation involving addition and subtraction of a 3-digit number and ones/tens/hundreds'
+          'Mental calculation involving addition and subtraction of a 3-digit number and ones/tens/hundreds',
         ],
       },
       {
@@ -365,10 +370,10 @@ export const MATH_TOPICS: MathTopic[] = [
           'Use of ÷ symbol',
           'Relationship between multiplication and division',
           'Multiplying and dividing within the multiplication tables',
-          'Mental calculation involving multiplication and division'
+          'Mental calculation involving multiplication and division',
         ],
-      }
-    ]
+      },
+    ],
   },
   {
     id: 'p2-fractions',
@@ -395,8 +400,8 @@ export const MATH_TOPICS: MathTopic[] = [
         objectives: [
           'Adding and subtracting like fractions within one whole with denominators of given fractions not exceeding 12',
         ],
-      }
-    ]
+      },
+    ],
   },
   {
     id: 'p2-money',
@@ -413,10 +418,10 @@ export const MATH_TOPICS: MathTopic[] = [
           'Counting amount of money in dollars and cents',
           'Reading and writing money in decimal notation',
           'Comparing two or three amounts of money',
-          'Converting money in decimal notation to cents only, and vice versa'
+          'Converting money in decimal notation to cents only, and vice versa',
         ],
-      }
-    ]
+      },
+    ],
   },
   {
     id: 'p2-measurement',
@@ -436,7 +441,7 @@ export const MATH_TOPICS: MathTopic[] = [
           'Using appropriate units of measurement and abbreviations (m, g, kg, ℓ)',
           'Comparing and ordering lengths',
           'Comparing and ordering masses',
-          'Comparing and ordering volumes'
+          'Comparing and ordering volumes',
         ],
       },
       {
@@ -446,10 +451,10 @@ export const MATH_TOPICS: MathTopic[] = [
         objectives: [
           'Telling time to the minute',
           'Measuring time in hours and minutes',
-          'Converting time in hours and minutes to minutes only, and vice versa'
+          'Converting time in hours and minutes to minutes only, and vice versa',
         ],
-      }
-    ]
+      },
+    ],
   },
   {
     id: 'p2-geometry',
@@ -473,8 +478,8 @@ export const MATH_TOPICS: MathTopic[] = [
         objectives: [
           'Identifying, naming, describing and classifying 3D shapes: cube, cuboid, cone, cylinder, sphere',
         ],
-      }
-    ]
+      },
+    ],
   },
   {
     id: 'p2-data-representation-and-interpretation',
@@ -482,16 +487,16 @@ export const MATH_TOPICS: MathTopic[] = [
     level: 2,
     strand: MathStrand.STATISTICS,
     subStrand: MathSubStrand.DATA_REPRESENTATION_AND_INTERPRETATION,
-    subTopics: [  
+    subTopics: [
       {
         id: 'picture-graphs-with-scales',
         name: 'Picture Graphs with Scales',
         difficulty: 2,
         objectives: [
-          'Reading and interpreting data from picture graphs with scales'
+          'Reading and interpreting data from picture graphs with scales',
         ],
-      }
-    ]
+      },
+    ],
   },
   // PRIMARY 3
   {
@@ -510,7 +515,7 @@ export const MATH_TOPICS: MathTopic[] = [
           'Number notation, representations and place values (thousands, hundreds, tens, ones)',
           'Reading and writing numbers in numerals and in words',
           'Comparing and ordering numbers',
-          'Patterns in number sequences'
+          'Patterns in number sequences',
         ],
       },
       {
@@ -519,7 +524,7 @@ export const MATH_TOPICS: MathTopic[] = [
         difficulty: 3,
         objectives: [
           'Addition and subtraction algorithms (up to 4 digits)',
-          'Mental calculation involving addition and subtraction of two 2-digit numbers'
+          'Mental calculation involving addition and subtraction of two 2-digit numbers',
         ],
       },
       {
@@ -531,10 +536,10 @@ export const MATH_TOPICS: MathTopic[] = [
           'Multiplying and dividing within the multiplication tables',
           'Division with remainder',
           'Multiplication and division algorithms (up to 3 digits by 1 digit)',
-          'Mental calculation involving multiplication and division within multiplication tables'
+          'Mental calculation involving multiplication and division within multiplication tables',
         ],
-      }
-    ]
+      },
+    ],
   },
   {
     id: 'p3-fractions',
@@ -551,7 +556,7 @@ export const MATH_TOPICS: MathTopic[] = [
           'Equivalent fractions',
           'Expressing a fraction in its simplest form',
           'Comparing and ordering unlike fractions with denominators not exceeding 12',
-          'Writing equivalent fractions given the denominator or numerator'
+          'Writing equivalent fractions given the denominator or numerator',
         ],
       },
       {
@@ -559,12 +564,11 @@ export const MATH_TOPICS: MathTopic[] = [
         name: 'Fractions Addition and Subtraction',
         difficulty: 3,
         objectives: [
-
           'Adding and subtracting two related fractions within one whole',
-          'Denominators of given fractions not exceeding 12'
+          'Denominators of given fractions not exceeding 12',
         ],
-      }
-    ]
+      },
+    ],
   },
   {
     id: 'p3-money',
@@ -577,12 +581,9 @@ export const MATH_TOPICS: MathTopic[] = [
         id: 'money-operations',
         name: 'Money Operations',
         difficulty: 3,
-        objectives: [
-          'Adding and subtracting money in decimal notation'
-        ],
-      }
-
-    ]
+        objectives: ['Adding and subtracting money in decimal notation'],
+      },
+    ],
   },
   {
     id: 'p3-measurement',
@@ -602,8 +603,7 @@ export const MATH_TOPICS: MathTopic[] = [
           'Converting a compound unit to the smaller unit (kilometres and metres)',
           'Converting a compound unit to the larger unit (metres and centimetres)',
           'Converting a compound unit to the smaller unit (kilograms and grams)',
-          'Converting a compound unit to the larger unit (litres and millilitres)'
-
+          'Converting a compound unit to the larger unit (litres and millilitres)',
         ],
       },
       {
@@ -613,10 +613,10 @@ export const MATH_TOPICS: MathTopic[] = [
         objectives: [
           'Measuring time in seconds',
           'Finding starting time, finishing time or duration',
-          '24-hour clock'
+          '24-hour clock',
         ],
-      }
-    ]
+      },
+    ],
   },
   {
     id: 'p3-area-and-volume',
@@ -636,10 +636,10 @@ export const MATH_TOPICS: MathTopic[] = [
           'Perimeter of rectangle',
           'Perimeter of square',
           'Area of rectangle',
-          'Area of square'
+          'Area of square',
         ],
-      }
-    ]
+      },
+    ],
   },
   {
     id: 'p3-geometry',
@@ -655,9 +655,8 @@ export const MATH_TOPICS: MathTopic[] = [
         objectives: [
           'Concepts of angle',
           'Right angles',
-          'Angles greater than/smaller than a right angle'
+          'Angles greater than/smaller than a right angle',
         ],
-
       },
       {
         id: 'perpendicular-and-parallel-lines',
@@ -665,10 +664,10 @@ export const MATH_TOPICS: MathTopic[] = [
         difficulty: 3,
         objectives: [
           'Perpendicular and parallel lines',
-          'Drawing perpendicular and parallel lines'
+          'Drawing perpendicular and parallel lines',
         ],
-      }
-    ]
+      },
+    ],
   },
   {
     id: 'p3-data-representation-and-interpretation',
@@ -683,10 +682,10 @@ export const MATH_TOPICS: MathTopic[] = [
         difficulty: 3,
         objectives: [
           'Reading and interpreting data from bar graphs',
-          'Using different scales on axis'
+          'Using different scales on axis',
         ],
-      }
-    ]
+      },
+    ],
   },
   // PRIMARY 4
   {
@@ -706,7 +705,7 @@ export const MATH_TOPICS: MathTopic[] = [
           'Comparing and ordering numbers',
           'Patterns in number sequences',
           'Rounding numbers to the nearest 10, 100 or 1000',
-          'Use of ≈'
+          'Use of ≈',
         ],
       },
       {
@@ -718,7 +717,7 @@ export const MATH_TOPICS: MathTopic[] = [
           'Determining if a 1-digit number is a factor of a given number within 100',
           'Finding the common factors of two given numbers',
           'Determining if a number is a multiple of a given 1-digit number',
-          'Finding the common multiples of two given 1-digit numbers'
+          'Finding the common multiples of two given 1-digit numbers',
         ],
       },
       {
@@ -731,7 +730,7 @@ export const MATH_TOPICS: MathTopic[] = [
           'Division algorithm (up to 4 digits by 1 digit)',
         ],
       },
-    ]
+    ],
   },
   {
     id: 'p4-fractions',
@@ -746,25 +745,23 @@ export const MATH_TOPICS: MathTopic[] = [
         difficulty: 4,
         objectives: [
           'Mixed numbers, improper fractions and their relationship',
-        ],            
+        ],
       },
       {
         id: 'fraction-of-a-set',
         name: 'Fraction of a Set',
         difficulty: 4,
-        objectives: [
-          'fraction as part of a set',
-        ],
+        objectives: ['fraction as part of a set'],
       },
       {
         id: 'fraction-addition-and-subtraction',
         name: 'Fraction Addition and Subtraction',
         difficulty: 4,
         objectives: [
-          'Add and subtract fractions with denominators not exceeding 12 and not more than two different denominators'
+          'Add and subtract fractions with denominators not exceeding 12 and not more than two different denominators',
         ],
-      }
-    ]
+      },
+    ],
   },
   {
     id: 'p4-decimals',
@@ -785,7 +782,7 @@ export const MATH_TOPICS: MathTopic[] = [
           'Rounding decimals to:',
           '- The nearest whole number',
           '- 1 decimal place',
-          '- 2 decimal places'
+          '- 2 decimal places',
         ],
       },
       {
@@ -796,10 +793,10 @@ export const MATH_TOPICS: MathTopic[] = [
           'Adding and subtracting decimals (up to 2 decimal places)',
           'Multiplying and dividing decimals (up to 2 decimal places) by a 1-digit whole number',
           'Dividing a whole number by a whole number with quotient as a decimal',
-          'Rounding answers to a specified degree of accuracy'
+          'Rounding answers to a specified degree of accuracy',
         ],
-      }
-    ]
+      },
+    ],
   },
   {
     id: 'p4-area-perimeter',
@@ -815,10 +812,10 @@ export const MATH_TOPICS: MathTopic[] = [
         objectives: [
           'Finding one dimension of a rectangle given the other dimension and its area/perimeter',
           'Finding the length of one side of a square given its area/perimeter',
-          'Finding the area and perimeter of composite figures made up of rectangles and squares'
+          'Finding the area and perimeter of composite figures made up of rectangles and squares',
         ],
-      }
-    ]
+      },
+    ],
   },
   {
     id: 'p4-angles',
@@ -834,10 +831,10 @@ export const MATH_TOPICS: MathTopic[] = [
         objectives: [
           'Using notation such as ∠ABC and ∠a to name angles',
           'Measuring angles in degrees',
-          'Drawing an angle of given size'
+          'Drawing an angle of given size',
         ],
-      }
-    ]
+      },
+    ],
   },
   {
     id: 'p4-geometry',
@@ -852,7 +849,7 @@ export const MATH_TOPICS: MathTopic[] = [
         difficulty: 4,
         objectives: [
           'Properties of rectangle and square, excluding diagonal properties',
-          'Drawing rectangles and squares'
+          'Drawing rectangles and squares',
         ],
       },
       {
@@ -862,7 +859,7 @@ export const MATH_TOPICS: MathTopic[] = [
         objectives: [
           'Identifying symmetric figures',
           'Determining whether a straight line is a line of symmetry of a symmetric figure',
-          'Completing a symmetric figure with respect to a given line of symmetry on square grid'
+          'Completing a symmetric figure with respect to a given line of symmetry on square grid',
         ],
       },
       {
@@ -884,10 +881,10 @@ export const MATH_TOPICS: MathTopic[] = [
           'Identifying the nets of 3D solids: cuboid',
           'Identifying the nets of 3D solids: prism',
           'Identifying the nets of 3D solids: pyramid',
-          'Identifying the solid which can be formed by a given net'
+          'Identifying the solid which can be formed by a given net',
         ],
-      }
-    ]
+      },
+    ],
   },
   {
     id: 'p4-tables-graphs',
@@ -902,10 +899,10 @@ export const MATH_TOPICS: MathTopic[] = [
         difficulty: 4,
         objectives: [
           'Completing a table from given data',
-          'Reading and interpreting data from tables/line graphs/pie charts'
+          'Reading and interpreting data from tables/line graphs/pie charts',
         ],
-      }
-    ]
+      },
+    ],
   },
   // PRIMARY 5
   {
@@ -920,10 +917,10 @@ export const MATH_TOPICS: MathTopic[] = [
         name: 'Numbers up to 10 million',
         difficulty: 5,
         objectives: [
-          'Reading and writing numbers in numerals and in words up to 10 million'
+          'Reading and writing numbers in numerals and in words up to 10 million',
         ],
-      }
-    ]
+      },
+    ],
   },
   {
     id: 'p5-four-operations',
@@ -939,10 +936,10 @@ export const MATH_TOPICS: MathTopic[] = [
         objectives: [
           'Multiplying and dividing by 10, 100, 1000 and their multiples without calculator',
           'Order of operations without calculator',
-          'Use of brackets without calculator'
+          'Use of brackets without calculator',
         ],
-      }
-    ]
+      },
+    ],
   },
   {
     id: 'p5-fractions-division',
@@ -957,7 +954,7 @@ export const MATH_TOPICS: MathTopic[] = [
         difficulty: 5,
         objectives: [
           'Dividing a whole number by a whole number with quotient as a fraction',
-          'Expressing fractions as decimals'
+          'Expressing fractions as decimals',
         ],
       },
       {
@@ -969,10 +966,10 @@ export const MATH_TOPICS: MathTopic[] = [
           'Multiplying a proper/improper fraction and a whole number without calculator',
           'Multiplying a proper fraction and a proper/improper fraction without calculator',
           'Multiplying two improper fractions',
-          'Multiplying a mixed number and a whole number'
+          'Multiplying a mixed number and a whole number',
         ],
-      }
-    ]
+      },
+    ],
   },
   {
     id: 'p5-decimals',
@@ -987,10 +984,10 @@ export const MATH_TOPICS: MathTopic[] = [
         difficulty: 5,
         objectives: [
           'Multiplying and dividing decimals (up to 3 decimal places) by 10, 100, 1000 and their multiples without calculator',
-          'Converting a measurement from a smaller unit to a larger unit in decimal form, and vice versa between km and m, kg and g, L and mL'
+          'Converting a measurement from a smaller unit to a larger unit in decimal form, and vice versa between km and m, kg and g, L and mL',
         ],
-      }
-    ]
+      },
+    ],
   },
   {
     id: 'p5-percentage',
@@ -1007,10 +1004,10 @@ export const MATH_TOPICS: MathTopic[] = [
           'Expressing a part of a whole as a percentage',
           'Use of % symbol',
           'Finding a percentage part of a whole',
-          'Finding discount, GST and annual interest'
+          'Finding discount, GST and annual interest',
         ],
-      }
-    ]
+      },
+    ],
   },
   {
     id: 'p5-rate',
@@ -1027,10 +1024,10 @@ export const MATH_TOPICS: MathTopic[] = [
           'Rate as the amount of a quantity per unit of another quantity',
           'Finding rate given total amount and number of units',
           'Finding total amount given rate and number of units',
-          'Finding number of units given rate and total amount'
+          'Finding number of units given rate and total amount',
         ],
-      }
-    ]
+      },
+    ],
   },
   {
     id: 'p5-area-and-volume',
@@ -1039,7 +1036,6 @@ export const MATH_TOPICS: MathTopic[] = [
     strand: MathStrand.MEASUREMENT_AND_GEOMETRY,
     subStrand: MathSubStrand.AREA_AND_VOLUME,
     subTopics: [
-
       {
         id: 'area-of-triangle',
         name: 'Area of Triangle',
@@ -1047,7 +1043,7 @@ export const MATH_TOPICS: MathTopic[] = [
         objectives: [
           'Concepts of base and height of a triangle',
           'Area of triangle',
-          'Finding area of composite figures with triangles'
+          'Finding area of composite figures with triangles',
         ],
       },
       {
@@ -1060,10 +1056,10 @@ export const MATH_TOPICS: MathTopic[] = [
           'Drawing cubes and cuboids on isometric grid',
           'Volume of cube/cuboid',
           'Finding volume of liquid in a rectangular tank',
-          'Relationship between ℓ (or ml) with cm3'
+          'Relationship between ℓ (or ml) with cm3',
         ],
-      }
-    ]
+      },
+    ],
   },
   {
     id: 'p5-geometry',
@@ -1080,7 +1076,7 @@ export const MATH_TOPICS: MathTopic[] = [
           'Angles on a straight line',
           'Angles at a point',
           'Vertically opposite angles',
-          'Finding unknown angles'
+          'Finding unknown angles',
         ],
       },
       {
@@ -1092,7 +1088,7 @@ export const MATH_TOPICS: MathTopic[] = [
           'Properties of equilateral triangle',
           'Properties of right-angled triangle',
           'Angle sum of a triangle',
-          'Finding unknown angles without additional construction'
+          'Finding unknown angles without additional construction',
         ],
       },
       {
@@ -1103,10 +1099,10 @@ export const MATH_TOPICS: MathTopic[] = [
           'Properties of parallelogram',
           'Properties of rhombus',
           'Properties of trapezium',
-          'Finding unknown angles without additional construction'
+          'Finding unknown angles without additional construction',
         ],
-      }
-    ]
+      },
+    ],
   },
   // Primary 6
   {
@@ -1122,10 +1118,10 @@ export const MATH_TOPICS: MathTopic[] = [
         difficulty: 6,
         objectives: [
           'Dividing a proper fraction by a whole number',
-          'Dividing a whole number/proper fraction by a proper fraction'
+          'Dividing a whole number/proper fraction by a proper fraction',
         ],
-      }
-    ]
+      },
+    ],
   },
   {
     id: 'p6-percentage',
@@ -1140,10 +1136,10 @@ export const MATH_TOPICS: MathTopic[] = [
         difficulty: 6,
         objectives: [
           'Finding the whole given a part and the percentage',
-          'Finding percentage increase/decrease'
+          'Finding percentage increase/decrease',
         ],
-      }
-    ]
+      },
+    ],
   },
   {
     id: 'p6-ratio',
@@ -1157,17 +1153,17 @@ export const MATH_TOPICS: MathTopic[] = [
         name: 'Ratio',
         difficulty: 6,
         objectives: [
-          'notation, representations and interpretation of a:b and a:b:c, where a, b and c are whole numbers', 
+          'notation, representations and interpretation of a:b and a:b:c, where a, b and c are whole numbers',
           'excluding ratios involving fractions and decimals',
           'equivalent ratios',
           'dividing a quantity in a given ratio',
           'expressing a ratio in its simplest form',
           'finding the ratio of two or three given quantities',
           'finding the missing term in a pair of equivalent ratios',
-          'relationship between fraction and ratio'
+          'relationship between fraction and ratio',
         ],
-      }
-    ]
+      },
+    ],
   },
   {
     id: 'p6-algebra',
@@ -1185,10 +1181,10 @@ export const MATH_TOPICS: MathTopic[] = [
           'notation, representations and interpretation of simple algebraic expressions such as a+-3, ax3 or 3a, a ÷ 3 or a/3',
           'simplifying simple linear expressions excluding brackets',
           'evaluating simple linear expressions by substitution',
-          'simple linear equations involving whole number coefficient only'
+          'simple linear equations involving whole number coefficient only',
         ],
-      }
-    ]
+      },
+    ],
   },
   {
     id: 'p6-area-and-volume',
@@ -1197,7 +1193,6 @@ export const MATH_TOPICS: MathTopic[] = [
     strand: MathStrand.MEASUREMENT_AND_GEOMETRY,
     subStrand: MathSubStrand.AREA_AND_VOLUME,
     subTopics: [
-
       {
         id: 'area-and-circumference-of-circle',
         name: 'Area and Circumference of Circle',
@@ -1206,7 +1201,7 @@ export const MATH_TOPICS: MathTopic[] = [
           'Area and circumference of circle',
           'Finding the area and perimeter of semicircle',
           'Finding the area and perimeter of quarter circle',
-          'Finding the area and perimeter of composite figures made up of square, rectangle, triangle, semicircle and quarter circle '
+          'Finding the area and perimeter of composite figures made up of square, rectangle, triangle, semicircle and quarter circle ',
         ],
       },
       {
@@ -1218,10 +1213,10 @@ export const MATH_TOPICS: MathTopic[] = [
           'Finding the length of one edge of a cube given its volume',
           'Finding the height of a cuboid given its volume and base area',
           'Finding the area of a face of a cuboid given its volume and one dimension',
-          'Use of square root and cube root'
+          'Use of square root and cube root',
         ],
-      }
-    ]
+      },
+    ],
   },
   {
     id: 'p6-special-quadrilaterals',
@@ -1237,8 +1232,8 @@ export const MATH_TOPICS: MathTopic[] = [
         objectives: [
           'Finding unknown angles, without additional construction of lines, in composite geometric figures involving squares, rectangles, triangles, parallelograms, rhombuses and trapeziums',
         ],
-      }
-    ]
+      },
+    ],
   },
   {
     id: 'p6-data-analysis',
@@ -1257,13 +1252,16 @@ export const MATH_TOPICS: MathTopic[] = [
           'Finding total value given average and number of data',
           'Finding number of data given average and total value',
         ],
-      }
-    ]
+      },
+    ],
   },
 ];
 
-export function getTopicsByLevel(startLevel: number, endLevel: number): MathTopic[] {
-  return MATH_TOPICS.filter(topic => 
-    topic.level >= startLevel && topic.level <= endLevel
+export function getTopicsByLevel(
+  startLevel: number,
+  endLevel: number
+): MathTopic[] {
+  return MATH_TOPICS.filter(
+    (topic) => topic.level >= startLevel && topic.level <= endLevel
   );
-} 
+}

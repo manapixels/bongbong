@@ -22,9 +22,9 @@ export default async function MathPage() {
       isCorrect: false,
       timeSpent: null,
       createdAt: null,
-      topicProgress: null
+      topicProgress: null,
     };
-    
+
     return (
       <PracticeLayout
         studentId={session.user.id}
@@ -41,4 +41,4 @@ export default async function MathPage() {
       studentProgress={progress}
     />
   );
-} 
+}

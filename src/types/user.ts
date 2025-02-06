@@ -13,4 +13,4 @@ export interface UserProfile extends User {
 export interface AuthUser {
   id: string;
   email: string;
-} 
+}

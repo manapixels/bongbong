@@ -19,7 +19,7 @@ interface Settings {
 
 export function MathTrainerSettings({
   settings,
-  onUpdate
+  onUpdate,
 }: {
   settings: Settings;
   onUpdate: (settings: Partial<Settings>) => void;
@@ -35,7 +35,9 @@ export function MathTrainerSettings({
           <Switch
             id="visual-aids"
             checked={settings.visualAidsEnabled}
-            onCheckedChange={(checked) => onUpdate({ visualAidsEnabled: checked })}
+            onCheckedChange={(checked) =>
+              onUpdate({ visualAidsEnabled: checked })
+            }
           />
         </div>
 
@@ -55,7 +57,7 @@ export function MathTrainerSettings({
           <Label>Learning Style</Label>
           <Select
             value={settings.preferredLearningStyle}
-            onValueChange={(value: Settings['preferredLearningStyle']) => 
+            onValueChange={(value: Settings['preferredLearningStyle']) =>
               onUpdate({ preferredLearningStyle: value })
             }
           >
@@ -72,4 +74,4 @@ export function MathTrainerSettings({
       </CardContent>
     </Card>
   );
-} 
+}

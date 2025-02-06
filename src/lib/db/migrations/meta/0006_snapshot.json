@@ -175,12 +175,8 @@
           "name": "practice_sessions_student_id_students_id_fk",
           "tableFrom": "practice_sessions",
           "tableTo": "students",
-          "columnsFrom": [
-            "student_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["student_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -220,12 +216,8 @@
           "name": "student_achievements_student_id_students_id_fk",
           "tableFrom": "student_achievements",
           "tableTo": "students",
-          "columnsFrom": [
-            "student_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["student_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -233,12 +225,8 @@
           "name": "student_achievements_achievement_id_achievements_id_fk",
           "tableFrom": "student_achievements",
           "tableTo": "achievements",
-          "columnsFrom": [
-            "achievement_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["achievement_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -246,10 +234,7 @@
       "compositePrimaryKeys": {
         "student_achievements_student_id_achievement_id_pk": {
           "name": "student_achievements_student_id_achievement_id_pk",
-          "columns": [
-            "student_id",
-            "achievement_id"
-          ]
+          "columns": ["student_id", "achievement_id"]
         }
       },
       "uniqueConstraints": {},
@@ -312,12 +297,8 @@
           "name": "student_progress_student_id_students_id_fk",
           "tableFrom": "student_progress",
           "tableTo": "students",
-          "columnsFrom": [
-            "student_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["student_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -325,12 +306,8 @@
           "name": "student_progress_problem_id_math_problems_id_fk",
           "tableFrom": "student_progress",
           "tableTo": "math_problems",
-          "columnsFrom": [
-            "problem_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["problem_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -365,12 +342,8 @@
           "name": "students_user_id_User_id_fk",
           "tableFrom": "students",
           "tableTo": "User",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }

@@ -14,7 +14,8 @@ class SoundManager {
 
       // Load sound preference from localStorage
       const soundEnabled = localStorage.getItem('soundEnabled');
-      this.isSoundEnabled = soundEnabled === null ? true : soundEnabled === 'true';
+      this.isSoundEnabled =
+        soundEnabled === null ? true : soundEnabled === 'true';
     }
   }
 
@@ -26,21 +27,27 @@ class SoundManager {
   playCorrect() {
     if (this.isSoundEnabled && this.correctSound) {
       this.correctSound.currentTime = 0;
-      this.correctSound.play().catch(err => console.error('Error playing sound:', err));
+      this.correctSound
+        .play()
+        .catch((err) => console.error('Error playing sound:', err));
     }
   }
 
   playIncorrect() {
     if (this.isSoundEnabled && this.incorrectSound) {
       this.incorrectSound.currentTime = 0;
-      this.incorrectSound.play().catch(err => console.error('Error playing sound:', err));
+      this.incorrectSound
+        .play()
+        .catch((err) => console.error('Error playing sound:', err));
     }
   }
 
   playAchievement() {
     if (this.isSoundEnabled && this.achievementSound) {
       this.achievementSound.currentTime = 0;
-      this.achievementSound.play().catch(err => console.error('Error playing sound:', err));
+      this.achievementSound
+        .play()
+        .catch((err) => console.error('Error playing sound:', err));
     }
   }
 
@@ -50,4 +57,5 @@ class SoundManager {
 }
 
 // Export a singleton instance
-export const soundManager = typeof window !== 'undefined' ? new SoundManager() : null; 
+export const soundManager =
+  typeof window !== 'undefined' ? new SoundManager() : null;

@@ -28,7 +28,11 @@ interface Problem {
   category: string;
 }
 
-export function MathTrainer({ studentId, profile, progress }: MathTrainerProps) {
+export function MathTrainer({
+  studentId,
+  profile,
+  progress,
+}: MathTrainerProps) {
   const [answer, setAnswer] = useState('');
   const [currentProblem, setCurrentProblem] = useState<Problem | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -42,11 +46,11 @@ export function MathTrainer({ studentId, profile, progress }: MathTrainerProps) 
         },
         body: JSON.stringify({ profile, progress }),
       });
-      
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      
+
       const data = await response.json();
       if (!data) {
         throw new Error('No data received from server');
@@ -66,7 +70,7 @@ export function MathTrainer({ studentId, profile, progress }: MathTrainerProps) 
 
     try {
       const isCorrect = Number(answer) === currentProblem.answer;
-      
+
       const response = await fetch('/api/math/update-progress', {
         method: 'POST',
         headers: {
@@ -97,17 +101,15 @@ export function MathTrainer({ studentId, profile, progress }: MathTrainerProps) 
     <div className="max-w-2xl mx-auto p-8">
       <Card className="p-6">
         <h2 className="text-2xl font-bold mb-6">Math Practice</h2>
-        
-        {error && (
-          <div className="text-red-500 mb-4">{error}</div>
-        )}
-        
+
+        {error && <div className="text-red-500 mb-4">{error}</div>}
+
         {!currentProblem ? (
           <Button onClick={generateNewProblem}>Start Practice</Button>
         ) : (
           <div className="space-y-4">
             <div className="text-xl">{currentProblem.question}</div>
-            
+
             <Input
               type="number"
               value={answer}
@@ -115,11 +117,11 @@ export function MathTrainer({ studentId, profile, progress }: MathTrainerProps) 
               placeholder="Enter your answer"
               className="text-lg"
             />
-            
+
             <Button onClick={checkAnswer}>Submit Answer</Button>
           </div>
         )}
       </Card>
     </div>
   );
-} 
+}

@@ -1,27 +1,27 @@
 export const singaporeContexts = {
   shopping: [
-    'NTUC FairPrice', 
-    'Giant', 
-    'Cold Storage', 
-    'Sheng Siong', 
+    'NTUC FairPrice',
+    'Giant',
+    'Cold Storage',
+    'Sheng Siong',
     'Prime Supermarket',
     'Don Don Donki',
     'Mustafa Centre',
     'Popular Bookstore',
     'Daiso',
-    'Value Dollar'
+    'Value Dollar',
   ],
   transport: [
-    'MRT', 
-    'public bus', 
-    'school bus', 
-    'taxi', 
+    'MRT',
+    'public bus',
+    'school bus',
+    'taxi',
     'private bus',
     'LRT',
     'Grab car',
     'shuttle bus',
     'double-decker bus',
-    'express bus'
+    'express bus',
   ],
   food: [
     'chicken rice',
@@ -41,7 +41,7 @@ export const singaporeContexts = {
     'rojak',
     'ice kacang',
     'popiah',
-    'otah'
+    'otah',
   ],
   places: [
     'Orchard Road',
@@ -61,7 +61,7 @@ export const singaporeContexts = {
     'NEX Shopping Mall',
     'Singapore Zoo',
     'Universal Studios',
-    'Clarke Quay'
+    'Clarke Quay',
   ],
   schools: [
     'primary school',
@@ -73,7 +73,7 @@ export const singaporeContexts = {
     'polytechnic',
     'ITE college',
     'enrichment centre',
-    'student care centre'
+    'student care centre',
   ],
   activities: [
     'badminton session',
@@ -85,7 +85,7 @@ export const singaporeContexts = {
     'dance class',
     'Chinese lesson',
     'coding workshop',
-    'math olympiad'
+    'math olympiad',
   ],
   festivals: [
     'Chinese New Year',
@@ -95,7 +95,7 @@ export const singaporeContexts = {
     'National Day',
     'Christmas',
     'Vesak Day',
-    'Thaipusam'
+    'Thaipusam',
   ],
   hawkerFood: [
     'bowl of fishball noodles',
@@ -107,7 +107,7 @@ export const singaporeContexts = {
     'bowl of bak kut teh',
     'plate of economic rice',
     'bowl of yong tau foo',
-    'serving of thunder tea rice'
+    'serving of thunder tea rice',
   ],
   drinks: [
     'teh tarik',
@@ -119,7 +119,7 @@ export const singaporeContexts = {
     'bubble tea',
     'lime juice',
     'grass jelly drink',
-    'coconut water'
+    'coconut water',
   ],
   neighborhoods: [
     'Ang Mo Kio',
@@ -131,7 +131,7 @@ export const singaporeContexts = {
     'Sengkang',
     'Punggol',
     'Clementi',
-    'Toa Payoh'
+    'Toa Payoh',
   ],
   currency: 'SGD',
   currencySymbol: '$',
@@ -139,6 +139,6 @@ export const singaporeContexts = {
     hawkerFood: [3, 4, 5, 6, 7, 8],
     drinks: [1.2, 1.5, 2, 2.5, 3],
     transport: [1.5, 2, 2.5, 3, 3.5],
-    snacks: [1, 1.5, 2, 2.5]
-  }
-}; 
+    snacks: [1, 1.5, 2, 2.5],
+  },
+};

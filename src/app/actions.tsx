@@ -36,7 +36,10 @@ Always:
 }
 
 // Generate Practice Questions
-export async function generateMathPractice(topic: string, difficulty: 'easy' | 'medium' | 'hard') {
+export async function generateMathPractice(
+  topic: string,
+  difficulty: 'easy' | 'medium' | 'hard'
+) {
   const stream = createStreamableUI();
 
   const { text } = await generateText({
@@ -50,8 +53,8 @@ Generate questions that:
     messages: [
       {
         role: 'user',
-        content: `Generate a ${difficulty} level practice question for ${topic} with detailed solution steps.`
-      }
+        content: `Generate a ${difficulty} level practice question for ${topic} with detailed solution steps.`,
+      },
     ],
   });
 

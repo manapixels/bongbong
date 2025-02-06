@@ -29,7 +29,7 @@ export const ratioQuestionGenerator: QuestionGenerator = {
         hints = [
           'Equivalent ratios maintain the same relationship between numbers',
           'If one number in the ratio is multiplied by a number, the other must be multiplied by the same number',
-          `The first number was multiplied by ${multiplier}, so...`
+          `The first number was multiplied by ${multiplier}, so...`,
         ];
         break;
 
@@ -44,7 +44,7 @@ export const ratioQuestionGenerator: QuestionGenerator = {
         hints = [
           'Look for the largest number that divides evenly into both numbers',
           'Try dividing both numbers by 2, 3, or 4',
-          `Both numbers are divisible by ${factor}`
+          `Both numbers are divisible by ${factor}`,
         ];
         break;
 
@@ -54,14 +54,15 @@ export const ratioQuestionGenerator: QuestionGenerator = {
         question = `Which ratio is larger: ${num1}:${num2} or ${ratio2Num1}:${ratio2Num2}?`;
         const ratio1Value = num1 / num2;
         const ratio2Value = ratio2Num1 / ratio2Num2;
-        answer = ratio1Value > ratio2Value ? 
-          `${num1}:${num2}` : 
-          `${ratio2Num1}:${ratio2Num2}`;
+        answer =
+          ratio1Value > ratio2Value
+            ? `${num1}:${num2}`
+            : `${ratio2Num1}:${ratio2Num2}`;
         explanation = `Converting both ratios to decimals: ${num1}:${num2} = ${ratio1Value.toFixed(2)}, ${ratio2Num1}:${ratio2Num2} = ${ratio2Value.toFixed(2)}. Therefore, ${answer} is larger.`;
         hints = [
           'Convert each ratio to a decimal by dividing the first number by the second',
           'Compare the decimal values to find the larger ratio',
-          `${num1} ÷ ${num2} = ${ratio1Value.toFixed(2)}, ${ratio2Num1} ÷ ${ratio2Num2} = ${ratio2Value.toFixed(2)}`
+          `${num1} ÷ ${num2} = ${ratio1Value.toFixed(2)}, ${ratio2Num1} ÷ ${ratio2Num2} = ${ratio2Value.toFixed(2)}`,
         ];
         break;
 
@@ -74,7 +75,7 @@ export const ratioQuestionGenerator: QuestionGenerator = {
         hints = [
           'Equivalent ratios maintain the same relationship between numbers',
           'If one number in the ratio is multiplied by a number, the other must be multiplied by the same number',
-          `The first number was multiplied by ${multiplier}, so...`
+          `The first number was multiplied by ${multiplier}, so...`,
         ];
     }
 
@@ -85,19 +86,22 @@ export const ratioQuestionGenerator: QuestionGenerator = {
       category: MathSubStrand.FRACTIONS,
       solution: {
         steps: [explanation],
-        explanation: explanation
+        explanation: explanation,
       },
 
       hints,
-      difficulty
+      difficulty,
     };
   },
-  generateSimilarQuestion: (originalQuestion: Question, variation: 'easier' | 'harder' | 'same' = 'same') => {
+  generateSimilarQuestion: (
+    originalQuestion: Question,
+    variation: 'easier' | 'harder' | 'same' = 'same'
+  ) => {
     // For now, just generate a new question with the same difficulty
     return ratioQuestionGenerator.generateQuestion(
-      originalQuestion.difficulty * (variation === 'harder' ? 1.2 : variation === 'easier' ? 0.8 : 1),
+      originalQuestion.difficulty *
+        (variation === 'harder' ? 1.2 : variation === 'easier' ? 0.8 : 1),
       []
     );
-
-  }
-}; 
+  },
+};

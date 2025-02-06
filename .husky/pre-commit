@@ -3,4 +3,3 @@
 
 npm run check
 npx lint-staged
-npx prettier --write .
