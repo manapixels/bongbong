@@ -2,7 +2,7 @@ import { auth } from '@/app/(auth)/auth';
 import { db } from '@/lib/db';
 import { mathProblems, studentProgress } from '@/lib/db/schema';
 import { MATH_TOPICS } from '@/types/math';
-import { selectNextQuestion } from '@/lib/math/questionGenerators';
+import { selectNextQuestion } from '@/lib/math';
 import { getStudentProgress } from '@/lib/db/queries';
 import type { StudentProgress } from '@/types/progress';
 
@@ -49,10 +49,11 @@ export async function GET(request: Request) {
     const [savedProblem] = await db
       .insert(mathProblems)
       .values({
-        question: question.text,
-        answer: parseInt(question.correctAnswer.toString()),
+        question: question.question,
+        answer: parseInt(question.answer.toString()),
         difficulty: question.difficulty,
-        category: topic.subStrand,
+        strand: topic.strand,
+        subStrand: topic.subStrand,
       })
       .returning();
 

@@ -28,7 +28,8 @@ export const mathProblems = pgTable('math_problems', {
   id: uuid('id').primaryKey().defaultRandom(),
   question: text('question').notNull(),
   answer: integer('answer').notNull(),
-  category: text('category').notNull(),
+  strand: text('strand').notNull(),
+  subStrand: text('sub_strand').notNull(),
   difficulty: integer('difficulty').notNull(),
 });
 

@@ -43,8 +43,24 @@ export interface QuestionTypeConfig {
 export interface SubTopic {
   id: string;
   name: string;
-  difficulty: number; // 1-4 scale
+  difficulty: number;
   objectives?: string[];
+  sampleQuestions?: {
+    question: string;
+    answer: string | number | null | number[] | string[];
+    explanation: string[];
+    type: 'mcq' | 'numeric' | 'word-problem';
+    variables?: {
+      [key: string]: {
+        min: number;
+        max: number;
+        step?: number;
+      };
+    };
+    // Optional fields for MCQ
+    options?: string[];
+    generateOptions?: (answer: number) => string[];
+  }[];
 }
 
 export interface MathTopic {
@@ -61,7 +77,7 @@ export interface PracticeQuestion {
   type: QuestionType;
   question: string;
   options?: string[]; // For MCQ questions
-  correctAnswer: string | number;
+  answer: string | number;
   explanation: string[];
   difficulty: number;
   topicId: string;
@@ -150,7 +166,7 @@ export interface Solution {
 export interface Question {
   id: string;
   text: string;
-  correctAnswer: string;
+  answer: string;
   difficulty: number;
   category: MathSubStrand;
   solution: {
@@ -182,7 +198,7 @@ export interface StudentProfile {
 
 export interface Progress {
   totalProblems: number;
-  correctAnswers: number;
+  answers: number;
   topicStats: Record<string, { total: number; correct: number }>;
 }
 
@@ -208,6 +224,20 @@ export const MATH_TOPICS: MathTopic[] = [
           'Patterns in number sequences',
           'Ordinal numbers (first, second, up to tenth) and symbols (1st, 2nd, 3rd, etc.)',
         ],
+        sampleQuestions: [
+          {
+            question: 'What is the sum of 35 and 47?',
+            answer: 82,
+            explanation: ['35 + 47 = 82'],
+            type: 'numeric',
+          },
+          {
+            question: 'What is the product of 7 and 8?',
+            answer: 56,
+            explanation: ['7 × 8 = 56'],
+            type: 'numeric',
+          },
+        ],
       },
       {
         id: 'addition-and-subtraction',
@@ -223,6 +253,20 @@ export const MATH_TOPICS: MathTopic[] = [
           'Mental calculation involving addition and subtraction of a 2-digit number and ones without renaming',
           'Mental calculation involving addition and subtraction of a 2-digit number and tens',
         ],
+        sampleQuestions: [
+          {
+            question: 'What is the sum of 23, 45, and 17?',
+            answer: 85,
+            explanation: ['23 + 45 + 17 = 85'],
+            type: 'numeric',
+          },
+          {
+            question: 'What is the difference between 78 and 54?',
+            answer: 24,
+            explanation: ['78 - 54 = 24'],
+            type: 'numeric',
+          },
+        ],
       },
       {
         id: 'multiplication',
@@ -233,12 +277,40 @@ export const MATH_TOPICS: MathTopic[] = [
           'Use of ×',
           'Multiplying within 40',
         ],
+        sampleQuestions: [
+          {
+            question: 'What is the product of 6 and 7?',
+            answer: 42,
+            explanation: ['6 × 7 = 42'],
+            type: 'numeric',
+          },
+          {
+            question: 'What is the product of 8 and 5?',
+            answer: 40,
+            explanation: ['8 × 5 = 40'],
+            type: 'numeric',
+          },
+        ],
       },
       {
         id: 'division',
         name: 'Division',
         difficulty: 1,
         objectives: ['Concepts of division', 'Dividing within 20'],
+        sampleQuestions: [
+          {
+            question: 'What is the quotient when 48 is divided by 6?',
+            answer: 8,
+            explanation: ['48 ÷ 6 = 8'],
+            type: 'numeric',
+          },
+          {
+            question: 'What is the quotient when 56 is divided by 7?',
+            answer: 8,
+            explanation: ['56 ÷ 7 = 8'],
+            type: 'numeric',
+          },
+        ],
       },
     ],
   },
@@ -256,6 +328,20 @@ export const MATH_TOPICS: MathTopic[] = [
         objectives: [
           'Counting amount of money in cents up to $1',
           'Counting amount of money in dollars up to $100',
+        ],
+        sampleQuestions: [
+          {
+            question: 'How many cents are there in $0.75?',
+            answer: 75,
+            explanation: ['$0.75 = 75 cents'],
+            type: 'numeric',
+          },
+          {
+            question: 'How many dollars are there in 1000 cents?',
+            answer: 10,
+            explanation: ['1000 cents = 10 dollars'],
+            type: 'numeric',
+          },
         ],
       },
     ],
@@ -277,6 +363,20 @@ export const MATH_TOPICS: MathTopic[] = [
           'Comparing and ordering lengths in cm',
           'Measuring and drawing a line segment to the nearest cm',
         ],
+        sampleQuestions: [
+          {
+            question: 'What is the length of a line that is 15 cm long?',
+            answer: 15,
+            explanation: ['The length is 15 cm'],
+            type: 'numeric',
+          },
+          {
+            question: 'Draw a line segment that is 7 cm long.',
+            answer: null,
+            explanation: ['Draw a line segment that is 7 cm long'],
+            type: 'mcq',
+          },
+        ],
       },
       {
         id: 'measurement-of-time',
@@ -287,6 +387,22 @@ export const MATH_TOPICS: MathTopic[] = [
           'Use of "am" and "pm"',
           'Use of abbreviations h and min',
           'Duration of one hour/half hour',
+        ],
+        sampleQuestions: [
+          {
+            question:
+              'What time is it when the hour hand is on 3 and the minute hand is on 12?',
+            answer: '3:00',
+            explanation: ['It is 3:00'],
+            type: 'numeric',
+          },
+          {
+            question:
+              'What time is it when the hour hand is on 12 and the minute hand is on 30?',
+            answer: '12:30',
+            explanation: ['It is 12:30'],
+            type: 'numeric',
+          },
         ],
       },
     ],
@@ -313,6 +429,21 @@ export const MATH_TOPICS: MathTopic[] = [
           'Identifying the 2D shapes that make up a given figure',
           'Copying figures on dot grid or square grid',
         ],
+        sampleQuestions: [
+          {
+            question:
+              'What is the area of a rectangle with length 5 cm and width 3 cm?',
+            answer: 15,
+            explanation: ['Area = length × width = 5 cm × 3 cm = 15 cm²'],
+            type: 'numeric',
+          },
+          {
+            question: 'Draw a square.',
+            answer: null,
+            explanation: ['Draw a square'],
+            type: 'mcq',
+          },
+        ],
       },
     ],
   },
@@ -328,6 +459,14 @@ export const MATH_TOPICS: MathTopic[] = [
         name: 'Picture Graphs',
         difficulty: 1,
         objectives: ['Reading and interpreting data from picture graphs'],
+        sampleQuestions: [
+          {
+            question: 'How many students chose option A?',
+            answer: 20,
+            explanation: ['20 students chose option A'],
+            type: 'numeric',
+          },
+        ],
       },
     ],
   },
@@ -351,6 +490,14 @@ export const MATH_TOPICS: MathTopic[] = [
           'Patterns in number sequences',
           'Odd and even numbers',
         ],
+        sampleQuestions: [
+          {
+            question: 'What is the sum of 500, 300, and 200?',
+            answer: 1000,
+            explanation: ['500 + 300 + 200 = 1000'],
+            type: 'numeric',
+          },
+        ],
       },
       {
         id: 'whole-numbers-addition-and-subtraction',
@@ -359,6 +506,20 @@ export const MATH_TOPICS: MathTopic[] = [
         objectives: [
           'Addition and subtraction algorithms (up to 3 digits)',
           'Mental calculation involving addition and subtraction of a 3-digit number and ones/tens/hundreds',
+        ],
+        sampleQuestions: [
+          {
+            question: 'What is the sum of 456 and 234?',
+            answer: 690,
+            explanation: ['456 + 234 = 690'],
+            type: 'numeric',
+          },
+          {
+            question: 'What is the difference between 876 and 543?',
+            answer: 333,
+            explanation: ['876 - 543 = 333'],
+            type: 'numeric',
+          },
         ],
       },
       {
@@ -371,6 +532,20 @@ export const MATH_TOPICS: MathTopic[] = [
           'Relationship between multiplication and division',
           'Multiplying and dividing within the multiplication tables',
           'Mental calculation involving multiplication and division',
+        ],
+        sampleQuestions: [
+          {
+            question: 'What is the product of 7 and 8?',
+            answer: 56,
+            explanation: ['7 × 8 = 56'],
+            type: 'numeric',
+          },
+          {
+            question: 'What is the quotient when 48 is divided by 6?',
+            answer: 8,
+            explanation: ['48 ÷ 6 = 8'],
+            type: 'numeric',
+          },
         ],
       },
     ],
@@ -392,6 +567,14 @@ export const MATH_TOPICS: MathTopic[] = [
           'Comparing and ordering unitfractions with denominators not exceeding 12',
           'Comparing and ordering like fractions with denominators not exceeding 12',
         ],
+        sampleQuestions: [
+          {
+            question: 'What is the fraction of the circle that is shaded?',
+            answer: 0.75,
+            explanation: ['The shaded area is 3/4 of the circle'],
+            type: 'numeric',
+          },
+        ],
       },
       {
         id: 'fraction-addition-and-subtraction',
@@ -399,6 +582,14 @@ export const MATH_TOPICS: MathTopic[] = [
         difficulty: 2,
         objectives: [
           'Adding and subtracting like fractions within one whole with denominators of given fractions not exceeding 12',
+        ],
+        sampleQuestions: [
+          {
+            question: 'What is the sum of 1/4 and 1/4?',
+            answer: 0.5,
+            explanation: ['1/4 + 1/4 = 2/4 = 1/2'],
+            type: 'numeric',
+          },
         ],
       },
     ],
@@ -419,6 +610,17 @@ export const MATH_TOPICS: MathTopic[] = [
           'Reading and writing money in decimal notation',
           'Comparing two or three amounts of money',
           'Converting money in decimal notation to cents only, and vice versa',
+        ],
+        sampleQuestions: [
+          {
+            question:
+              'What is the total amount of money if you have 3 quarters and 2 dimes?',
+            answer: 0.85,
+            explanation: [
+              '3 quarters = $0.75, 2 dimes = $0.20, 0.75 + 0.20 = $0.95',
+            ],
+            type: 'numeric',
+          },
         ],
       },
     ],
@@ -443,6 +645,14 @@ export const MATH_TOPICS: MathTopic[] = [
           'Comparing and ordering masses',
           'Comparing and ordering volumes',
         ],
+        sampleQuestions: [
+          {
+            question: 'What is the length of a table that is 1.2 meters long?',
+            answer: 1.2,
+            explanation: ['The length is 1.2 meters'],
+            type: 'numeric',
+          },
+        ],
       },
       {
         id: 'measurement-time',
@@ -452,6 +662,15 @@ export const MATH_TOPICS: MathTopic[] = [
           'Telling time to the minute',
           'Measuring time in hours and minutes',
           'Converting time in hours and minutes to minutes only, and vice versa',
+        ],
+        sampleQuestions: [
+          {
+            question:
+              'What time is it when the hour hand is on 3 and the minute hand is on 12?',
+            answer: '3:00',
+            explanation: ['It is 3:00'],
+            type: 'numeric',
+          },
         ],
       },
     ],
@@ -470,6 +689,14 @@ export const MATH_TOPICS: MathTopic[] = [
         objectives: [
           'Making/completing patterns with 2D shapes according to one or two of the following attributes: size, shape, color, orientation',
         ],
+        sampleQuestions: [
+          {
+            question: 'Draw a rectangle.',
+            answer: null,
+            explanation: ['Draw a rectangle'],
+            type: 'mcq',
+          },
+        ],
       },
       {
         id: '3d-shapes',
@@ -477,6 +704,14 @@ export const MATH_TOPICS: MathTopic[] = [
         difficulty: 2,
         objectives: [
           'Identifying, naming, describing and classifying 3D shapes: cube, cuboid, cone, cylinder, sphere',
+        ],
+        sampleQuestions: [
+          {
+            question: "What is the shape of a Rubik's cube?",
+            answer: 'cube',
+            explanation: ["A Rubik's cube is a cube"],
+            type: 'mcq',
+          },
         ],
       },
     ],
@@ -494,6 +729,14 @@ export const MATH_TOPICS: MathTopic[] = [
         difficulty: 2,
         objectives: [
           'Reading and interpreting data from picture graphs with scales',
+        ],
+        sampleQuestions: [
+          {
+            question: 'How many students chose option B?',
+            answer: 15,
+            explanation: ['15 students chose option B'],
+            type: 'numeric',
+          },
         ],
       },
     ],
@@ -517,6 +760,14 @@ export const MATH_TOPICS: MathTopic[] = [
           'Comparing and ordering numbers',
           'Patterns in number sequences',
         ],
+        sampleQuestions: [
+          {
+            question: 'What is the sum of 5,000, 3,000, and 2,000?',
+            answer: 10000,
+            explanation: ['5,000 + 3,000 + 2,000 = 10,000'],
+            type: 'numeric',
+          },
+        ],
       },
       {
         id: 'addition-and-subtraction',
@@ -525,6 +776,20 @@ export const MATH_TOPICS: MathTopic[] = [
         objectives: [
           'Addition and subtraction algorithms (up to 4 digits)',
           'Mental calculation involving addition and subtraction of two 2-digit numbers',
+        ],
+        sampleQuestions: [
+          {
+            question: 'What is the sum of 4,567 and 2,345?',
+            answer: 6912,
+            explanation: ['4,567 + 2,345 = 6,912'],
+            type: 'numeric',
+          },
+          {
+            question: 'What is the difference between 8,765 and 3,456?',
+            answer: 5309,
+            explanation: ['8,765 - 3,456 = 5,309'],
+            type: 'numeric',
+          },
         ],
       },
       {
@@ -537,6 +802,20 @@ export const MATH_TOPICS: MathTopic[] = [
           'Division with remainder',
           'Multiplication and division algorithms (up to 3 digits by 1 digit)',
           'Mental calculation involving multiplication and division within multiplication tables',
+        ],
+        sampleQuestions: [
+          {
+            question: 'What is the product of 6 and 7?',
+            answer: 42,
+            explanation: ['6 × 7 = 42'],
+            type: 'numeric',
+          },
+          {
+            question: 'What is the quotient when 42 is divided by 6?',
+            answer: 7,
+            explanation: ['42 ÷ 6 = 7'],
+            type: 'numeric',
+          },
         ],
       },
     ],
@@ -558,6 +837,14 @@ export const MATH_TOPICS: MathTopic[] = [
           'Comparing and ordering unlike fractions with denominators not exceeding 12',
           'Writing equivalent fractions given the denominator or numerator',
         ],
+        sampleQuestions: [
+          {
+            question: 'What is the simplest form of 4/8?',
+            answer: 0.5,
+            explanation: ['4/8 = 1/2'],
+            type: 'numeric',
+          },
+        ],
       },
       {
         id: 'fractions-addition-and-subtraction',
@@ -566,6 +853,14 @@ export const MATH_TOPICS: MathTopic[] = [
         objectives: [
           'Adding and subtracting two related fractions within one whole',
           'Denominators of given fractions not exceeding 12',
+        ],
+        sampleQuestions: [
+          {
+            question: 'What is the sum of 1/4 and 1/4?',
+            answer: 0.5,
+            explanation: ['1/4 + 1/4 = 2/4 = 1/2'],
+            type: 'numeric',
+          },
         ],
       },
     ],
@@ -582,6 +877,15 @@ export const MATH_TOPICS: MathTopic[] = [
         name: 'Money Operations',
         difficulty: 3,
         objectives: ['Adding and subtracting money in decimal notation'],
+        sampleQuestions: [
+          {
+            question:
+              'What is the total amount of money if you have $0.75 and $0.20?',
+            answer: 0.95,
+            explanation: ['$0.75 + $0.20 = $0.95'],
+            type: 'numeric',
+          },
+        ],
       },
     ],
   },
@@ -605,6 +909,14 @@ export const MATH_TOPICS: MathTopic[] = [
           'Converting a compound unit to the smaller unit (kilograms and grams)',
           'Converting a compound unit to the larger unit (litres and millilitres)',
         ],
+        sampleQuestions: [
+          {
+            question: 'What is the length of a road that is 5 kilometers long?',
+            answer: 5,
+            explanation: ['The length is 5 kilometers'],
+            type: 'numeric',
+          },
+        ],
       },
       {
         id: 'time',
@@ -614,6 +926,15 @@ export const MATH_TOPICS: MathTopic[] = [
           'Measuring time in seconds',
           'Finding starting time, finishing time or duration',
           '24-hour clock',
+        ],
+        sampleQuestions: [
+          {
+            question:
+              'What time is it when the hour hand is on 3 and the minute hand is on 12?',
+            answer: '3:00',
+            explanation: ['It is 3:00'],
+            type: 'numeric',
+          },
         ],
       },
     ],
@@ -638,6 +959,15 @@ export const MATH_TOPICS: MathTopic[] = [
           'Area of rectangle',
           'Area of square',
         ],
+        sampleQuestions: [
+          {
+            question:
+              'What is the area of a rectangle with length 5 cm and width 3 cm?',
+            answer: 15,
+            explanation: ['Area = length × width = 5 cm × 3 cm = 15 cm²'],
+            type: 'numeric',
+          },
+        ],
       },
     ],
   },
@@ -657,6 +987,14 @@ export const MATH_TOPICS: MathTopic[] = [
           'Right angles',
           'Angles greater than/smaller than a right angle',
         ],
+        sampleQuestions: [
+          {
+            question: 'What is the measure of angle ABC?',
+            answer: 90,
+            explanation: ['Angle ABC is a right angle'],
+            type: 'numeric',
+          },
+        ],
       },
       {
         id: 'perpendicular-and-parallel-lines',
@@ -665,6 +1003,14 @@ export const MATH_TOPICS: MathTopic[] = [
         objectives: [
           'Perpendicular and parallel lines',
           'Drawing perpendicular and parallel lines',
+        ],
+        sampleQuestions: [
+          {
+            question: 'Draw a perpendicular line to line AB.',
+            answer: null,
+            explanation: ['Draw a perpendicular line to line AB'],
+            type: 'mcq',
+          },
         ],
       },
     ],
@@ -683,6 +1029,14 @@ export const MATH_TOPICS: MathTopic[] = [
         objectives: [
           'Reading and interpreting data from bar graphs',
           'Using different scales on axis',
+        ],
+        sampleQuestions: [
+          {
+            question: 'How many students chose option A?',
+            answer: 20,
+            explanation: ['20 students chose option A'],
+            type: 'numeric',
+          },
         ],
       },
     ],
@@ -707,6 +1061,14 @@ export const MATH_TOPICS: MathTopic[] = [
           'Rounding numbers to the nearest 10, 100 or 1000',
           'Use of ≈',
         ],
+        sampleQuestions: [
+          {
+            question: 'What is the sum of 50,000, 30,000, and 20,000?',
+            answer: 100000,
+            explanation: ['50,000 + 30,000 + 20,000 = 100,000'],
+            type: 'numeric',
+          },
+        ],
       },
       {
         id: 'factors-and-multiples',
@@ -719,6 +1081,14 @@ export const MATH_TOPICS: MathTopic[] = [
           'Determining if a number is a multiple of a given 1-digit number',
           'Finding the common multiples of two given 1-digit numbers',
         ],
+        sampleQuestions: [
+          {
+            question: 'What are the factors of 24?',
+            answer: [1, 2, 3, 4, 6, 8, 12, 24],
+            explanation: ['The factors of 24 are 1, 2, 3, 4, 6, 8, 12, and 24'],
+            type: 'numeric',
+          },
+        ],
       },
       {
         id: 'four-operations',
@@ -728,6 +1098,14 @@ export const MATH_TOPICS: MathTopic[] = [
           'Multiplication algorithm up to 4 digits by 1 digit',
           'Multiplication algorithm up to 3 digits by 2 digits',
           'Division algorithm (up to 4 digits by 1 digit)',
+        ],
+        sampleQuestions: [
+          {
+            question: 'What is the product of 4,567 and 8?',
+            answer: 36536,
+            explanation: ['4,567 × 8 = 36536'],
+            type: 'numeric',
+          },
         ],
       },
     ],
@@ -746,12 +1124,28 @@ export const MATH_TOPICS: MathTopic[] = [
         objectives: [
           'Mixed numbers, improper fractions and their relationship',
         ],
+        sampleQuestions: [
+          {
+            question: 'What is the mixed number form of 7/3?',
+            answer: '2 1/3',
+            explanation: ['7/3 = 2 1/3'],
+            type: 'numeric',
+          },
+        ],
       },
       {
         id: 'fraction-of-a-set',
         name: 'Fraction of a Set',
         difficulty: 4,
         objectives: ['fraction as part of a set'],
+        sampleQuestions: [
+          {
+            question: 'What fraction of the class is boys?',
+            answer: 0.5,
+            explanation: ['Half of the class is boys'],
+            type: 'numeric',
+          },
+        ],
       },
       {
         id: 'fraction-addition-and-subtraction',
@@ -759,6 +1153,14 @@ export const MATH_TOPICS: MathTopic[] = [
         difficulty: 4,
         objectives: [
           'Add and subtract fractions with denominators not exceeding 12 and not more than two different denominators',
+        ],
+        sampleQuestions: [
+          {
+            question: 'What is the sum of 1/4 and 1/4?',
+            answer: 0.5,
+            explanation: ['1/4 + 1/4 = 2/4 = 1/2'],
+            type: 'numeric',
+          },
         ],
       },
     ],
@@ -779,10 +1181,17 @@ export const MATH_TOPICS: MathTopic[] = [
           'Comparing and ordering decimals',
           'Expressing decimals as fractions',
           'Expressing fractions as decimals when denominator is factor of 10 or 100',
-          'Rounding decimals to:',
-          '- The nearest whole number',
-          '- 1 decimal place',
-          '- 2 decimal places',
+          'Rounding decimals to the nearest whole number',
+          'Rounding decimals to 1 decimal place',
+          'Rounding decimals to 2 decimal places',
+        ],
+        sampleQuestions: [
+          {
+            question: 'What is the decimal form of 3/4?',
+            answer: 0.75,
+            explanation: ['3/4 = 0.75'],
+            type: 'numeric',
+          },
         ],
       },
       {
@@ -794,6 +1203,14 @@ export const MATH_TOPICS: MathTopic[] = [
           'Multiplying and dividing decimals (up to 2 decimal places) by a 1-digit whole number',
           'Dividing a whole number by a whole number with quotient as a decimal',
           'Rounding answers to a specified degree of accuracy',
+        ],
+        sampleQuestions: [
+          {
+            question: 'What is the sum of 0.75 and 0.25?',
+            answer: 1,
+            explanation: ['0.75 + 0.25 = 1'],
+            type: 'numeric',
+          },
         ],
       },
     ],
@@ -814,6 +1231,17 @@ export const MATH_TOPICS: MathTopic[] = [
           'Finding the length of one side of a square given its area/perimeter',
           'Finding the area and perimeter of composite figures made up of rectangles and squares',
         ],
+        sampleQuestions: [
+          {
+            question:
+              'What is the length of a rectangle with area 20 cm² and width 5 cm?',
+            answer: 4,
+            explanation: [
+              'Area = length × width, so 20 = 4 × width, so width = 5 cm',
+            ],
+            type: 'numeric',
+          },
+        ],
       },
     ],
   },
@@ -833,6 +1261,14 @@ export const MATH_TOPICS: MathTopic[] = [
           'Measuring angles in degrees',
           'Drawing an angle of given size',
         ],
+        sampleQuestions: [
+          {
+            question: 'What is the measure of angle ABC?',
+            answer: 90,
+            explanation: ['Angle ABC is a right angle'],
+            type: 'numeric',
+          },
+        ],
       },
     ],
   },
@@ -851,6 +1287,14 @@ export const MATH_TOPICS: MathTopic[] = [
           'Properties of rectangle and square, excluding diagonal properties',
           'Drawing rectangles and squares',
         ],
+        sampleQuestions: [
+          {
+            question: 'Draw a rectangle.',
+            answer: null,
+            explanation: ['Draw a rectangle'],
+            type: 'mcq',
+          },
+        ],
       },
       {
         id: 'line-symmetry',
@@ -860,6 +1304,14 @@ export const MATH_TOPICS: MathTopic[] = [
           'Identifying symmetric figures',
           'Determining whether a straight line is a line of symmetry of a symmetric figure',
           'Completing a symmetric figure with respect to a given line of symmetry on square grid',
+        ],
+        sampleQuestions: [
+          {
+            question: 'Draw the line of symmetry for the given figure.',
+            answer: null,
+            explanation: ['Draw the line of symmetry for the given figure'],
+            type: 'mcq',
+          },
         ],
       },
       {
@@ -883,6 +1335,14 @@ export const MATH_TOPICS: MathTopic[] = [
           'Identifying the nets of 3D solids: pyramid',
           'Identifying the solid which can be formed by a given net',
         ],
+        sampleQuestions: [
+          {
+            question: 'Draw the net of a cube.',
+            answer: null,
+            explanation: ['Draw the net of a cube'],
+            type: 'mcq',
+          },
+        ],
       },
     ],
   },
@@ -901,6 +1361,14 @@ export const MATH_TOPICS: MathTopic[] = [
           'Completing a table from given data',
           'Reading and interpreting data from tables/line graphs/pie charts',
         ],
+        sampleQuestions: [
+          {
+            question: 'Complete the table from the given data.',
+            answer: null,
+            explanation: ['Complete the table from the given data'],
+            type: 'mcq',
+          },
+        ],
       },
     ],
   },
@@ -918,6 +1386,25 @@ export const MATH_TOPICS: MathTopic[] = [
         difficulty: 5,
         objectives: [
           'Reading and writing numbers in numerals and in words up to 10 million',
+        ],
+        sampleQuestions: [
+          {
+            question:
+              'What is the number for one million nine hundred and ninety-nine thousand?',
+            answer: 1999000,
+            explanation: [
+              'The number for one million nine hundred and ninety-nine thousand is 1999000',
+            ],
+            type: 'numeric',
+          },
+          {
+            question: 'Write the number 1,999,000 in words.',
+            answer: 'one million nine hundred and ninety-nine thousand',
+            explanation: [
+              'The number 1,999,000 in words is one million nine hundred and ninety-nine thousand',
+            ],
+            type: 'word-problem',
+          },
         ],
       },
     ],
@@ -938,6 +1425,14 @@ export const MATH_TOPICS: MathTopic[] = [
           'Order of operations without calculator',
           'Use of brackets without calculator',
         ],
+        sampleQuestions: [
+          {
+            question: 'What is the product of 10 and 100?',
+            answer: 1000,
+            explanation: ['10 × 100 = 1000'],
+            type: 'numeric',
+          },
+        ],
       },
     ],
   },
@@ -956,6 +1451,14 @@ export const MATH_TOPICS: MathTopic[] = [
           'Dividing a whole number by a whole number with quotient as a fraction',
           'Expressing fractions as decimals',
         ],
+        sampleQuestions: [
+          {
+            question: 'What is the quotient when 4 is divided by 8?',
+            answer: 0.5,
+            explanation: ['4 ÷ 8 = 0.5'],
+            type: 'numeric',
+          },
+        ],
       },
       {
         id: 'fractions-four-operations',
@@ -967,6 +1470,14 @@ export const MATH_TOPICS: MathTopic[] = [
           'Multiplying a proper fraction and a proper/improper fraction without calculator',
           'Multiplying two improper fractions',
           'Multiplying a mixed number and a whole number',
+        ],
+        sampleQuestions: [
+          {
+            question: 'What is the sum of 2 1/4 and 1 3/4?',
+            answer: 4,
+            explanation: ['2 1/4 + 1 3/4 = 4'],
+            type: 'numeric',
+          },
         ],
       },
     ],
@@ -985,6 +1496,14 @@ export const MATH_TOPICS: MathTopic[] = [
         objectives: [
           'Multiplying and dividing decimals (up to 3 decimal places) by 10, 100, 1000 and their multiples without calculator',
           'Converting a measurement from a smaller unit to a larger unit in decimal form, and vice versa between km and m, kg and g, L and mL',
+        ],
+        sampleQuestions: [
+          {
+            question: 'What is the product of 0.5 and 0.5?',
+            answer: 0.25,
+            explanation: ['0.5 × 0.5 = 0.25'],
+            type: 'numeric',
+          },
         ],
       },
     ],
@@ -1006,6 +1525,14 @@ export const MATH_TOPICS: MathTopic[] = [
           'Finding a percentage part of a whole',
           'Finding discount, GST and annual interest',
         ],
+        sampleQuestions: [
+          {
+            question: 'What percentage is 20 out of 50?',
+            answer: 40,
+            explanation: ['20 ÷ 50 = 0.4, which is 40%'],
+            type: 'numeric',
+          },
+        ],
       },
     ],
   },
@@ -1026,6 +1553,15 @@ export const MATH_TOPICS: MathTopic[] = [
           'Finding total amount given rate and number of units',
           'Finding number of units given rate and total amount',
         ],
+        sampleQuestions: [
+          {
+            question:
+              'How much does each item cost if 100 of this item cost $500?',
+            answer: 5,
+            explanation: ['500 ÷ 100 = 5, so each item costs $5.'],
+            type: 'numeric',
+          },
+        ],
       },
     ],
   },
@@ -1045,6 +1581,17 @@ export const MATH_TOPICS: MathTopic[] = [
           'Area of triangle',
           'Finding area of composite figures with triangles',
         ],
+        sampleQuestions: [
+          {
+            question:
+              'What is the area of a triangle with base 10 cm and height 5 cm?',
+            answer: 25,
+            explanation: [
+              'Area = 1/2 × base × height = 1/2 × 10 cm × 5 cm = 25 cm²',
+            ],
+            type: 'numeric',
+          },
+        ],
       },
       {
         id: 'volume-of-cube-and-cuboid',
@@ -1057,6 +1604,16 @@ export const MATH_TOPICS: MathTopic[] = [
           'Volume of cube/cuboid',
           'Finding volume of liquid in a rectangular tank',
           'Relationship between ℓ (or ml) with cm3',
+        ],
+        sampleQuestions: [
+          {
+            question: 'What is the volume of a cube with side length 3 cm?',
+            answer: 27,
+            explanation: [
+              'Volume = side length³ = 3 cm × 3 cm × 3 cm = 27 cm³',
+            ],
+            type: 'numeric',
+          },
         ],
       },
     ],
@@ -1078,6 +1635,14 @@ export const MATH_TOPICS: MathTopic[] = [
           'Vertically opposite angles',
           'Finding unknown angles',
         ],
+        sampleQuestions: [
+          {
+            question: 'What is the measure of angle ABC?',
+            answer: 90,
+            explanation: ['Angle ABC is a right angle'],
+            type: 'numeric',
+          },
+        ],
       },
       {
         id: 'triangles',
@@ -1090,6 +1655,16 @@ export const MATH_TOPICS: MathTopic[] = [
           'Angle sum of a triangle',
           'Finding unknown angles without additional construction',
         ],
+        sampleQuestions: [
+          {
+            question: 'What is the measure of angle x in the given triangle?',
+            answer: 45,
+            explanation: [
+              'The triangle is isosceles, so the two base angles are equal',
+            ],
+            type: 'numeric',
+          },
+        ],
       },
       {
         id: 'quadrilaterals',
@@ -1100,6 +1675,15 @@ export const MATH_TOPICS: MathTopic[] = [
           'Properties of rhombus',
           'Properties of trapezium',
           'Finding unknown angles without additional construction',
+        ],
+        sampleQuestions: [
+          {
+            question:
+              'What is the measure of angle x in the given parallelogram?',
+            answer: 120,
+            explanation: ['The opposite angles in a parallelogram are equal'],
+            type: 'numeric',
+          },
         ],
       },
     ],
@@ -1120,6 +1704,14 @@ export const MATH_TOPICS: MathTopic[] = [
           'Dividing a proper fraction by a whole number',
           'Dividing a whole number/proper fraction by a proper fraction',
         ],
+        sampleQuestions: [
+          {
+            question: 'What is the quotient when 4 is divided by 8?',
+            answer: 0.5,
+            explanation: ['4 ÷ 8 = 0.5'],
+            type: 'numeric',
+          },
+        ],
       },
     ],
   },
@@ -1137,6 +1729,15 @@ export const MATH_TOPICS: MathTopic[] = [
         objectives: [
           'Finding the whole given a part and the percentage',
           'Finding percentage increase/decrease',
+        ],
+        sampleQuestions: [
+          {
+            question:
+              'What is the original price if a 20% discount reduces it to $80?',
+            answer: 100,
+            explanation: ['80 is 80% of the original price'],
+            type: 'numeric',
+          },
         ],
       },
     ],
@@ -1162,6 +1763,15 @@ export const MATH_TOPICS: MathTopic[] = [
           'finding the missing term in a pair of equivalent ratios',
           'relationship between fraction and ratio',
         ],
+        sampleQuestions: [
+          {
+            question:
+              'What is the ratio of boys to girls if there are 12 boys and 8 girls?',
+            answer: '3:2',
+            explanation: ['12 ÷ 4 = 3, 8 ÷ 4 = 2'],
+            type: 'numeric',
+          },
+        ],
       },
     ],
   },
@@ -1183,6 +1793,14 @@ export const MATH_TOPICS: MathTopic[] = [
           'evaluating simple linear expressions by substitution',
           'simple linear equations involving whole number coefficient only',
         ],
+        sampleQuestions: [
+          {
+            question: 'What is the value of x in the equation 2x + 3 = 7?',
+            answer: 2,
+            explanation: ['2x + 3 = 7, so 2x = 7 - 3, so x = 2'],
+            type: 'numeric',
+          },
+        ],
       },
     ],
   },
@@ -1203,6 +1821,14 @@ export const MATH_TOPICS: MathTopic[] = [
           'Finding the area and perimeter of quarter circle',
           'Finding the area and perimeter of composite figures made up of square, rectangle, triangle, semicircle and quarter circle ',
         ],
+        sampleQuestions: [
+          {
+            question: 'What is the area of a circle with radius 5 cm?',
+            answer: 78.5,
+            explanation: ['Area = πr² = 3.14 × 5 cm × 5 cm = 78.5 cm²'],
+            type: 'numeric',
+          },
+        ],
       },
       {
         id: 'volume-of-cube-and-cuboid',
@@ -1214,6 +1840,16 @@ export const MATH_TOPICS: MathTopic[] = [
           'Finding the height of a cuboid given its volume and base area',
           'Finding the area of a face of a cuboid given its volume and one dimension',
           'Use of square root and cube root',
+        ],
+        sampleQuestions: [
+          {
+            question: 'What is the volume of a cube with side length 4 cm?',
+            answer: 64,
+            explanation: [
+              'Volume = side length³ = 4 cm × 4 cm × 4 cm = 64 cm³',
+            ],
+            type: 'numeric',
+          },
         ],
       },
     ],
@@ -1231,6 +1867,15 @@ export const MATH_TOPICS: MathTopic[] = [
         difficulty: 6,
         objectives: [
           'Finding unknown angles, without additional construction of lines, in composite geometric figures involving squares, rectangles, triangles, parallelograms, rhombuses and trapeziums',
+        ],
+        sampleQuestions: [
+          {
+            question:
+              'What is the measure of angle x in the given quadrilateral?',
+            answer: 120,
+            explanation: ['The sum of angles in a quadrilateral is 360°'],
+            type: 'numeric',
+          },
         ],
       },
     ],
@@ -1251,6 +1896,14 @@ export const MATH_TOPICS: MathTopic[] = [
           'Finding average given total value and number of data',
           'Finding total value given average and number of data',
           'Finding number of data given average and total value',
+        ],
+        sampleQuestions: [
+          {
+            question: 'What is the average of the numbers 2, 4, 6, 8, and 10?',
+            answer: 6,
+            explanation: ['(2 + 4 + 6 + 8 + 10) ÷ 5 = 30 ÷ 5 = 6'],
+            type: 'numeric',
+          },
         ],
       },
     ],

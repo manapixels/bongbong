@@ -39,7 +39,7 @@ export function usePracticeSession(topic: MathTopic, studentId: string) {
     if (!currentQuestion) return;
 
     const timeSpent = timer.stop();
-    const correct = answer === currentQuestion.correctAnswer.toString();
+    const correct = answer === currentQuestion.answer.toString();
     setIsCorrect(correct);
     setQuestionsAnswered((prev) => prev + 1);
     if (correct) {

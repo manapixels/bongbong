@@ -42,7 +42,7 @@ export function ProblemDisplay({
               variant="outline"
               onClick={() => onAnswer(option)}
               className={
-                showSolution && option === problem.correctAnswer
+                showSolution && option === problem.answer
                   ? 'border-green-500'
                   : ''
               }

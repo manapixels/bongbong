@@ -50,7 +50,7 @@ export function PracticeSession({
   const handleAnswer = async (answer: string) => {
     if (!currentQuestion) return;
 
-    const correct = answer === currentQuestion.correctAnswer.toString();
+    const correct = answer === currentQuestion.answer.toString();
     setIsCorrect(correct);
     setQuestionsAnswered((prev) => prev + 1);
     if (correct) {

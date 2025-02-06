@@ -5,7 +5,7 @@ import type { MathTopic, Problem } from '@/types/math';
 import { MATH_TOPICS } from '@/types/math';
 import { StudentProgress } from '@/types/progress';
 import { User } from '@/types';
-import { selectNextQuestion } from '@/lib/math/questionGenerators';
+import { selectNextQuestion } from '@/lib/math';
 
 export async function getUser(email: string): Promise<User[]> {
   return db.select().from(user).where(eq(user.email, email));
@@ -115,12 +115,13 @@ export async function generateProblem(
   // Ensure all fields are properly typed and handle potential undefined values
   return {
     id: question.id ?? crypto.randomUUID(),
-    question: question.text,
+    question: question.question,
     answer:
-      typeof question.correctAnswer === 'string'
-        ? parseInt(question.correctAnswer, 10)
-        : Number(question.correctAnswer),
-    category: question.category || topic.id,
+      typeof question.answer === 'string'
+        ? parseInt(question.answer, 10)
+        : Number(question.answer),
+    strand: topic.strand,
+    subStrand: topic.subStrand,
     difficulty: question.difficulty || 1,
   };
 }

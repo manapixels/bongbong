@@ -15,7 +15,7 @@ export async function checkAndUnlockAchievements(
   }
 
   // Check for accuracy achievements
-  const accuracy = progress.correctAnswers / progress.totalProblems;
+  const accuracy = progress.answers / progress.totalProblems;
   if (accuracy > 0.9 && progress.totalProblems > 50) {
     await unlockAchievement(studentId, 'MATH_MASTER');
     unlockedAchievements.push('Math Master');

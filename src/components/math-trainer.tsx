@@ -37,6 +37,8 @@ export function MathTrainer({
   const [currentProblem, setCurrentProblem] = useState<Problem | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  console.log(currentProblem);
+
   const generateNewProblem = async () => {
     try {
       const response = await fetch('/api/math/generate-problem', {
@@ -109,7 +111,6 @@ export function MathTrainer({
         ) : (
           <div className="space-y-4">
             <div className="text-xl">{currentProblem.question}</div>
-
             <Input
               type="number"
               value={answer}
