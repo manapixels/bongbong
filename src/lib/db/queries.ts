@@ -1,25 +1,20 @@
 import { eq } from 'drizzle-orm';
 import { db } from '@/lib/db';
-import { 
-  user,
-  students, 
-  studentProgress, 
-} from '@/lib/db/schema';
+import { user, students, studentProgress } from '@/lib/db/schema';
 import type { MathTopic, Problem } from '@/types/math';
 import { MATH_TOPICS } from '@/types/math';
 import { StudentProgress } from '@/types/progress';
 import { Student, User } from '@/types';
 import { selectNextQuestion } from '@/lib/math/questionGenerators';
 
-
 export async function getUser(email: string): Promise<User[]> {
-  return db
-    .select()
-    .from(user)
-    .where(eq(user.email, email));
+  return db.select().from(user).where(eq(user.email, email));
 }
 
-export async function createUser(email: string, password: string): Promise<User> {
+export async function createUser(
+  email: string,
+  password: string
+): Promise<User> {
   const [newUser] = await db
     .insert(user)
     .values({ email, password })
@@ -27,14 +22,20 @@ export async function createUser(email: string, password: string): Promise<User>
   return newUser;
 }
 
-export async function getStudentProfile(studentId: string): Promise<Student | undefined> {
+export async function getStudentProfile(
+  studentId: string
+): Promise<Student | undefined> {
   const student = await db.query.students.findFirst({
     where: eq(students.id, studentId),
   });
   return student;
 }
 
-export async function getStudentProgress({ userId }: { userId: string }): Promise<StudentProgress | undefined> {
+export async function getStudentProgress({
+  userId,
+}: {
+  userId: string;
+}): Promise<StudentProgress | undefined> {
   const [progress] = await db
     .select()
     .from(studentProgress)
@@ -63,8 +64,8 @@ export async function updateStudentProgress({
 }
 
 export async function generateProblem(
-  difficulty: number, 
-  topics: string[], 
+  difficulty: number,
+  topics: string[],
   progress: StudentProgress
 ): Promise<Problem> {
   if (!topics || topics.length === 0) {
@@ -73,24 +74,25 @@ export async function generateProblem(
 
   // Find the topic the student needs most practice with
   const topicStats = progress?.topicProgress || [];
-  
+
   // Calculate success rates for each enabled topic
-  const topicSuccessRates = topics.map(topicId => {
-    const stats = topicStats.find(p => p.topicId === topicId);
+  const topicSuccessRates = topics.map((topicId) => {
+    const stats = topicStats.find((p) => p.topicId === topicId);
     if (!stats) {
-      return { 
-        topicId, 
+      return {
+        topicId,
         successRate: 0, // New topics should be prioritized
-        totalAttempts: 0 
+        totalAttempts: 0,
       };
     }
 
-    return { 
+    return {
       topicId,
-      successRate: stats.questionsAttempted > 0 
-        ? stats.correctAnswers / stats.questionsAttempted 
-        : 0,
-      totalAttempts: stats.questionsAttempted
+      successRate:
+        stats.questionsAttempted > 0
+          ? stats.correctAnswers / stats.questionsAttempted
+          : 0,
+      totalAttempts: stats.questionsAttempted,
     };
   });
 
@@ -104,19 +106,21 @@ export async function generateProblem(
     return a.totalAttempts - b.totalAttempts;
   });
 
-  const topic: MathTopic = MATH_TOPICS.find(t => topics.includes(t.id)) || MATH_TOPICS[0];
+  const topic: MathTopic =
+    MATH_TOPICS.find((t) => topics.includes(t.id)) || MATH_TOPICS[0];
 
   // Generate the question using selectNextQuestion
   const question = selectNextQuestion(progress, topic);
-  
-  // Ensure the return type matches Problem
 
+  // Ensure all fields are properly typed and handle potential undefined values
   return {
-    ...question,
-    id: question.id || crypto.randomUUID(),
+    id: question.id ?? crypto.randomUUID(),
     question: question.text,
-    answer: Number(question.correctAnswer),
-    category: question.category,
-    difficulty: question.difficulty,
+    answer:
+      typeof question.correctAnswer === 'string'
+        ? parseInt(question.correctAnswer, 10)
+        : Number(question.correctAnswer),
+    category: question.category || topic.id,
+    difficulty: question.difficulty || 1,
   };
-} 
+}

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
@@ -17,7 +17,7 @@ interface PracticeSessionProps {
 export function PracticeSession({
   topic,
   studentId,
-  onComplete
+  onComplete,
 }: PracticeSessionProps) {
   const [currentQuestion, setCurrentQuestion] = useState<Question | null>(null);
   const [isCorrect, setIsCorrect] = useState<boolean | undefined>();
@@ -26,11 +26,7 @@ export function PracticeSession({
   const [correctAnswers, setCorrectAnswers] = useState(0);
   const { toast } = useToast();
 
-  useEffect(() => {
-    fetchNextQuestion();
-  }, [topic.id]);
-
-  const fetchNextQuestion = async () => {
+  const fetchNextQuestion = useCallback(async () => {
     try {
       const response = await fetch(`/api/math/problems?topicId=${topic.id}`);
       if (!response.ok) throw new Error('Failed to fetch question');
@@ -40,21 +36,25 @@ export function PracticeSession({
       setShowSolution(false);
     } catch (error) {
       toast({
-        title: "Error",
-        description: "Failed to load next question",
-        variant: "destructive"
+        title: 'Error',
+        description: 'Failed to fetch the next question.',
+        variant: 'destructive',
       });
     }
-  };
+  }, [topic.id, toast]);
+
+  useEffect(() => {
+    fetchNextQuestion();
+  }, [fetchNextQuestion]);
 
   const handleAnswer = async (answer: string) => {
     if (!currentQuestion) return;
 
     const correct = answer === currentQuestion.correctAnswer.toString();
     setIsCorrect(correct);
-    setQuestionsAnswered(prev => prev + 1);
+    setQuestionsAnswered((prev) => prev + 1);
     if (correct) {
-      setCorrectAnswers(prev => prev + 1);
+      setCorrectAnswers((prev) => prev + 1);
     }
 
     try {
@@ -66,8 +66,8 @@ export function PracticeSession({
           topicId: topic.id,
           questionId: currentQuestion.id,
           isCorrect: correct,
-          timeSpent: 0 // TODO: Implement timer
-        })
+          timeSpent: 0, // TODO: Implement timer
+        }),
       });
     } catch (error) {
       console.error('Failed to update progress:', error);
@@ -89,10 +89,12 @@ export function PracticeSession({
       <Card className="p-4">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-semibold">{topic.name}</h2>
-          <Button variant="outline" onClick={onComplete}>End Session</Button>
+          <Button variant="outline" onClick={onComplete}>
+            End Session
+          </Button>
         </div>
-        <Progress 
-          value={(correctAnswers / Math.max(1, questionsAnswered)) * 100} 
+        <Progress
+          value={(correctAnswers / Math.max(1, questionsAnswered)) * 100}
           className="mb-2"
         />
         <div className="text-sm text-muted-foreground">
@@ -108,4 +110,4 @@ export function PracticeSession({
       />
     </div>
   );
-} 
+}

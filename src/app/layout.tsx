@@ -7,9 +7,11 @@ import { MathTopicsSidebar } from '@/components/math-topics-sidebar';
 import './globals.css';
 
 export const metadata: Metadata = {
-  metadataBase: new URL(''),
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+  ),
   title: 'Math Tutor',
-  description: '',
+  description: 'Interactive math learning platform for primary school students',
 };
 
 export const viewport = {
@@ -66,9 +68,7 @@ export default function RootLayout({
         >
           <div className="flex h-screen">
             <MathTopicsSidebar />
-            <main className="flex-1 overflow-auto">
-              {children}
-            </main>
+            <main className="flex-1 overflow-auto">{children}</main>
           </div>
           <Toaster />
         </ThemeProvider>

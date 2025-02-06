@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useTimer } from './use-timer';
 import { useToast } from '@/hooks/use-toast';
 import { Question, MathTopic } from '@/types/math';
@@ -12,11 +12,7 @@ export function usePracticeSession(topic: MathTopic, studentId: string) {
   const timer = useTimer();
   const { toast } = useToast();
 
-  useEffect(() => {
-    fetchNextQuestion();
-  }, [topic.id]);
-
-  const fetchNextQuestion = async () => {
+  const fetchNextQuestion = useCallback(async () => {
     try {
       const response = await fetch(`/api/math/problems?topicId=${topic.id}`);
       if (!response.ok) throw new Error('Failed to fetch question');
@@ -28,12 +24,16 @@ export function usePracticeSession(topic: MathTopic, studentId: string) {
       timer.start();
     } catch (error) {
       toast({
-        title: "Error",
-        description: "Failed to load next question",
-        variant: "destructive"
+        title: 'Error',
+        description: 'Failed to fetch the next question.',
+        variant: 'destructive',
       });
     }
-  };
+  }, [topic.id, toast, timer]);
+
+  useEffect(() => {
+    fetchNextQuestion();
+  }, [fetchNextQuestion]);
 
   const handleAnswer = async (answer: string) => {
     if (!currentQuestion) return;
@@ -41,9 +41,9 @@ export function usePracticeSession(topic: MathTopic, studentId: string) {
     const timeSpent = timer.stop();
     const correct = answer === currentQuestion.correctAnswer.toString();
     setIsCorrect(correct);
-    setQuestionsAnswered(prev => prev + 1);
+    setQuestionsAnswered((prev) => prev + 1);
     if (correct) {
-      setCorrectAnswers(prev => prev + 1);
+      setCorrectAnswers((prev) => prev + 1);
     }
 
     try {
@@ -55,17 +55,17 @@ export function usePracticeSession(topic: MathTopic, studentId: string) {
           topicId: topic.id,
           questionId: currentQuestion.id,
           isCorrect: correct,
-          timeSpent
-        })
+          timeSpent,
+        }),
       });
 
       const { newAchievements } = await response.json();
-      
+
       if (newAchievements?.length > 0) {
         toast({
-          title: "Achievement Unlocked!",
+          title: 'Achievement Unlocked!',
           description: `You've earned: ${newAchievements.join(', ')}`,
-          variant: "success"
+          variant: 'success',
         });
       }
     } catch (error) {
@@ -86,6 +86,6 @@ export function usePracticeSession(topic: MathTopic, studentId: string) {
     questionsAnswered,
     correctAnswers,
     handleAnswer,
-    timer: timer.time
+    timer: timer.time,
   };
-} 
+}

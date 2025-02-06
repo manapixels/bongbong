@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { Card } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import {
@@ -21,15 +21,15 @@ interface StudentDashboardProps {
 export function StudentDashboard({ studentId }: StudentDashboardProps) {
   const [analytics, setAnalytics] = useState<any>(null);
 
-  useEffect(() => {
-    fetchAnalytics();
-  }, [studentId]);
-
-  const fetchAnalytics = async () => {
+  const fetchAnalytics = useCallback(async () => {
     const response = await fetch(`/api/analytics/${studentId}`);
     const data = await response.json();
     setAnalytics(data);
-  };
+  }, [studentId]);
+
+  useEffect(() => {
+    fetchAnalytics();
+  }, [studentId, fetchAnalytics]);
 
   if (!analytics) return <div>Loading...</div>;
 
@@ -59,7 +59,7 @@ export function StudentDashboard({ studentId }: StudentDashboardProps) {
         </ResponsiveContainer>
       </Card>
 
-      <AchievementDisplay 
+      <AchievementDisplay
         achievements={analytics.achievements}
         newAchievements={analytics.newAchievements}
       />
@@ -74,4 +74,4 @@ export function StudentDashboard({ studentId }: StudentDashboardProps) {
       </Card>
     </div>
   );
-} 
+}

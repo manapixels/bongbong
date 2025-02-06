@@ -37,9 +37,21 @@ export const students = pgTable('students', {
 export const topics = pgTable('topics', {
   id: uuid('id').primaryKey().defaultRandom(),
   name: text('name').notNull(),
-  category: text('category').notNull(), // Will store MathSubStrand values
-  description: text('description'),
   level: integer('level').notNull(), // 1-6 for Primary levels
+  strand: text('strand').notNull(), // Will store MathStrand values
+  subStrand: text('sub_strand').notNull(), // Will store MathSubStrand values
+  description: text('description'),
+  // New fields to match MATH_TOPICS structure
+  subTopics: json('sub_topics')
+    .$type<
+      {
+        id: string;
+        name: string;
+        difficulty: number;
+        objectives?: string[];
+      }[]
+    >()
+    .notNull(),
 });
 
 export const studentProgress = pgTable('student_progress', {
@@ -49,12 +61,14 @@ export const studentProgress = pgTable('student_progress', {
   isCorrect: boolean('is_correct').notNull(),
   timeSpent: integer('time_spent'),
   createdAt: timestamp('created_at').defaultNow(),
-  topicProgress: json('topic_progress').$type<{
-    topicId: string;
-    questionsAttempted: number;
-    correctAnswers: number;
-    mistakes: string[];
-  }[]>()
+  topicProgress: json('topic_progress').$type<
+    {
+      topicId: string;
+      questionsAttempted: number;
+      correctAnswers: number;
+      mistakes: string[];
+    }[]
+  >(),
 });
 
 // ==================== Achievement System ====================
@@ -68,18 +82,28 @@ export const achievements = pgTable('achievements', {
   rewardXP: integer('reward_xp').notNull(),
 });
 
-export const studentAchievements = pgTable('student_achievements', {
-  studentId: text('student_id').notNull().references(() => students.id),
-  achievementId: text('achievement_id').notNull().references(() => achievements.id),
-  unlockedAt: timestamp('unlocked_at').notNull(),
-}, (table) => ({
-  pk: primaryKey(table.studentId, table.achievementId)
-}));
+export const studentAchievements = pgTable(
+  'student_achievements',
+  {
+    studentId: text('student_id')
+      .notNull()
+      .references(() => students.id),
+    achievementId: text('achievement_id')
+      .notNull()
+      .references(() => achievements.id),
+    unlockedAt: timestamp('unlocked_at').notNull(),
+  },
+  (table) => ({
+    pk: primaryKey(table.studentId, table.achievementId),
+  })
+);
 
 // ==================== Practice Sessions ====================
 export const practiceSession = pgTable('practice_sessions', {
   id: text('id').primaryKey(),
-  studentId: text('student_id').notNull().references(() => students.id),
+  studentId: text('student_id')
+    .notNull()
+    .references(() => students.id),
   mode: text('mode').notNull(), // 'practice' or 'test'
   startedAt: timestamp('started_at').notNull(),
   endedAt: timestamp('ended_at'),
