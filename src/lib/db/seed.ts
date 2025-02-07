@@ -3,7 +3,7 @@ import { strands } from './schema';
 import { MATH_TOPICS, MathTopic } from '@/types/math';
 
 // Seed the topics table with the MathTopic array
-async function seedTopics(): Promise<void> {
+async function seedStrands(): Promise<void> {
   try {
     await db.insert(strands).values(
       MATH_TOPICS.map((topic: MathTopic) => ({
@@ -20,7 +20,7 @@ async function seedTopics(): Promise<void> {
         description: null, // optional
       }))
     );
-    console.log('Topics seeded successfully');
+    console.log('Strands seeded successfully');
     process.exit(0);
   } catch (error: unknown) {
     console.error(
@@ -31,4 +31,4 @@ async function seedTopics(): Promise<void> {
   }
 }
 
-void seedTopics();
+void seedStrands();

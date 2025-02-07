@@ -10,9 +10,11 @@ CREATE TABLE "achievements" (
 --> statement-breakpoint
 CREATE TABLE "math_problems" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"type" text NOT NULL,
 	"question" text NOT NULL,
 	"answer" integer NOT NULL,
-	"category" text NOT NULL,
+	"strand" text NOT NULL,
+	"sub_strand" text NOT NULL,
 	"difficulty" integer NOT NULL
 );
 --> statement-breakpoint
@@ -29,6 +31,16 @@ CREATE TABLE "practice_sessions" (
 	"coins_earned" integer
 );
 --> statement-breakpoint
+CREATE TABLE "strands" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"name" text NOT NULL,
+	"level" integer NOT NULL,
+	"description" text,
+	"strand" text NOT NULL,
+	"sub_strand" text NOT NULL,
+	"sub_strand_topics" json NOT NULL
+);
+--> statement-breakpoint
 CREATE TABLE "student_achievements" (
 	"user_id" uuid NOT NULL,
 	"achievement_id" text NOT NULL,
@@ -43,17 +55,7 @@ CREATE TABLE "student_progress" (
 	"is_correct" boolean NOT NULL,
 	"time_spent" integer,
 	"created_at" timestamp DEFAULT now(),
-	"topic_progress" json
-);
---> statement-breakpoint
-CREATE TABLE "topics" (
-	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"name" text NOT NULL,
-	"level" integer NOT NULL,
-	"strand" text NOT NULL,
-	"sub_strand" text NOT NULL,
-	"description" text,
-	"sub_topics" json NOT NULL
+	"sub_strand_progress" json
 );
 --> statement-breakpoint
 CREATE TABLE "User" (

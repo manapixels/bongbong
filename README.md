@@ -30,7 +30,7 @@ npm install
 
 ```bash
 # Copy the example env file and modify if needed
-cp .env.example .env.local
+cp .env.example .env
 ```
 
 4. Start the PostgreSQL database:

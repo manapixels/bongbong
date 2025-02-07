@@ -8,7 +8,7 @@ const pool = new Pool({
   port: parseInt(process.env.POSTGRES_PORT || '5432'),
   user: process.env.POSTGRES_USER || 'postgres',
   password: process.env.POSTGRES_PASSWORD || 'postgres',
-  database: process.env.POSTGRES_DB || 'postgres',
+  database: process.env.POSTGRES_DB || 'math_trainer',
 });
 
 async function resetDatabase() {
@@ -29,25 +29,32 @@ async function resetDatabase() {
     console.log('✓ Dropped all tables');
 
     // Read and execute the migration file
-    const migrationPath = path.join(
+    const migrationsDir = path.join(
       process.cwd(),
       'src',
       'lib',
       'db',
-      'migrations',
-      '0000_closed_cannonball.sql'
+      'migrations'
     );
-    const migrationSQL = await fs.readFile(migrationPath, 'utf8');
+    const migrationFiles = await fs.readdir(migrationsDir);
+    const migrationPaths = migrationFiles
+      .filter((file) => file.endsWith('.sql'))
+      .map((file) => path.join(migrationsDir, file));
 
-    // Split and execute each statement separately
-    const statements = migrationSQL
-      .split('-->')
-      .map((stmt) => stmt.trim())
-      .filter((stmt) => stmt && !stmt.startsWith('statement-breakpoint'));
+    // Execute each migration file
+    for (const migrationPath of migrationPaths) {
+      const migrationSQL = await fs.readFile(migrationPath, 'utf8');
 
-    for (const statement of statements) {
-      if (statement) {
-        await pool.query(statement);
+      // Split and execute each statement separately
+      const statements = migrationSQL
+        .split('-->')
+        .map((stmt) => stmt.trim())
+        .filter((stmt) => stmt && !stmt.startsWith('statement-breakpoint'));
+
+      for (const statement of statements) {
+        if (statement) {
+          await pool.query(statement);
+        }
       }
     }
 
