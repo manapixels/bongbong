@@ -1,6 +1,6 @@
 import { eq } from 'drizzle-orm';
 import { db } from '@/lib/db';
-import { user, studentProgress } from '@/lib/db/schema';
+import { user, studentProgress, mathProblems } from '@/lib/db/schema';
 import type { MathTopic, Question } from '@/types/math';
 import { MATH_TOPICS } from '@/types/math';
 import { StudentProgress } from '@/types/progress';
@@ -118,9 +118,9 @@ export async function generateProblem(
   // Generate the question using selectNextQuestion
   const question = selectNextQuestion(progress, topic.subStrand);
 
-  // Ensure all fields are properly typed and handle potential undefined values
-  return {
-    id: question.id ?? crypto.randomUUID(),
+  // Create the problem object
+  const problem = {
+    id: crypto.randomUUID(),
     type: question.type,
     question: question.question,
     answer:
@@ -132,4 +132,17 @@ export async function generateProblem(
     explanation: question.explanation,
     difficulty: question.difficulty || 1,
   };
+
+  // Store the problem in the database
+  await db.insert(mathProblems).values({
+    id: problem.id,
+    type: problem.type,
+    question: problem.question,
+    answer: problem.answer,
+    strand: problem.strand,
+    subStrand: problem.subStrand,
+    difficulty: problem.difficulty,
+  });
+
+  return problem;
 }
