@@ -1,11 +1,24 @@
-import { eq } from 'drizzle-orm';
+import { eq, and } from 'drizzle-orm';
 import { db } from '@/lib/db';
-import { user, studentProgress, mathProblems } from '@/lib/db/schema';
-import type { MathTopic, Question } from '@/types/math';
+import {
+  user,
+  studentProgress,
+  mathProblems,
+  studentSkillProgress,
+  studentProblemHistory,
+  problemTemplates,
+} from '@/lib/db/schema';
+import type { MathTopic, Question, MathSubStrand } from '@/types/math';
 import { MATH_TOPICS } from '@/types/math';
 import { StudentProgress } from '@/types/progress';
 import { User } from '@/types';
-import { selectNextQuestion } from '@/lib/math';
+import {
+  generateProblemFromTemplate,
+  findNextTemplate,
+  isSimilarProblem,
+} from '@/lib/math/problem-generator';
+import type { SkillProgress, ProblemTemplate } from '@/types/problem-template';
+import { sql } from 'drizzle-orm';
 
 export async function getUser(email: string): Promise<User[]> {
   return db.select().from(user).where(eq(user.email, email));
@@ -69,6 +82,30 @@ export async function updateStudentProgress({
   });
 }
 
+export async function getStudentSkillProgress(
+  userId: string
+): Promise<SkillProgress[]> {
+  try {
+    const progress = await db
+      .select()
+      .from(studentSkillProgress)
+      .where(eq(studentSkillProgress.userId, userId));
+
+    return progress.map((p) => ({
+      skillId: p.skillId,
+      proficiency: p.proficiency / 100, // Convert from integer (0-100) to float (0-1)
+      lastPracticed: p.lastPracticed,
+      totalAttempts: p.totalAttempts,
+      successRate: p.successRate / 100, // Convert from integer (0-100) to float (0-1)
+      needsReview: p.needsReview,
+    }));
+  } catch (error) {
+    // If table doesn't exist or other error, return empty progress
+    console.warn('Could not fetch skill progress, using default:', error);
+    return [];
+  }
+}
+
 export async function generateProblem(
   difficulty: number,
   topics: string[],
@@ -76,6 +113,10 @@ export async function generateProblem(
 ): Promise<Question> {
   if (!topics || topics.length === 0) {
     throw new Error('No topics provided');
+  }
+
+  if (!progress.userId) {
+    throw new Error('User ID is required');
   }
 
   // Find the topic the student needs most practice with
@@ -115,34 +156,118 @@ export async function generateProblem(
   const topic: MathTopic =
     MATH_TOPICS.find((t) => topics.includes(t.id)) || MATH_TOPICS[0];
 
-  // Generate the question using selectNextQuestion
-  const question = selectNextQuestion(progress, topic.subStrand);
+  try {
+    // Get student's skill progress
+    const skillProgress = await getStudentSkillProgress(progress.userId);
 
-  // Create the problem object
-  const problem = {
-    id: crypto.randomUUID(),
-    type: question.type,
-    question: question.question,
-    answer:
-      typeof question.answer === 'string'
-        ? parseInt(question.answer, 10)
-        : Number(question.answer),
-    strand: topic.strand,
-    subStrand: topic.subStrand,
-    explanation: question.explanation,
-    difficulty: question.difficulty || 1,
-  };
+    // Find the next best template based on student's progress
+    const template = await findNextTemplate(progress.userId, skillProgress);
+    if (!template) {
+      // If no template found, get a random one
+      const [randomTemplate] = await db
+        .select()
+        .from(problemTemplates)
+        .orderBy(sql`RANDOM()`)
+        .limit(1);
 
-  // Store the problem in the database
-  await db.insert(mathProblems).values({
-    id: problem.id,
-    type: problem.type,
-    question: problem.question,
-    answer: problem.answer,
-    strand: problem.strand,
-    subStrand: problem.subStrand,
-    difficulty: problem.difficulty,
-  });
+      if (!randomTemplate) {
+        throw new Error('No problem templates available');
+      }
 
-  return problem;
+      // Convert database result to ProblemTemplate
+      const template = {
+        ...randomTemplate,
+        context: randomTemplate.context || undefined,
+        subStrand: randomTemplate.subStrand as MathSubStrand,
+        validationRules:
+          randomTemplate.validationRules as ProblemTemplate['validationRules'],
+      };
+
+      // Generate a problem from the random template
+      const problem = await generateProblemFromTemplate(
+        template,
+        progress.userId
+      );
+
+      // Store the generated problem
+      await db.insert(mathProblems).values({
+        id: problem.id,
+        templateId: template.id,
+        type: problem.type,
+        question: problem.question,
+        variables: problem.variables,
+        answer: problem.answer,
+        strand: problem.strand as string,
+        subStrand: problem.subStrand,
+        difficulty: problem.difficulty,
+        context: problem.context,
+      });
+
+      return {
+        id: problem.id,
+        type: problem.type,
+        question: problem.question,
+        answer: problem.answer,
+        explanation: problem.explanation,
+        difficulty: problem.difficulty,
+        strand: problem.strand as Question['strand'],
+        subStrand: problem.subStrand,
+      };
+    }
+
+    // Generate a problem from the template
+    const historyResult = await db.query.studentProblemHistory.findFirst({
+      where: and(
+        eq(studentProblemHistory.userId, progress.userId),
+        eq(studentProblemHistory.templateId, template.id)
+      ),
+    });
+
+    // Transform database result to match StudentProblemHistory type
+    const history = historyResult
+      ? {
+          templateId: historyResult.templateId!,
+          attempts: historyResult.attempts,
+          correctAttempts: historyResult.correctAttempts,
+          lastAttempted: historyResult.lastAttempted,
+          averageResponseTime: historyResult.averageResponseTime,
+          commonMistakes: historyResult.commonMistakes,
+          variationsUsed: historyResult.variationsUsed,
+        }
+      : undefined;
+
+    const problem = await generateProblemFromTemplate(
+      template,
+      progress.userId,
+      history
+    );
+
+    // Store the generated problem
+    await db.insert(mathProblems).values({
+      id: problem.id,
+      templateId: template.id,
+      type: problem.type,
+      question: problem.question,
+      variables: problem.variables,
+      answer: problem.answer,
+      strand: problem.strand as string,
+      subStrand: problem.subStrand,
+      difficulty: problem.difficulty,
+      context: problem.context,
+    });
+
+    return {
+      id: problem.id,
+      type: problem.type,
+      question: problem.question,
+      answer: problem.answer,
+      explanation: problem.explanation,
+      difficulty: problem.difficulty,
+      strand: problem.strand as Question['strand'],
+      subStrand: problem.subStrand,
+    };
+  } catch (error) {
+    console.error('Error generating problem with template:', error);
+    throw error;
+  }
 }

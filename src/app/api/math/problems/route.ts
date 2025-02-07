@@ -57,6 +57,7 @@ export async function GET(request: Request) {
         difficulty: question.difficulty ?? 0,
         strand: topic.strand,
         subStrand: topic.subStrand,
+        variables: {},
       })
       .returning();
 

@@ -4,42 +4,31 @@ import { useState, useEffect } from 'react';
 import { Button } from './ui/button';
 import { Card } from './ui/card';
 import { Input } from './ui/input';
-
-interface MathTrainerProps {
-  studentId: string;
-  profile: {
-    id: string;
-    preferences: {
-      difficulty: string;
-      topicsEnabled: string[];
-    };
-  };
-  progress: {
-    totalProblems: number;
-    correctAnswers: number;
-    topicStats: Record<string, { total: number; correct: number }>;
-  };
-}
+import { useLocalUser } from '@/hooks/use-local-user';
+import { MathSubStrand } from '@/types/math';
 
 interface Problem {
   id: string;
   question: string;
   answer: number;
   strand: string;
-  subStrand: string;
+  subStrand: MathSubStrand;
   difficulty: number;
   topicId: string;
 }
 
-export function MathTrainer({
-  studentId,
-  profile,
-  progress: initialProgress,
-}: MathTrainerProps) {
+export function MathTrainer() {
+  const { localUser, updateProgress, getTotalProgress } = useLocalUser();
   const [answer, setAnswer] = useState('');
   const [currentProblem, setCurrentProblem] = useState<Problem | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [progress, setProgress] = useState(initialProgress);
+  const [isInitialized, setIsInitialized] = useState(false);
+
+  useEffect(() => {
+    if (localUser.id && !isInitialized) {
+      setIsInitialized(true);
+    }
+  }, [localUser.id, isInitialized]);
 
   const generateNewProblem = async () => {
     try {
@@ -48,7 +37,16 @@ export function MathTrainer({
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ profile, progress }),
+        body: JSON.stringify({
+          profile: {
+            id: localUser.id,
+            preferences: localUser.preferences,
+          },
+          progress: {
+            ...localUser.progress,
+            userId: localUser.id,
+          },
+        }),
       });
 
       if (!response.ok) {
@@ -69,47 +67,19 @@ export function MathTrainer({
     }
   };
 
-  const updateLocalProgress = (topicId: string, isCorrect: boolean) => {
-    setProgress((prev) => {
-      // Update total stats
-      const newProgress = {
-        ...prev,
-        totalProblems: prev.totalProblems + 1,
-        correctAnswers: prev.correctAnswers + (isCorrect ? 1 : 0),
-      };
-
-      // Update topic-specific stats
-      const currentTopicStats = prev.topicStats[topicId] || {
-        total: 0,
-        correct: 0,
-      };
-      newProgress.topicStats = {
-        ...prev.topicStats,
-        [topicId]: {
-          total: currentTopicStats.total + 1,
-          correct: currentTopicStats.correct + (isCorrect ? 1 : 0),
-        },
-      };
-
-      return newProgress;
-    });
-  };
-
   const checkAnswer = async () => {
-    if (!currentProblem || !studentId) return;
+    if (!currentProblem) return;
 
     try {
       const isCorrect = Number(answer) === currentProblem.answer;
 
       const requestBody = {
-        studentId,
+        studentId: localUser.id,
         questionId: currentProblem.id,
         topicId: currentProblem.topicId || currentProblem.strand,
         isCorrect,
         timeSpent: 0,
       };
-
-      console.log('Sending request with body:', requestBody);
 
       const response = await fetch('/api/math/update-progress', {
         method: 'POST',
@@ -123,8 +93,12 @@ export function MathTrainer({
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      // Update local progress before generating new problem
-      updateLocalProgress(currentProblem.topicId, isCorrect);
+      // Update local progress
+      updateProgress(
+        currentProblem.topicId || currentProblem.strand,
+        isCorrect,
+        currentProblem.subStrand
+      );
 
       // Show feedback before moving to next problem
       setError(
@@ -142,6 +116,17 @@ export function MathTrainer({
       setError('Failed to submit answer. Please try again.');
     }
   };
+
+  // Don't render until initialization is complete
+  if (!isInitialized) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="text-lg">Loading...</div>
+      </div>
+    );
+  }
+
+  const { totalProblems, correctAnswers } = getTotalProgress();
 
   return (
     <div className="max-w-2xl mx-auto p-8">
@@ -180,15 +165,13 @@ export function MathTrainer({
         <div className="mt-6 pt-6 border-t">
           <h3 className="text-lg font-semibold mb-2">Progress</h3>
           <div className="text-sm text-gray-600">
-            Total Problems: {progress.totalProblems}
+            Total Problems: {totalProblems}
             <br />
-            Correct Answers: {progress.correctAnswers}
+            Correct Answers: {correctAnswers}
             <br />
             Accuracy:{' '}
-            {progress.totalProblems > 0
-              ? Math.round(
-                  (progress.correctAnswers / progress.totalProblems) * 100
-                )
+            {totalProblems > 0
+              ? Math.round((correctAnswers / totalProblems) * 100)
               : 0}
             %
           </div>

@@ -58,11 +58,11 @@ function substituteContext(template: string): [string, Record<string, string>] {
     /{(\w+):(\w+)}/g,
     (_, contextType, varName) => {
       if (contextType in singaporeContexts) {
-        const value = randomChoice(
-          singaporeContexts[
-            contextType as keyof typeof singaporeContexts
-          ] as string[]
-        );
+        const contextArray =
+          singaporeContexts[contextType as keyof typeof singaporeContexts];
+        const value = Array.isArray(contextArray)
+          ? randomChoice(contextArray)
+          : randomChoice(Object.values(contextArray));
         contextVars[varName] = value;
         return value;
       }
