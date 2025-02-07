@@ -41,24 +41,17 @@ async function resetDatabase() {
       .filter((file) => file.endsWith('.sql'))
       .map((file) => path.join(migrationsDir, file));
 
-    // Execute each migration file
-    for (const migrationPath of migrationPaths) {
-      const migrationSQL = await fs.readFile(migrationPath, 'utf8');
-
-      // Split and execute each statement separately
-      const statements = migrationSQL
-        .split('-->')
-        .map((stmt) => stmt.trim())
-        .filter((stmt) => stmt && !stmt.startsWith('statement-breakpoint'));
-
-      for (const statement of statements) {
-        if (statement) {
-          await pool.query(statement);
-        }
+    // Remove migration folder and all migration files
+    try {
+      await fs.rm(migrationsDir, { recursive: true, force: true });
+      console.log('✓ Removed migrations directory and all its contents');
+    } catch (err: any) {
+      if (err.code === 'ENOENT') {
+        console.log('No migrations directory found - skipping cleanup');
+      } else {
+        throw err;
       }
     }
-
-    console.log('✓ Applied migrations');
   } catch (error) {
     console.error('Error resetting database:', error);
     throw error;

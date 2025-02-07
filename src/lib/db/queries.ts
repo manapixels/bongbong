@@ -1,4 +1,4 @@
-import { eq, and } from 'drizzle-orm';
+import { eq, and, desc } from 'drizzle-orm';
 import { db } from '@/lib/db';
 import {
   user,
@@ -106,6 +106,74 @@ export async function getStudentSkillProgress(
   }
 }
 
+interface MasteryCheck {
+  isMastered: boolean;
+  canProgress: boolean;
+  nextDifficulty?: number;
+  nextLevel?: number;
+}
+
+export async function checkMastery(
+  userId: string,
+  strand: string,
+  subStrand: MathSubStrand,
+  currentDifficulty: number,
+  currentLevel: number
+): Promise<MasteryCheck> {
+  // Get recent progress for this subStrand
+  const recentProgress = await db
+    .select()
+    .from(studentProgress)
+    .where(
+      and(
+        eq(studentProgress.userId, userId),
+        sql`${studentProgress.subStrandProgress}->>'subStrand' = ${subStrand}`
+      )
+    )
+    .orderBy(desc(studentProgress.createdAt))
+    .limit(10);
+
+  if (recentProgress.length < 10) {
+    return { isMastered: false, canProgress: false };
+  }
+
+  // Calculate accuracy over last 10 attempts
+  const correctCount = recentProgress.filter((p) => p.isCorrect).length;
+  const accuracy = correctCount / recentProgress.length;
+
+  // Check for 3 consecutive correct answers
+  const lastThree = recentProgress.slice(0, 3);
+  const hasConsecutiveCorrect =
+    lastThree.length === 3 && lastThree.every((p) => p.isCorrect);
+
+  const isMastered = accuracy >= 0.8 && hasConsecutiveCorrect;
+
+  if (!isMastered) {
+    return { isMastered, canProgress: false };
+  }
+
+  // Determine next progression
+  let nextDifficulty = currentDifficulty;
+  let nextLevel = currentLevel;
+
+  if (currentDifficulty < 5) {
+    nextDifficulty = currentDifficulty + 1;
+  } else if (currentLevel < 6) {
+    nextLevel = currentLevel + 1;
+    nextDifficulty = 1;
+  }
+
+  const canProgress =
+    nextDifficulty !== currentDifficulty || nextLevel !== currentLevel;
+
+  return {
+    isMastered,
+    canProgress,
+    nextDifficulty: canProgress ? nextDifficulty : undefined,
+    nextLevel: canProgress ? nextLevel : undefined,
+  };
+}
+
 export async function generateProblem(
   difficulty: number,
   topics: string[],
@@ -155,6 +223,33 @@ export async function generateProblem(
 
   const topic: MathTopic =
     MATH_TOPICS.find((t) => topics.includes(t.id)) || MATH_TOPICS[0];
+
+  // Check mastery and adjust difficulty if needed
+  const masteryCheck = await checkMastery(
+    progress.userId,
+    topic.strand,
+    topicSuccessRates[0].subStrand as MathSubStrand,
+    difficulty,
+    topic.level
+  );
+
+  if (masteryCheck.canProgress) {
+    difficulty = masteryCheck.nextDifficulty || difficulty;
+    // Update user's current level/difficulty in their progress
+    await db
+      .update(studentProgress)
+      .set({
+        subStrandProgress: sql`jsonb_set(
+          ${studentProgress.subStrandProgress},
+          '{${topicSuccessRates[0].subStrand}}',
+          jsonb_build_object(
+            'level', ${masteryCheck.nextLevel},
+            'difficulty', ${masteryCheck.nextDifficulty}
+          )
+        )`,
+      })
+      .where(eq(studentProgress.userId, progress.userId));
+  }
 
   try {
     // Get student's skill progress

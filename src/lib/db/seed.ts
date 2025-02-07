@@ -1,8 +1,13 @@
 import { db } from './index';
 import { strands } from './schema';
-import { MATH_TOPICS, MathTopic } from '@/types/math';
+import {
+  MATH_TOPICS,
+  MathTopic,
+  MathStrand,
+  MathSubStrand,
+} from '@/types/math';
 import { problemTemplates } from './schema';
-import { MathSubStrand } from '@/types/math';
+import type { ProblemTemplate } from '@/types/problem-template';
 
 // Seed the topics table with the MathTopic array
 async function seedStrands(): Promise<void> {
@@ -19,11 +24,10 @@ async function seedStrands(): Promise<void> {
           difficulty: subTopic.difficulty,
           objectives: subTopic.objectives || [],
         })),
-        description: null, // optional
+        description: null,
       }))
     );
-    console.log('Strands seeded successfully');
-    process.exit(0);
+    console.log('✅ Strands seeded successfully');
   } catch (error: unknown) {
     console.error(
       'Error seeding topics:',
@@ -33,123 +37,138 @@ async function seedStrands(): Promise<void> {
   }
 }
 
+function extractVariablesFromQuestion(
+  question: string
+): Record<string, { min: number; max: number }> {
+  // Find all numbers in the question
+  const numbers = question.match(/\d+/g)?.map(Number) || [];
+  if (numbers.length < 2) return { a: { min: 1, max: 10 } }; // Default range if no numbers found
+
+  // For arithmetic operations, use the numbers to determine ranges
+  const max = Math.max(...numbers);
+  const min = Math.min(...numbers);
+
+  // If it's a basic arithmetic question, use a and b as variables
+  if (
+    question.includes('+') ||
+    question.includes('-') ||
+    question.includes('×') ||
+    question.includes('÷')
+  ) {
+    return {
+      a: { min: Math.max(1, min - 5), max: max + 5 },
+      b: { min: Math.max(1, min - 5), max: max + 5 },
+    };
+  }
+
+  // For other types of questions, use more specific variable names
+  if (question.toLowerCase().includes('length')) {
+    return { length: { min, max: max * 2 } };
+  }
+  if (question.toLowerCase().includes('width')) {
+    return { width: { min, max: max * 2 } };
+  }
+  if (question.toLowerCase().includes('radius')) {
+    return { radius: { min, max: max * 2 } };
+  }
+
+  // Default case
+  return { n: { min, max: max * 2 } };
+}
+
+function generateAnswerFormula(question: string): string {
+  if (question.includes('+')) return 'a + b';
+  if (question.includes('-')) return 'a - b';
+  if (question.includes('×')) return 'a * b';
+  if (question.includes('÷')) return 'a / b';
+  if (question.includes('area') && question.includes('rectangle'))
+    return 'length * width';
+  if (question.includes('area') && question.includes('circle'))
+    return 'Math.PI * radius * radius';
+  return 'a'; // Default case
+}
+
 async function seedProblemTemplates() {
   try {
-    // Add basic arithmetic templates
-    await db.insert(problemTemplates).values([
-      {
-        id: crypto.randomUUID(),
-        type: 'arithmetic',
-        structure: 'What is {a} + {b}?',
-        variables: {
-          a: { min: 1, max: 20 },
-          b: { min: 1, max: 20 },
-        },
-        answerFormula: 'a + b',
-        difficulty: 1,
-        strand: 'number-and-algebra',
-        subStrand: MathSubStrand.WHOLE_NUMBERS,
-        skills: [
-          {
-            id: 'basic-addition',
-            name: 'Basic Addition',
-            level: 1,
-            prerequisites: [],
-          },
-        ],
-        commonMisconceptions: ['Counting error', 'Place value confusion'],
-        explanationTemplate: [
-          'To add {a} and {b}:',
-          '1. Start with {a}',
-          '2. Count forward {b} more',
-          'So, {a} + {b} = {answer}',
-        ],
-        validationRules: {
-          maxResult: 40,
-          minResult: 2,
-          mustBeWhole: true,
-        },
-      },
-      {
-        id: crypto.randomUUID(),
-        type: 'arithmetic',
-        structure: 'What is {a} - {b}?',
-        variables: {
-          a: { min: 5, max: 20 },
-          b: { min: 1, max: 10 },
-        },
-        answerFormula: 'a - b',
-        difficulty: 1,
-        strand: 'number-and-algebra',
-        subStrand: MathSubStrand.WHOLE_NUMBERS,
-        skills: [
-          {
-            id: 'basic-subtraction',
-            name: 'Basic Subtraction',
-            level: 1,
-            prerequisites: [],
-          },
-        ],
-        commonMisconceptions: [
-          'Counting backwards error',
-          'Subtracting from smaller number',
-        ],
-        explanationTemplate: [
-          'To subtract {b} from {a}:',
-          '1. Start with {a}',
-          '2. Count backward {b} times',
-          'So, {a} - {b} = {answer}',
-        ],
-        validationRules: {
-          maxResult: 19,
-          minResult: 1,
-          mustBeWhole: true,
-        },
-      },
-      {
-        id: crypto.randomUUID(),
-        type: 'arithmetic',
-        structure: 'What is {a} × {b}?',
-        variables: {
-          a: { min: 2, max: 10 },
-          b: { min: 2, max: 10 },
-        },
-        answerFormula: 'a * b',
-        difficulty: 2,
-        strand: 'number-and-algebra',
-        subStrand: MathSubStrand.WHOLE_NUMBERS,
-        skills: [
-          {
-            id: 'basic-multiplication',
-            name: 'Basic Multiplication',
-            level: 2,
-            prerequisites: ['basic-addition'],
-          },
-        ],
-        commonMisconceptions: [
-          'Adding instead of multiplying',
-          'Skip counting errors',
-        ],
-        explanationTemplate: [
-          'To multiply {a} and {b}:',
-          '1. Think of {a} groups of {b}',
-          '2. Add: ' + Array(5).fill('{b}').join(' + ') + ' ({a} times)',
-          'So, {a} × {b} = {answer}',
-        ],
-        validationRules: {
-          maxResult: 100,
-          minResult: 4,
-          mustBeWhole: true,
-        },
-      },
-    ]);
+    const templates: Array<{
+      id: string;
+      type: string;
+      structure: string;
+      variables: Record<string, { min: number; max: number }>;
+      answerFormula: string;
+      difficulty: number;
+      strand: string;
+      subStrand: string;
+      skills: Array<{
+        id: string;
+        name: string;
+        level: number;
+        prerequisites: string[];
+      }>;
+      commonMisconceptions: string[];
+      explanationTemplate: string[];
+      validationRules: {
+        mustBeWhole?: boolean;
+        minResult?: number;
+        maxResult?: number;
+      };
+    }> = [];
 
-    console.log('✅ Added problem templates');
+    // Convert each sample question in MATH_TOPICS to a template
+    MATH_TOPICS.forEach((topic) => {
+      topic.subStrandTopics.forEach((subTopic) => {
+        subTopic.sampleQuestions.forEach((question) => {
+          if (question.type === 'numeric') {
+            // Only use numeric questions for now
+            const variables = extractVariablesFromQuestion(question.question);
+            const answerFormula = generateAnswerFormula(question.question);
+
+            templates.push({
+              id: crypto.randomUUID(),
+              type: question.type,
+              structure: question.question,
+              variables,
+              answerFormula,
+              difficulty: subTopic.difficulty,
+              strand: topic.strand,
+              subStrand: topic.subStrand,
+              skills: [
+                {
+                  id: `${topic.subStrand}-${subTopic.name.toLowerCase().replace(/\s+/g, '-')}`,
+                  name: subTopic.name,
+                  level: topic.level,
+                  prerequisites: [],
+                },
+              ],
+              commonMisconceptions: [],
+              explanationTemplate: question.explanation,
+              validationRules: {
+                mustBeWhole: true, // Default to whole numbers for most primary math
+                minResult: 1,
+                maxResult:
+                  Math.max(...Object.values(variables).map((v) => v.max)) * 2,
+              },
+            });
+          }
+        });
+      });
+    });
+
+    // Insert all templates
+    await db.insert(problemTemplates).values(templates);
+    console.log(
+      `✅ Added ${templates.length} problem templates from MATH_TOPICS`
+    );
   } catch (error) {
-    console.error('Error seeding database:', error);
+    console.error('Error seeding problem templates:', error);
     process.exit(1);
   }
 }
 
-seedStrands();
-seedProblemTemplates();
+async function seed() {
+  await seedStrands();
+  await seedProblemTemplates();
+  process.exit(0);
+}
+
+seed();
