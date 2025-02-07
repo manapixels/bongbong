@@ -21,9 +21,9 @@ export function TopicSelector({
   const [selectedLevel, setSelectedLevel] = useState<number>(1);
 
   const getTopicProgress = (topicId: string) => {
-    if (!studentProgress.topicProgress) return 0;
-    const progress = studentProgress.topicProgress.find(
-      (p) => p.topicId === topicId
+    if (!studentProgress.subStrandProgress) return 0;
+    const progress = studentProgress.subStrandProgress.find(
+      (p) => p.subStrand === topicId
     );
     if (!progress) return 0;
     return (progress.correctAnswers / progress.questionsAttempted) * 100;
@@ -57,7 +57,7 @@ export function TopicSelector({
             <h3 className="font-medium mb-2">{topic.name}</h3>
             <Progress value={getTopicProgress(topic.id)} className="h-2" />
             <div className="mt-2 text-sm text-muted-foreground">
-              {topic.subTopics.length} subtopics
+              {topic.subStrandTopics.length} subtopics
             </div>
           </Card>
         ))}

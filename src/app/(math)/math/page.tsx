@@ -22,7 +22,7 @@ export default async function MathPage() {
       isCorrect: false,
       timeSpent: null,
       createdAt: null,
-      topicProgress: null,
+      subStrandProgress: null,
     };
 
     return (

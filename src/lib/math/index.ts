@@ -1,9 +1,9 @@
 import type { StudentProgress } from '@/types/progress';
-import { MathTopic, Question, PracticeQuestion } from '@/types/math';
+import { MathSubStrand, MathTopic, Question } from '@/types/math';
 import { calculateDifficulty } from '@/lib/utils/math';
 import { MATH_TOPICS } from '@/types/math';
 import { singaporeContexts } from './singaporeContexts';
-import { randomChoice } from '@/lib/utils/random';
+import crypto from 'crypto';
 
 interface VariableRange {
   min: number;
@@ -13,15 +13,26 @@ interface VariableRange {
 
 interface QuestionTemplate {
   question: string;
-  answer: string | number | null | number[] | string[];
+  answer: number | string | number[] | null;
   explanation: string[];
+  type: string;
   variables?: Record<string, VariableRange>;
-  type: 'mcq' | 'numeric' | 'word-problem';
-  options?: string[];
   generateOptions?: (answer: number) => string[];
 }
 
+interface SubTopic {
+  id: string;
+  name: string;
+  difficulty: number;
+  objectives: string[];
+  sampleQuestions: Question[];
+}
+
 // Helper functions
+function randomChoice<T>(arr: T[]): T {
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
 function getRandomNumber(min: number, max: number, step: number = 1): number {
   const range = (max - min) / step;
   return min + Math.floor(Math.random() * range) * step;
@@ -62,44 +73,56 @@ function substituteContext(template: string): [string, Record<string, string>] {
   return [processedTemplate, contextVars];
 }
 
-function generateQuestionImpl(
-  topicId: string | MathTopic,
-  difficulty: number,
-  previousMistakes: string[] = []
-): PracticeQuestion {
-  // Handle MathTopic object
-  const topic =
-    typeof topicId === 'string'
-      ? MATH_TOPICS.find((t) => t.id === topicId)
-      : topicId;
+function findSubtopicById(st: string): SubTopic | null {
+  for (const topic of MATH_TOPICS) {
+    const subtopic = topic.subStrandTopics.find((s) => s.id === st);
+    if (subtopic) {
+      const { id, name, difficulty, objectives, sampleQuestions } = subtopic;
+      return {
+        id,
+        name,
+        difficulty,
+        objectives,
+        sampleQuestions: [...sampleQuestions] as Question[],
+      };
+    }
+  }
+  return null;
+}
 
-  if (!topic) {
-    throw new Error(`No topic found for id: ${topicId}`);
+function generateQuestionImpl(
+  subStrand: MathSubStrand,
+  level: number,
+  previousMistakes: string[] = []
+): Question {
+  if (!subStrand) {
+    throw new Error(`No subStrand found for id: ${subStrand}`);
   }
 
   // Find subtopics matching difficulty
-  const eligibleSubtopics = topic.subTopics.filter(
-    (st) => st.difficulty === difficulty
+  const eligibleTopics = MATH_TOPICS.filter(
+    (st) => st.subStrand === subStrand && st.level === level
   );
-  if (eligibleSubtopics.length === 0) {
+  if (eligibleTopics.length === 0) {
     throw new Error(
-      `No subtopics found for topic ${topic.id} with difficulty ${difficulty}`
+      `No topics found for subStrand ${subStrand} with difficulty ${level}`
     );
   }
 
-  // Randomly select a subtopic
-  const subtopic =
-    eligibleSubtopics[Math.floor(Math.random() * eligibleSubtopics.length)];
+  // Randomly select a topic
+  const topic =
+    eligibleTopics[Math.floor(Math.random() * eligibleTopics.length)];
 
   // Get sample questions
-  const sampleQuestions = subtopic.sampleQuestions;
+  const sampleQuestions = topic.subStrandTopics.flatMap(
+    (s) => s.sampleQuestions
+  );
   if (!sampleQuestions || sampleQuestions.length === 0) {
-    throw new Error(`No sample questions found for subtopic ${subtopic.id}`);
+    throw new Error(`No sample questions found for subtopic ${topic.id}`);
   }
 
   // Select a random sample question
-  const template: QuestionTemplate =
-    sampleQuestions[Math.floor(Math.random() * sampleQuestions.length)];
+  const template = randomChoice(sampleQuestions) as QuestionTemplate;
 
   // Generate variables if template has them
   const variables: Record<string, number> = {};
@@ -147,21 +170,21 @@ function generateQuestionImpl(
   );
 
   return {
-    id: `${topic.id}-${Date.now()}`,
+    id: crypto.randomUUID(),
     type: template.type,
     question,
     answer,
-    explanation,
-    difficulty,
-    topicId: topic.id,
-    subTopicId: subtopic.id,
+    explanation: explanation as string[],
+    difficulty: topic.level,
+    strand: topic.strand,
+    subStrand,
   };
 }
 
 function generateSimilarQuestionImpl(
-  originalQuestion: PracticeQuestion,
+  originalQuestion: Question,
   variation: 'easier' | 'harder' | 'same' = 'same'
-): PracticeQuestion {
+): Question {
   const difficultyAdjustment = {
     easier: -1,
     harder: 1,
@@ -170,19 +193,26 @@ function generateSimilarQuestionImpl(
 
   const newDifficulty = Math.max(
     1,
-    Math.min(6, originalQuestion.difficulty + difficultyAdjustment[variation])
+    Math.min(
+      6,
+      (originalQuestion.difficulty ?? 0) + difficultyAdjustment[variation]
+    )
   );
 
-  return generateQuestionImpl(originalQuestion.topicId, newDifficulty);
+  if (!originalQuestion.subStrand) {
+    throw new Error(`No subStrand found for question ${originalQuestion.id}`);
+  }
+
+  return generateQuestionImpl(originalQuestion.subStrand, newDifficulty);
 }
 
 export function selectNextQuestion(
   progress: StudentProgress,
-  topic: MathTopic
-): PracticeQuestion {
+  subStrand: MathSubStrand
+): Question {
   // Calculate success rate for current topic
-  const topicStats = progress.topicProgress?.find(
-    (p) => p.topicId === topic.id
+  const topicStats = progress.subStrandProgress?.find(
+    (p) => p.subStrand === subStrand
   );
 
   const successRate = topicStats
@@ -190,10 +220,10 @@ export function selectNextQuestion(
     : 0.5; // Default to medium difficulty for new topics
 
   // Determine difficulty based on performance
-  const difficulty = calculateDifficulty(topic.level, successRate);
+  const difficulty = calculateDifficulty(topicStats?.level ?? 0, successRate);
 
   // Generate question
-  return generateQuestionImpl(topic, difficulty);
+  return generateQuestionImpl(subStrand, difficulty);
 }
 
 // Export the functions

@@ -7,7 +7,7 @@ import { MATH_TOPICS } from '@/types/math';
 
 export function MathTopicsSidebar() {
   const [expandedLevels, setExpandedLevels] = useState<number[]>([]);
-  const [expandedTopics, setExpandedTopics] = useState<string[]>([]);
+  const [expandedStrands, setExpandedStrands] = useState<string[]>([]);
 
   // Group topics by level
   const topicsByLevel = MATH_TOPICS.reduce(
@@ -28,7 +28,7 @@ export function MathTopicsSidebar() {
   };
 
   const toggleTopic = (topicId: string) => {
-    setExpandedTopics((prev) =>
+    setExpandedStrands((prev) =>
       prev.includes(topicId)
         ? prev.filter((t) => t !== topicId)
         : [...prev, topicId]
@@ -64,7 +64,7 @@ export function MathTopicsSidebar() {
                           onClick={() => toggleTopic(topic.id)}
                           className="flex items-center w-full text-left p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded"
                         >
-                          {expandedTopics.includes(topic.id) ? (
+                          {expandedStrands.includes(topic.id) ? (
                             <ChevronDown className="w-4 h-4 mr-2" />
                           ) : (
                             <ChevronRight className="w-4 h-4 mr-2" />
@@ -72,9 +72,9 @@ export function MathTopicsSidebar() {
                           {topic.name}
                         </button>
 
-                        {expandedTopics.includes(topic.id) && (
+                        {expandedStrands.includes(topic.id) && (
                           <div className="ml-6 space-y-1">
-                            {topic.subTopics.map((subtopic) => (
+                            {topic.subStrandTopics.map((subtopic) => (
                               <Link
                                 key={subtopic.id}
                                 href={`/math/practice/${subtopic.id}`}

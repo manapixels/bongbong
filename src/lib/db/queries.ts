@@ -1,7 +1,7 @@
 import { eq } from 'drizzle-orm';
 import { db } from '@/lib/db';
 import { user, studentProgress } from '@/lib/db/schema';
-import type { MathTopic, Problem } from '@/types/math';
+import type { MathTopic, Question } from '@/types/math';
 import { MATH_TOPICS } from '@/types/math';
 import { StudentProgress } from '@/types/progress';
 import { User } from '@/types';
@@ -13,11 +13,17 @@ export async function getUser(email: string): Promise<User[]> {
 
 export async function createUser(
   email: string,
-  password: string
+  password: string,
+  specificId?: string
 ): Promise<User> {
   const [newUser] = await db
     .insert(user)
-    .values({ email, password })
+    .values({
+      id: specificId,
+      email,
+      password,
+      isStudent: true,
+    })
     .returning();
   return newUser;
 }
@@ -67,27 +73,27 @@ export async function generateProblem(
   difficulty: number,
   topics: string[],
   progress: StudentProgress
-): Promise<Problem> {
+): Promise<Question> {
   if (!topics || topics.length === 0) {
     throw new Error('No topics provided');
   }
 
   // Find the topic the student needs most practice with
-  const topicStats = progress?.topicProgress || [];
+  const topicStats = progress?.subStrandProgress || [];
 
   // Calculate success rates for each enabled topic
-  const topicSuccessRates = topics.map((topicId) => {
-    const stats = topicStats.find((p) => p.topicId === topicId);
+  const topicSuccessRates = topics.map((subStrand) => {
+    const stats = topicStats.find((p) => p.subStrand === subStrand);
     if (!stats) {
       return {
-        topicId,
+        subStrand,
         successRate: 0, // New topics should be prioritized
         totalAttempts: 0,
       };
     }
 
     return {
-      topicId,
+      subStrand,
       successRate:
         stats.questionsAttempted > 0
           ? stats.correctAnswers / stats.questionsAttempted
@@ -110,11 +116,12 @@ export async function generateProblem(
     MATH_TOPICS.find((t) => topics.includes(t.id)) || MATH_TOPICS[0];
 
   // Generate the question using selectNextQuestion
-  const question = selectNextQuestion(progress, topic);
+  const question = selectNextQuestion(progress, topic.subStrand);
 
   // Ensure all fields are properly typed and handle potential undefined values
   return {
     id: question.id ?? crypto.randomUUID(),
+    type: question.type,
     question: question.question,
     answer:
       typeof question.answer === 'string'
@@ -122,6 +129,7 @@ export async function generateProblem(
         : Number(question.answer),
     strand: topic.strand,
     subStrand: topic.subStrand,
+    explanation: question.explanation,
     difficulty: question.difficulty || 1,
   };
 }

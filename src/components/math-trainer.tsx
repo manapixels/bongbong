@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from './ui/button';
 import { Card } from './ui/card';
 import { Input } from './ui/input';
@@ -25,19 +25,21 @@ interface Problem {
   id: string;
   question: string;
   answer: number;
-  category: string;
+  strand: string;
+  subStrand: string;
+  difficulty: number;
+  topicId: string;
 }
 
 export function MathTrainer({
   studentId,
   profile,
-  progress,
+  progress: initialProgress,
 }: MathTrainerProps) {
   const [answer, setAnswer] = useState('');
   const [currentProblem, setCurrentProblem] = useState<Problem | null>(null);
   const [error, setError] = useState<string | null>(null);
-
-  console.log(currentProblem);
+  const [progress, setProgress] = useState(initialProgress);
 
   const generateNewProblem = async () => {
     try {
@@ -67,32 +69,74 @@ export function MathTrainer({
     }
   };
 
+  const updateLocalProgress = (topicId: string, isCorrect: boolean) => {
+    setProgress((prev) => {
+      // Update total stats
+      const newProgress = {
+        ...prev,
+        totalProblems: prev.totalProblems + 1,
+        correctAnswers: prev.correctAnswers + (isCorrect ? 1 : 0),
+      };
+
+      // Update topic-specific stats
+      const currentTopicStats = prev.topicStats[topicId] || {
+        total: 0,
+        correct: 0,
+      };
+      newProgress.topicStats = {
+        ...prev.topicStats,
+        [topicId]: {
+          total: currentTopicStats.total + 1,
+          correct: currentTopicStats.correct + (isCorrect ? 1 : 0),
+        },
+      };
+
+      return newProgress;
+    });
+  };
+
   const checkAnswer = async () => {
-    if (!currentProblem) return;
+    if (!currentProblem || !studentId) return;
 
     try {
       const isCorrect = Number(answer) === currentProblem.answer;
+
+      const requestBody = {
+        studentId,
+        questionId: currentProblem.id,
+        topicId: currentProblem.topicId || currentProblem.strand,
+        isCorrect,
+        timeSpent: 0,
+      };
+
+      console.log('Sending request with body:', requestBody);
 
       const response = await fetch('/api/math/update-progress', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          studentId,
-          questionId: currentProblem.id,
-          topicId: currentProblem.category,
-          isCorrect,
-          timeSpent: 0, // Add timer implementation if needed
-        }),
+        body: JSON.stringify(requestBody),
       });
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      // Generate new problem after submitting answer
-      generateNewProblem();
+      // Update local progress before generating new problem
+      updateLocalProgress(currentProblem.topicId, isCorrect);
+
+      // Show feedback before moving to next problem
+      setError(
+        isCorrect
+          ? '✅ Correct!'
+          : '❌ Incorrect. The answer was ' + currentProblem.answer
+      );
+
+      // Wait a moment before generating new problem
+      setTimeout(() => {
+        generateNewProblem();
+      }, 1500);
     } catch (err) {
       console.error('Error updating progress:', err);
       setError('Failed to submit answer. Please try again.');
@@ -104,13 +148,22 @@ export function MathTrainer({
       <Card className="p-6">
         <h2 className="text-2xl font-bold mb-6">Math Practice</h2>
 
-        {error && <div className="text-red-500 mb-4">{error}</div>}
+        {error && (
+          <div
+            className={`mb-4 ${error.includes('✅') ? 'text-green-500' : error.includes('❌') ? 'text-red-500' : 'text-red-500'}`}
+          >
+            {error}
+          </div>
+        )}
 
         {!currentProblem ? (
           <Button onClick={generateNewProblem}>Start Practice</Button>
         ) : (
           <div className="space-y-4">
             <div className="text-xl">{currentProblem.question}</div>
+            <div className="text-sm text-gray-500">
+              Topic: {currentProblem.strand}
+            </div>
             <Input
               type="number"
               value={answer}
@@ -122,6 +175,24 @@ export function MathTrainer({
             <Button onClick={checkAnswer}>Submit Answer</Button>
           </div>
         )}
+
+        {/* Progress Summary */}
+        <div className="mt-6 pt-6 border-t">
+          <h3 className="text-lg font-semibold mb-2">Progress</h3>
+          <div className="text-sm text-gray-600">
+            Total Problems: {progress.totalProblems}
+            <br />
+            Correct Answers: {progress.correctAnswers}
+            <br />
+            Accuracy:{' '}
+            {progress.totalProblems > 0
+              ? Math.round(
+                  (progress.correctAnswers / progress.totalProblems) * 100
+                )
+              : 0}
+            %
+          </div>
+        </div>
       </Card>
     </div>
   );

@@ -1,17 +1,17 @@
 import { db } from './index';
-import { topics } from './schema';
+import { strands } from './schema';
 import { MATH_TOPICS, MathTopic } from '@/types/math';
 
 // Seed the topics table with the MathTopic array
 async function seedTopics(): Promise<void> {
   try {
-    await db.insert(topics).values(
+    await db.insert(strands).values(
       MATH_TOPICS.map((topic: MathTopic) => ({
         name: topic.name,
         strand: topic.strand,
         subStrand: topic.subStrand,
         level: topic.level,
-        subTopics: topic.subTopics.map((subTopic) => ({
+        subStrandTopics: topic.subStrandTopics.map((subTopic) => ({
           id: subTopic.id,
           name: subTopic.name,
           difficulty: subTopic.difficulty,

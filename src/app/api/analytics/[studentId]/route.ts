@@ -142,17 +142,18 @@ function calculateCategoryData(
 ) {
   const categoryStats = progress.reduce(
     (acc, entry) => {
-      if (!entry.topicProgress) return acc;
+      if (!entry.subStrandProgress) return acc;
 
-      entry.topicProgress.forEach((topic) => {
-        if (!acc[topic.topicId]) {
-          acc[topic.topicId] = {
+      entry.subStrandProgress.forEach((subStrand) => {
+        if (!acc[subStrand.subStrand]) {
+          acc[subStrand.subStrand] = {
             questionsAttempted: 0,
             correctAnswers: 0,
           };
         }
-        acc[topic.topicId].questionsAttempted += topic.questionsAttempted;
-        acc[topic.topicId].correctAnswers += topic.correctAnswers;
+        acc[subStrand.subStrand].questionsAttempted +=
+          subStrand.questionsAttempted;
+        acc[subStrand.subStrand].correctAnswers += subStrand.correctAnswers;
       });
       return acc;
     },

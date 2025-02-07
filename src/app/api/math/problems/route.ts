@@ -36,22 +36,25 @@ export async function GET(request: Request) {
         isCorrect: false,
         timeSpent: null,
         createdAt: new Date(),
-        topicProgress: [],
+        subStrandProgress: [],
       };
 
-      return Response.json(selectNextQuestion(defaultProgress, topic));
+      return Response.json(
+        selectNextQuestion(defaultProgress, topic.subStrand)
+      );
     }
 
     // No need for transformation since we're using the correct type
-    const question = selectNextQuestion(progress, topic);
+    const question = selectNextQuestion(progress, topic.subStrand);
 
     // First save the problem
     const [savedProblem] = await db
       .insert(mathProblems)
       .values({
-        question: question.question,
-        answer: parseInt(question.answer.toString()),
-        difficulty: question.difficulty,
+        type: question.type,
+        question: question.question || '',
+        answer: Number(question.answer ?? 0),
+        difficulty: question.difficulty ?? 0,
         strand: topic.strand,
         subStrand: topic.subStrand,
       })

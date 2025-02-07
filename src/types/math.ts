@@ -1,8 +1,29 @@
-import type { InferSelectModel } from 'drizzle-orm';
-import {
-  mathProblems,
-  practiceSessions as dbPracticeSessions,
-} from '@/lib/db/schema';
+export interface SubStrandTopic {
+  id: string;
+  name: string;
+  difficulty: number;
+  objectives: string[];
+  sampleQuestions: Question[];
+}
+export interface MathTopic {
+  id: string;
+  name: string;
+  level: number;
+  strand: MathStrand;
+  subStrand: MathSubStrand;
+  subStrandTopics: SubStrandTopic[];
+}
+
+export interface Question {
+  id?: string;
+  type: string;
+  question: string;
+  answer: number | string | number[] | null;
+  explanation: string[];
+  difficulty?: number;
+  strand?: MathStrand;
+  subStrand?: MathSubStrand;
+}
 
 export const enum MathStrand {
   NUMBER_AND_ALGEBRA = 'number-and-algebra',
@@ -31,188 +52,16 @@ export const enum MathSubStrand {
   RATE = 'rate',
 }
 
-export type QuestionType = 'mcq' | 'numeric' | 'word-problem';
-
-export interface QuestionTypeConfig {
-  id: string;
-  type: QuestionType;
-  conceptExplanation: string[];
-  remediationStrategy?: string;
-}
-
-export interface SubTopic {
-  id: string;
-  name: string;
-  difficulty: number;
-  objectives?: string[];
-  sampleQuestions?: {
-    question: string;
-    answer: string | number | null | number[] | string[];
-    explanation: string[];
-    type: 'mcq' | 'numeric' | 'word-problem';
-    variables?: {
-      [key: string]: {
-        min: number;
-        max: number;
-        step?: number;
-      };
-    };
-    // Optional fields for MCQ
-    options?: string[];
-    generateOptions?: (answer: number) => string[];
-  }[];
-}
-
-export interface MathTopic {
-  id: string;
-  name: string;
-  level: number; // 1-6 for Primary 1-6
-  strand: MathStrand;
-  subStrand: MathSubStrand;
-  subTopics: SubTopic[];
-}
-
-export interface PracticeQuestion {
-  id: string;
-  type: QuestionType;
-  question: string;
-  options?: string[]; // For MCQ questions
-  answer: string | number;
-  explanation: string[];
-  difficulty: number;
-  topicId: string;
-  subTopicId: string;
-}
-
-export type Problem = InferSelectModel<typeof mathProblems>;
-
-export type DBPracticeSession = InferSelectModel<typeof dbPracticeSessions>;
-
-export interface PracticeSession extends DBPracticeSession {
-  questions: PracticeQuestion[];
-  currentQuestionIndex: number;
-  answers: {
-    questionId: string;
-    userAnswer: string | number;
-    isCorrect: boolean;
-    timeSpent: number;
-  }[];
-}
-
-export interface RemediationExample {
-  problem: string;
-  solution: string;
-  explanation: string[];
-}
-
-export interface RemediationStrategy {
-  type: 'visualization' | 'practice' | 'concept';
-  steps: string[];
-  examples: RemediationExample[];
-}
-
-export const REMEDIATION_STRATEGIES: Record<string, RemediationStrategy> = {
-  barModelVisualization: {
-    type: 'visualization',
-    steps: [
-      '1. Read the problem carefully and identify the ratio relationship',
-      '2. Draw bars of equal length for each part',
-      '3. Label the known values',
-      '4. Divide to find the unit value',
-      '5. Multiply to find the answer',
-    ],
-    examples: [
-      {
-        problem:
-          'The ratio of boys to girls in a class is 3:2. If there are 30 students in total, how many are boys?',
-        solution: '18 boys',
-        explanation: [
-          '1. Total parts in ratio = 3 + 2 = 5 parts',
-          '2. Each part = 30 ÷ 5 = 6 students',
-          '3. Boys = 3 parts = 3 × 6 = 18 boys',
-        ],
-      },
-    ],
-  },
-  partWholeModel: {
-    type: 'visualization',
-    steps: [
-      '1. Identify the whole (total)',
-      '2. Identify the parts',
-      '3. Draw rectangles to represent parts',
-      '4. Label known values',
-      '5. Find unknown values',
-    ],
-    examples: [
-      {
-        problem:
-          'John has 12 red marbles and 8 blue marbles. How many marbles does he have in total?',
-        solution: '20 marbles',
-        explanation: [
-          '1. Draw rectangle for red marbles (12)',
-          '2. Draw rectangle for blue marbles (8)',
-          '3. Whole = 12 + 8 = 20 marbles',
-        ],
-      },
-    ],
-  },
-};
-
-export interface Solution {
-  steps: string[];
-  explanation: string;
-}
-
-export interface Question {
-  id: string;
-  text: string;
-  answer: string;
-  difficulty: number;
-  category: MathSubStrand;
-  solution: {
-    steps: string[];
-    explanation: string;
-  };
-  hints: string[];
-  options?: string[];
-}
-
-export interface QuestionGenerator {
-  generateQuestion: (
-    difficulty: number,
-    previousMistakes: string[]
-  ) => Question;
-  generateSimilarQuestion: (
-    originalQuestion: Question,
-    variation?: 'easier' | 'harder' | 'same'
-  ) => Question;
-}
-
-export interface StudentProfile {
-  id: string;
-  preferences: {
-    difficulty: string;
-    topicsEnabled: string[];
-  };
-}
-
-export interface Progress {
-  totalProblems: number;
-  answers: number;
-  topicStats: Record<string, { total: number; correct: number }>;
-}
-
-export const MATH_TOPICS: MathTopic[] = [
-  // PRIMARY 1
+export const MATH_TOPICS = [
   {
-    id: 'p1-whole-numbers',
+    id: 'd1e6a12d-7313-4939-bbb9-60d11b8f4667',
     name: 'Whole Numbers',
     level: 1,
     strand: MathStrand.NUMBER_AND_ALGEBRA,
     subStrand: MathSubStrand.WHOLE_NUMBERS,
-    subTopics: [
+    subStrandTopics: [
       {
-        id: 'numbers-to-100',
+        id: '998f4fe6-4579-4aee-82f2-a7cb2f458503',
         name: 'Numbers up to 100',
         difficulty: 1,
         objectives: [
@@ -240,7 +89,7 @@ export const MATH_TOPICS: MathTopic[] = [
         ],
       },
       {
-        id: 'addition-and-subtraction',
+        id: '7692a08c-3560-428c-bcf1-187711873dfd',
         name: 'Addition and Subtraction',
         difficulty: 1,
         objectives: [
@@ -269,7 +118,7 @@ export const MATH_TOPICS: MathTopic[] = [
         ],
       },
       {
-        id: 'multiplication',
+        id: '4cabf5ba-f3bb-4576-84c2-8b3e300ef778',
         name: 'Multiplication',
         difficulty: 1,
         objectives: [
@@ -293,7 +142,7 @@ export const MATH_TOPICS: MathTopic[] = [
         ],
       },
       {
-        id: 'division',
+        id: 'cef54c34-989b-4a3c-bc35-4bc187e4ba63',
         name: 'Division',
         difficulty: 1,
         objectives: ['Concepts of division', 'Dividing within 20'],
@@ -315,14 +164,14 @@ export const MATH_TOPICS: MathTopic[] = [
     ],
   },
   {
-    id: 'p1-money',
+    id: 'fb1261ec-2dd9-4df3-9835-3c71093ecf0e',
     name: 'Money',
     level: 1,
     strand: MathStrand.NUMBER_AND_ALGEBRA,
     subStrand: MathSubStrand.MONEY,
-    subTopics: [
+    subStrandTopics: [
       {
-        id: 'counting-money',
+        id: '4c8ade56-22c2-4b0e-9c9c-8a2793a09cf4',
         name: 'Counting Money',
         difficulty: 1,
         objectives: [
@@ -347,14 +196,14 @@ export const MATH_TOPICS: MathTopic[] = [
     ],
   },
   {
-    id: 'p1-length',
+    id: '8d641e08-7967-4462-a198-b3eb8bde3194',
     name: 'Length',
     level: 1,
     strand: MathStrand.MEASUREMENT_AND_GEOMETRY,
     subStrand: MathSubStrand.MEASUREMENT,
-    subTopics: [
+    subStrandTopics: [
       {
-        id: 'measuring-of-length',
+        id: '62483d15-36e4-43e7-acb4-2a772806035e',
         name: 'Measuring of Length',
         difficulty: 1,
         objectives: [
@@ -379,7 +228,7 @@ export const MATH_TOPICS: MathTopic[] = [
         ],
       },
       {
-        id: 'measurement-of-time',
+        id: 'c7560517-82ac-4bb3-8e37-503e2ff4b0fe',
         name: 'Measurement of Time',
         difficulty: 1,
         objectives: [
@@ -408,14 +257,14 @@ export const MATH_TOPICS: MathTopic[] = [
     ],
   },
   {
-    id: 'p1-geometry',
+    id: '288ec1f7-9a53-48a8-a2c9-076336153d3f',
     name: 'Geometry',
     level: 1,
     strand: MathStrand.MEASUREMENT_AND_GEOMETRY,
     subStrand: MathSubStrand.GEOMETRY,
-    subTopics: [
+    subStrandTopics: [
       {
-        id: 'geometry-2d-shapes',
+        id: '12d95fd0-60e1-4f99-8bf2-b8b1c4cb2554',
         name: 'Geometry 2D Shapes',
         difficulty: 1,
         objectives: [
@@ -448,14 +297,14 @@ export const MATH_TOPICS: MathTopic[] = [
     ],
   },
   {
-    id: 'p1-data-representation-and-interpretation',
+    id: '248b62b7-f884-49f9-8eca-a409d1dc94c9',
     name: 'Data Representation and Interpretation',
     level: 1,
     strand: MathStrand.STATISTICS,
     subStrand: MathSubStrand.DATA_REPRESENTATION_AND_INTERPRETATION,
-    subTopics: [
+    subStrandTopics: [
       {
-        id: 'picture-graphs',
+        id: '4b350a48-1ebb-47d7-a1e9-d89879d83088',
         name: 'Picture Graphs',
         difficulty: 1,
         objectives: ['Reading and interpreting data from picture graphs'],
@@ -470,16 +319,15 @@ export const MATH_TOPICS: MathTopic[] = [
       },
     ],
   },
-  // PRIMARY 2
   {
-    id: 'p2-whole-numbers',
+    id: '4e299797-5bcd-473d-8e53-13d1b8c2c649',
     name: 'Whole Numbers',
     level: 2,
     strand: MathStrand.NUMBER_AND_ALGEBRA,
     subStrand: MathSubStrand.WHOLE_NUMBERS,
-    subTopics: [
+    subStrandTopics: [
       {
-        id: 'numbers-to-1000',
+        id: '40acff90-5cf1-45c6-a90a-030a8997dd89',
         name: 'Numbers up to 1000',
         difficulty: 2,
         objectives: [
@@ -500,7 +348,7 @@ export const MATH_TOPICS: MathTopic[] = [
         ],
       },
       {
-        id: 'whole-numbers-addition-and-subtraction',
+        id: '7d32b8e9-c9cd-42f0-8c4b-8321ee098fa4',
         name: 'Whole Numbers Addition and Subtraction',
         difficulty: 2,
         objectives: [
@@ -523,7 +371,7 @@ export const MATH_TOPICS: MathTopic[] = [
         ],
       },
       {
-        id: 'whole-numbers-multiplication-and-division',
+        id: '19edeffe-a8c2-4aef-b2e0-c66cce5a580b',
         name: 'Whole Numbers Multiplication and Division',
         difficulty: 2,
         objectives: [
@@ -551,14 +399,14 @@ export const MATH_TOPICS: MathTopic[] = [
     ],
   },
   {
-    id: 'p2-fractions',
+    id: '9a950172-add3-4d9b-a8e9-4bd482d0c0f7',
     name: 'Fractions',
     level: 2,
     strand: MathStrand.NUMBER_AND_ALGEBRA,
     subStrand: MathSubStrand.FRACTIONS,
-    subTopics: [
+    subStrandTopics: [
       {
-        id: 'fraction-of-a-whole',
+        id: '17619218-12a1-4204-a375-28c1d3b6ef46',
         name: 'Fraction of a Whole',
         difficulty: 2,
         objectives: [
@@ -577,7 +425,7 @@ export const MATH_TOPICS: MathTopic[] = [
         ],
       },
       {
-        id: 'fraction-addition-and-subtraction',
+        id: 'dc0508f5-673a-49ca-94f6-8c241b81c1fc',
         name: 'Fraction Addition and Subtraction',
         difficulty: 2,
         objectives: [
@@ -595,14 +443,14 @@ export const MATH_TOPICS: MathTopic[] = [
     ],
   },
   {
-    id: 'p2-money',
+    id: '3c557419-26e3-40d9-97dc-8bb5e2d80699',
     name: 'Money',
     level: 2,
     strand: MathStrand.NUMBER_AND_ALGEBRA,
     subStrand: MathSubStrand.MONEY,
-    subTopics: [
+    subStrandTopics: [
       {
-        id: 'money-operations',
+        id: 'c9d4be29-ba85-4f21-969b-19e1653b82c7',
         name: 'Money Operations',
         difficulty: 2,
         objectives: [
@@ -626,14 +474,14 @@ export const MATH_TOPICS: MathTopic[] = [
     ],
   },
   {
-    id: 'p2-measurement',
+    id: 'ae59466a-98d7-4dfa-95a6-00665e640aee',
     name: 'Measurement',
     level: 2,
     strand: MathStrand.MEASUREMENT_AND_GEOMETRY,
     subStrand: MathSubStrand.MEASUREMENT,
-    subTopics: [
+    subStrandTopics: [
       {
-        id: 'length-mass-and-volume',
+        id: 'ef0f0734-2e16-4251-ab4f-9b47c69be3bd',
         name: 'Length, Mass and Volume',
         difficulty: 2,
         objectives: [
@@ -655,7 +503,7 @@ export const MATH_TOPICS: MathTopic[] = [
         ],
       },
       {
-        id: 'measurement-time',
+        id: 'dd24f2c2-8d07-4f18-91d0-0aaa14da15ad',
         name: 'Measurement Time',
         difficulty: 2,
         objectives: [
@@ -676,14 +524,14 @@ export const MATH_TOPICS: MathTopic[] = [
     ],
   },
   {
-    id: 'p2-geometry',
+    id: 'afad2755-2a54-4203-aa2b-d36ac9c23725',
     name: 'Geometry',
     level: 2,
     strand: MathStrand.MEASUREMENT_AND_GEOMETRY,
     subStrand: MathSubStrand.GEOMETRY,
-    subTopics: [
+    subStrandTopics: [
       {
-        id: '2d-shapes',
+        id: '0dab254d-261f-4a96-9390-73149f30fa47',
         name: '2D Shapes',
         difficulty: 2,
         objectives: [
@@ -699,7 +547,7 @@ export const MATH_TOPICS: MathTopic[] = [
         ],
       },
       {
-        id: '3d-shapes',
+        id: 'f3751a7a-ab22-4041-b986-7549f72132ff',
         name: '3D Shapes',
         difficulty: 2,
         objectives: [
@@ -717,14 +565,14 @@ export const MATH_TOPICS: MathTopic[] = [
     ],
   },
   {
-    id: 'p2-data-representation-and-interpretation',
+    id: 'ccfd0393-59af-45ef-87c9-07256cae5c79',
     name: 'Data Representation and Interpretation',
     level: 2,
     strand: MathStrand.STATISTICS,
     subStrand: MathSubStrand.DATA_REPRESENTATION_AND_INTERPRETATION,
-    subTopics: [
+    subStrandTopics: [
       {
-        id: 'picture-graphs-with-scales',
+        id: '49152e60-2b58-40a1-b4a3-824fdaaea2a6',
         name: 'Picture Graphs with Scales',
         difficulty: 2,
         objectives: [
@@ -741,16 +589,15 @@ export const MATH_TOPICS: MathTopic[] = [
       },
     ],
   },
-  // PRIMARY 3
   {
-    id: 'p3-whole-numbers',
+    id: 'f8f4e8b5-6988-49d9-b4a4-1ab86f8c235e',
     name: 'Whole Numbers',
     level: 3,
     strand: MathStrand.NUMBER_AND_ALGEBRA,
     subStrand: MathSubStrand.WHOLE_NUMBERS,
-    subTopics: [
+    subStrandTopics: [
       {
-        id: 'numbers-to-10000',
+        id: 'f52a4eaf-3f5e-475d-b19e-8f4a37da4bcf',
         name: 'Numbers up to 10000',
         difficulty: 3,
         objectives: [
@@ -770,7 +617,7 @@ export const MATH_TOPICS: MathTopic[] = [
         ],
       },
       {
-        id: 'addition-and-subtraction',
+        id: '799d2311-750d-462e-9f5a-da180a12f658',
         name: 'Addition and Subtraction',
         difficulty: 3,
         objectives: [
@@ -793,7 +640,7 @@ export const MATH_TOPICS: MathTopic[] = [
         ],
       },
       {
-        id: 'multiplication-and-division',
+        id: '26fafdfa-f587-40ef-863b-469d29372657',
         name: 'Multiplication and Division',
         difficulty: 3,
         objectives: [
@@ -821,14 +668,14 @@ export const MATH_TOPICS: MathTopic[] = [
     ],
   },
   {
-    id: 'p3-fractions',
+    id: '463f2115-8bcd-4f2f-9fe6-f66e85cea0c4',
     name: 'Fractions',
     level: 3,
     strand: MathStrand.NUMBER_AND_ALGEBRA,
     subStrand: MathSubStrand.FRACTIONS,
-    subTopics: [
+    subStrandTopics: [
       {
-        id: 'equivalent-fractions',
+        id: '75f07d13-6b93-4b92-9590-de059db3e7b5',
         name: 'Equivalent Fractions',
         difficulty: 3,
         objectives: [
@@ -847,8 +694,8 @@ export const MATH_TOPICS: MathTopic[] = [
         ],
       },
       {
-        id: 'fractions-addition-and-subtraction',
-        name: 'Fractions Addition and Subtraction',
+        id: '8ba9d78e-1aa6-47f2-a2eb-67b34576dee3',
+        name: 'Fraction Addition and Subtraction',
         difficulty: 3,
         objectives: [
           'Adding and subtracting two related fractions within one whole',
@@ -866,14 +713,14 @@ export const MATH_TOPICS: MathTopic[] = [
     ],
   },
   {
-    id: 'p3-money',
+    id: '81bd01a5-6a53-483d-bbd6-3e860b8dbaee',
     name: 'Money',
     level: 3,
     strand: MathStrand.NUMBER_AND_ALGEBRA,
     subStrand: MathSubStrand.MONEY,
-    subTopics: [
+    subStrandTopics: [
       {
-        id: 'money-operations',
+        id: 'c9d4be29-ba85-4f21-969b-19e1653b82c7',
         name: 'Money Operations',
         difficulty: 3,
         objectives: ['Adding and subtracting money in decimal notation'],
@@ -890,14 +737,14 @@ export const MATH_TOPICS: MathTopic[] = [
     ],
   },
   {
-    id: 'p3-measurement',
+    id: '15ab9b72-0b91-4cb1-8742-e3668fd0c006',
     name: 'Length, Mass and Volume',
     level: 3,
     strand: MathStrand.MEASUREMENT_AND_GEOMETRY,
     subStrand: MathSubStrand.MEASUREMENT,
-    subTopics: [
+    subStrandTopics: [
       {
-        id: 'length-mass-and-volume',
+        id: 'ef0f0734-2e16-4251-ab4f-9b47c69be3bd',
         name: 'Length, Mass and Volume',
         difficulty: 3,
         objectives: [
@@ -919,7 +766,7 @@ export const MATH_TOPICS: MathTopic[] = [
         ],
       },
       {
-        id: 'time',
+        id: 'cc793e52-fd19-4ed1-9002-86c54dda9aa0',
         name: 'Time',
         difficulty: 3,
         objectives: [
@@ -940,14 +787,14 @@ export const MATH_TOPICS: MathTopic[] = [
     ],
   },
   {
-    id: 'p3-area-and-volume',
+    id: '249f9bd2-2edd-4471-ba3a-6c367c1720fc',
     name: 'Area and Volume',
     level: 3,
     strand: MathStrand.MEASUREMENT_AND_GEOMETRY,
     subStrand: MathSubStrand.AREA_AND_VOLUME,
-    subTopics: [
+    subStrandTopics: [
       {
-        id: 'area-and-perimeter',
+        id: '3d8d1794-76b1-490e-bd07-4da12c185a66',
         name: 'Area and Perimeter',
         difficulty: 3,
         objectives: [
@@ -972,14 +819,14 @@ export const MATH_TOPICS: MathTopic[] = [
     ],
   },
   {
-    id: 'p3-geometry',
+    id: '306cc28d-20c4-4a44-8d6c-85364bb90817',
     name: 'Geometry',
     level: 3,
     strand: MathStrand.MEASUREMENT_AND_GEOMETRY,
     subStrand: MathSubStrand.GEOMETRY,
-    subTopics: [
+    subStrandTopics: [
       {
-        id: 'angles',
+        id: 'e4b0716d-0bed-4e1d-a848-d7e9025083ce',
         name: 'Angles',
         difficulty: 3,
         objectives: [
@@ -997,7 +844,7 @@ export const MATH_TOPICS: MathTopic[] = [
         ],
       },
       {
-        id: 'perpendicular-and-parallel-lines',
+        id: 'db0e73c2-c426-43cb-af4d-77be7fc93379',
         name: 'Perpendicular and Parallel Lines',
         difficulty: 3,
         objectives: [
@@ -1016,14 +863,14 @@ export const MATH_TOPICS: MathTopic[] = [
     ],
   },
   {
-    id: 'p3-data-representation-and-interpretation',
+    id: '5d68b8d7-0588-4405-b57a-7c5d5ff96ba6',
     name: 'Data Representation and Interpretation',
     level: 3,
     strand: MathStrand.STATISTICS,
     subStrand: MathSubStrand.DATA_REPRESENTATION_AND_INTERPRETATION,
-    subTopics: [
+    subStrandTopics: [
       {
-        id: 'bar-graphs',
+        id: '26c66f6d-8be5-4fb8-8171-a04960326a34',
         name: 'Bar Graphs',
         difficulty: 3,
         objectives: [
@@ -1041,347 +888,15 @@ export const MATH_TOPICS: MathTopic[] = [
       },
     ],
   },
-  // PRIMARY 4
   {
-    id: 'p4-whole-numbers',
-    name: 'Whole Numbers',
-    level: 4,
-    strand: MathStrand.NUMBER_AND_ALGEBRA,
-    subStrand: MathSubStrand.WHOLE_NUMBERS,
-    subTopics: [
-      {
-        id: 'numbers-to-100000',
-        name: 'Numbers up to 100000',
-        difficulty: 4,
-        objectives: [
-          'Number notation, representations and place values (ten thousands, thousands, hundreds, tens, ones)',
-          'Reading and writing numbers in numerals and in words',
-          'Comparing and ordering numbers',
-          'Patterns in number sequences',
-          'Rounding numbers to the nearest 10, 100 or 1000',
-          'Use of ≈',
-        ],
-        sampleQuestions: [
-          {
-            question: 'What is the sum of 50,000, 30,000, and 20,000?',
-            answer: 100000,
-            explanation: ['50,000 + 30,000 + 20,000 = 100,000'],
-            type: 'numeric',
-          },
-        ],
-      },
-      {
-        id: 'factors-and-multiples',
-        name: 'Factors and Multiples',
-        difficulty: 4,
-        objectives: [
-          'Factors, multiples and their relationship',
-          'Determining if a 1-digit number is a factor of a given number within 100',
-          'Finding the common factors of two given numbers',
-          'Determining if a number is a multiple of a given 1-digit number',
-          'Finding the common multiples of two given 1-digit numbers',
-        ],
-        sampleQuestions: [
-          {
-            question: 'What are the factors of 24?',
-            answer: [1, 2, 3, 4, 6, 8, 12, 24],
-            explanation: ['The factors of 24 are 1, 2, 3, 4, 6, 8, 12, and 24'],
-            type: 'numeric',
-          },
-        ],
-      },
-      {
-        id: 'four-operations',
-        name: 'Four Operations',
-        difficulty: 4,
-        objectives: [
-          'Multiplication algorithm up to 4 digits by 1 digit',
-          'Multiplication algorithm up to 3 digits by 2 digits',
-          'Division algorithm (up to 4 digits by 1 digit)',
-        ],
-        sampleQuestions: [
-          {
-            question: 'What is the product of 4,567 and 8?',
-            answer: 36536,
-            explanation: ['4,567 × 8 = 36536'],
-            type: 'numeric',
-          },
-        ],
-      },
-    ],
-  },
-  {
-    id: 'p4-fractions',
-    name: 'Mixed Numbers and Improper Fractions',
-    level: 4,
-    strand: MathStrand.NUMBER_AND_ALGEBRA,
-    subStrand: MathSubStrand.FRACTIONS,
-    subTopics: [
-      {
-        id: 'mixed-numbers',
-        name: 'Mixed Numbers and Improper Fractions',
-        difficulty: 4,
-        objectives: [
-          'Mixed numbers, improper fractions and their relationship',
-        ],
-        sampleQuestions: [
-          {
-            question: 'What is the mixed number form of 7/3?',
-            answer: '2 1/3',
-            explanation: ['7/3 = 2 1/3'],
-            type: 'numeric',
-          },
-        ],
-      },
-      {
-        id: 'fraction-of-a-set',
-        name: 'Fraction of a Set',
-        difficulty: 4,
-        objectives: ['fraction as part of a set'],
-        sampleQuestions: [
-          {
-            question: 'What fraction of the class is boys?',
-            answer: 0.5,
-            explanation: ['Half of the class is boys'],
-            type: 'numeric',
-          },
-        ],
-      },
-      {
-        id: 'fraction-addition-and-subtraction',
-        name: 'Fraction Addition and Subtraction',
-        difficulty: 4,
-        objectives: [
-          'Add and subtract fractions with denominators not exceeding 12 and not more than two different denominators',
-        ],
-        sampleQuestions: [
-          {
-            question: 'What is the sum of 1/4 and 1/4?',
-            answer: 0.5,
-            explanation: ['1/4 + 1/4 = 2/4 = 1/2'],
-            type: 'numeric',
-          },
-        ],
-      },
-    ],
-  },
-  {
-    id: 'p4-decimals',
-    name: 'Decimals',
-    level: 4,
-    strand: MathStrand.NUMBER_AND_ALGEBRA,
-    subStrand: MathSubStrand.DECIMALS,
-    subTopics: [
-      {
-        id: 'decimal-concepts',
-        name: 'Decimals up to 3 decimal places',
-        difficulty: 4,
-        objectives: [
-          'Notation, representations and place values (tenths, hundredths, thousandths)',
-          'Comparing and ordering decimals',
-          'Expressing decimals as fractions',
-          'Expressing fractions as decimals when denominator is factor of 10 or 100',
-          'Rounding decimals to the nearest whole number',
-          'Rounding decimals to 1 decimal place',
-          'Rounding decimals to 2 decimal places',
-        ],
-        sampleQuestions: [
-          {
-            question: 'What is the decimal form of 3/4?',
-            answer: 0.75,
-            explanation: ['3/4 = 0.75'],
-            type: 'numeric',
-          },
-        ],
-      },
-      {
-        id: 'decimal-operations',
-        name: 'Operations with Decimals',
-        difficulty: 4,
-        objectives: [
-          'Adding and subtracting decimals (up to 2 decimal places)',
-          'Multiplying and dividing decimals (up to 2 decimal places) by a 1-digit whole number',
-          'Dividing a whole number by a whole number with quotient as a decimal',
-          'Rounding answers to a specified degree of accuracy',
-        ],
-        sampleQuestions: [
-          {
-            question: 'What is the sum of 0.75 and 0.25?',
-            answer: 1,
-            explanation: ['0.75 + 0.25 = 1'],
-            type: 'numeric',
-          },
-        ],
-      },
-    ],
-  },
-  {
-    id: 'p4-area-perimeter',
-    name: 'Area and Perimeter',
-    level: 4,
-    strand: MathStrand.MEASUREMENT_AND_GEOMETRY,
-    subStrand: MathSubStrand.AREA_AND_VOLUME,
-    subTopics: [
-      {
-        id: 'advanced-area-perimeter',
-        name: 'Advanced Area and Perimeter',
-        difficulty: 4,
-        objectives: [
-          'Finding one dimension of a rectangle given the other dimension and its area/perimeter',
-          'Finding the length of one side of a square given its area/perimeter',
-          'Finding the area and perimeter of composite figures made up of rectangles and squares',
-        ],
-        sampleQuestions: [
-          {
-            question:
-              'What is the length of a rectangle with area 20 cm² and width 5 cm?',
-            answer: 4,
-            explanation: [
-              'Area = length × width, so 20 = 4 × width, so width = 5 cm',
-            ],
-            type: 'numeric',
-          },
-        ],
-      },
-    ],
-  },
-  {
-    id: 'p4-angles',
-    name: 'Angles',
-    level: 4,
-    strand: MathStrand.MEASUREMENT_AND_GEOMETRY,
-    subStrand: MathSubStrand.GEOMETRY,
-    subTopics: [
-      {
-        id: 'angle-measurement',
-        name: 'Angle Measurement',
-        difficulty: 4,
-        objectives: [
-          'Using notation such as ∠ABC and ∠a to name angles',
-          'Measuring angles in degrees',
-          'Drawing an angle of given size',
-        ],
-        sampleQuestions: [
-          {
-            question: 'What is the measure of angle ABC?',
-            answer: 90,
-            explanation: ['Angle ABC is a right angle'],
-            type: 'numeric',
-          },
-        ],
-      },
-    ],
-  },
-  {
-    id: 'p4-geometry',
-    name: 'Geometry',
-    level: 4,
-    strand: MathStrand.MEASUREMENT_AND_GEOMETRY,
-    subStrand: MathSubStrand.GEOMETRY,
-    subTopics: [
-      {
-        id: 'rectangle-square',
-        name: 'Rectangle and Square',
-        difficulty: 4,
-        objectives: [
-          'Properties of rectangle and square, excluding diagonal properties',
-          'Drawing rectangles and squares',
-        ],
-        sampleQuestions: [
-          {
-            question: 'Draw a rectangle.',
-            answer: null,
-            explanation: ['Draw a rectangle'],
-            type: 'mcq',
-          },
-        ],
-      },
-      {
-        id: 'line-symmetry',
-        name: 'Line Symmetry',
-        difficulty: 4,
-        objectives: [
-          'Identifying symmetric figures',
-          'Determining whether a straight line is a line of symmetry of a symmetric figure',
-          'Completing a symmetric figure with respect to a given line of symmetry on square grid',
-        ],
-        sampleQuestions: [
-          {
-            question: 'Draw the line of symmetry for the given figure.',
-            answer: null,
-            explanation: ['Draw the line of symmetry for the given figure'],
-            type: 'mcq',
-          },
-        ],
-      },
-      {
-        id: 'nets',
-        name: 'Nets',
-        difficulty: 4,
-        objectives: [
-          'Identifying 2D representations of 3D shape: cube',
-          'Identifying 2D representations of 3D shape: cuboid',
-          'Identifying 2D representations of 3D shape: cone',
-          'Identifying 2D representations of 3D shape: cylinder',
-          'Identifying 2D representations of 3D shape: prism',
-          'Identifying 2D representations of 3D shape: pyramid',
-          'Drawing 2D representations of cube',
-          'Drawing 2D representations of cuboid',
-          'Drawing 2D representations of prism',
-          'Drawing 2D representations of pyramid',
-          'Identifying the nets of 3D solids: cube',
-          'Identifying the nets of 3D solids: cuboid',
-          'Identifying the nets of 3D solids: prism',
-          'Identifying the nets of 3D solids: pyramid',
-          'Identifying the solid which can be formed by a given net',
-        ],
-        sampleQuestions: [
-          {
-            question: 'Draw the net of a cube.',
-            answer: null,
-            explanation: ['Draw the net of a cube'],
-            type: 'mcq',
-          },
-        ],
-      },
-    ],
-  },
-  {
-    id: 'p4-tables-graphs',
-    name: 'Tables and Graphs',
-    level: 4,
-    strand: MathStrand.STATISTICS,
-    subStrand: MathSubStrand.DATA_REPRESENTATION_AND_INTERPRETATION,
-    subTopics: [
-      {
-        id: 'tables-line-graphs-pie-charts',
-        name: 'Tables, Line Graphs and Pie Charts',
-        difficulty: 4,
-        objectives: [
-          'Completing a table from given data',
-          'Reading and interpreting data from tables/line graphs/pie charts',
-        ],
-        sampleQuestions: [
-          {
-            question: 'Complete the table from the given data.',
-            answer: null,
-            explanation: ['Complete the table from the given data'],
-            type: 'mcq',
-          },
-        ],
-      },
-    ],
-  },
-  // PRIMARY 5
-  {
-    id: 'p5-whole-numbers',
+    id: '92518db0-110b-4d49-8414-2834443f57ee',
     name: 'Numbers up to 10 million',
     level: 5,
     strand: MathStrand.NUMBER_AND_ALGEBRA,
     subStrand: MathSubStrand.WHOLE_NUMBERS,
-    subTopics: [
+    subStrandTopics: [
       {
-        id: 'numbers-up-to-10-million',
+        id: 'ebb0afa6-f43d-4742-9732-ebe44087a7d4',
         name: 'Numbers up to 10 million',
         difficulty: 5,
         objectives: [
@@ -1410,14 +925,14 @@ export const MATH_TOPICS: MathTopic[] = [
     ],
   },
   {
-    id: 'p5-four-operations',
+    id: '6e83b314-de87-4726-b14c-3375c241bb6d',
     name: 'Four Operations',
     level: 5,
     strand: MathStrand.NUMBER_AND_ALGEBRA,
     subStrand: MathSubStrand.WHOLE_NUMBERS,
-    subTopics: [
+    subStrandTopics: [
       {
-        id: 'four-operations',
+        id: '3e7bb46a-8165-40e9-b9c2-a4fbbd589350',
         name: 'Four Operations',
         difficulty: 5,
         objectives: [
@@ -1437,14 +952,14 @@ export const MATH_TOPICS: MathTopic[] = [
     ],
   },
   {
-    id: 'p5-fractions-division',
+    id: '9489591d-cecc-428f-8767-a5b7d89efcfa',
     name: 'Fraction and Division',
     level: 5,
     strand: MathStrand.NUMBER_AND_ALGEBRA,
     subStrand: MathSubStrand.FRACTIONS,
-    subTopics: [
+    subStrandTopics: [
       {
-        id: 'fraction-division',
+        id: '5aeb6594-9e8b-4b27-8b83-fa814d0e19e1',
         name: 'Fraction and Division',
         difficulty: 5,
         objectives: [
@@ -1461,7 +976,7 @@ export const MATH_TOPICS: MathTopic[] = [
         ],
       },
       {
-        id: 'fractions-four-operations',
+        id: 'cd65fa82-1618-4b08-a6c3-af10b23f0820',
         name: 'Fraction and Four Operations',
         difficulty: 5,
         objectives: [
@@ -1483,14 +998,14 @@ export const MATH_TOPICS: MathTopic[] = [
     ],
   },
   {
-    id: 'p5-decimals',
+    id: 'a8887948-05ec-43a8-8404-5b25f7a828c0',
     name: 'Decimals',
     level: 5,
     strand: MathStrand.NUMBER_AND_ALGEBRA,
     subStrand: MathSubStrand.DECIMALS,
-    subTopics: [
+    subStrandTopics: [
       {
-        id: 'decimals-four-operations',
+        id: 'a4b41fdd-18ea-4175-960f-16755d965124',
         name: 'Decimals and Four Operations',
         difficulty: 5,
         objectives: [
@@ -1509,27 +1024,26 @@ export const MATH_TOPICS: MathTopic[] = [
     ],
   },
   {
-    id: 'p5-percentage',
+    id: '6d1384af-0297-47af-a7d3-4bc44383ee48',
     name: 'Percentage',
     level: 5,
     strand: MathStrand.NUMBER_AND_ALGEBRA,
     subStrand: MathSubStrand.PERCENTAGE,
-    subTopics: [
+    subStrandTopics: [
       {
-        id: 'percentage',
+        id: '8e4d67ca-7ecf-47ca-a127-9d4c1b80b9e8',
         name: 'Percentage',
         difficulty: 5,
         objectives: [
-          'Expressing a part of a whole as a percentage',
-          'Use of % symbol',
-          'Finding a percentage part of a whole',
-          'Finding discount, GST and annual interest',
+          'Finding the whole given a part and the percentage',
+          'Finding percentage increase/decrease',
         ],
         sampleQuestions: [
           {
-            question: 'What percentage is 20 out of 50?',
-            answer: 40,
-            explanation: ['20 ÷ 50 = 0.4, which is 40%'],
+            question:
+              'What is the original price if a 20% discount reduces it to $80?',
+            answer: 100,
+            explanation: ['80 is 80% of the original price'],
             type: 'numeric',
           },
         ],
@@ -1537,14 +1051,14 @@ export const MATH_TOPICS: MathTopic[] = [
     ],
   },
   {
-    id: 'p5-rate',
+    id: 'd9c65763-a499-48d7-9a7a-a506c83b4c54',
     name: 'Rate',
     level: 5,
     strand: MathStrand.NUMBER_AND_ALGEBRA,
     subStrand: MathSubStrand.RATE,
-    subTopics: [
+    subStrandTopics: [
       {
-        id: 'rate',
+        id: '16b5f125-92a8-436b-9777-c9c11a559080',
         name: 'Rate',
         difficulty: 5,
         objectives: [
@@ -1566,14 +1080,14 @@ export const MATH_TOPICS: MathTopic[] = [
     ],
   },
   {
-    id: 'p5-area-and-volume',
+    id: '2707ae16-af03-4359-9402-d98c3fbc1cf9',
     name: 'Area and Volume',
     level: 5,
     strand: MathStrand.MEASUREMENT_AND_GEOMETRY,
     subStrand: MathSubStrand.AREA_AND_VOLUME,
-    subTopics: [
+    subStrandTopics: [
       {
-        id: 'area-of-triangle',
+        id: '19ad6e6f-09ac-41f0-b4d3-3cb7810e1845',
         name: 'Area of Triangle',
         difficulty: 5,
         objectives: [
@@ -1594,23 +1108,22 @@ export const MATH_TOPICS: MathTopic[] = [
         ],
       },
       {
-        id: 'volume-of-cube-and-cuboid',
+        id: 'fc1f9d5a-14df-4345-ad80-1ff84ce6a04f',
         name: 'Volume of Cube and Cuboid',
         difficulty: 5,
         objectives: [
-          'Building solids with unit cubes',
-          'Understanding cubic units (cm³, m³), excluding conversion between cm³ and m³',
-          'Drawing cubes and cuboids on isometric grid',
-          'Volume of cube/cuboid',
-          'Finding volume of liquid in a rectangular tank',
-          'Relationship between ℓ (or ml) with cm3',
+          'Finding one dimension of a cuboid given its volume and the other dimensions',
+          'Finding the length of one edge of a cube given its volume',
+          'Finding the height of a cuboid given its volume and base area',
+          'Finding the area of a face of a cuboid given its volume and one dimension',
+          'Use of square root and cube root',
         ],
         sampleQuestions: [
           {
-            question: 'What is the volume of a cube with side length 3 cm?',
-            answer: 27,
+            question: 'What is the volume of a cube with side length 4 cm?',
+            answer: 64,
             explanation: [
-              'Volume = side length³ = 3 cm × 3 cm × 3 cm = 27 cm³',
+              'Volume = side length³ = 4 cm × 4 cm × 4 cm = 64 cm³',
             ],
             type: 'numeric',
           },
@@ -1619,14 +1132,14 @@ export const MATH_TOPICS: MathTopic[] = [
     ],
   },
   {
-    id: 'p5-geometry',
+    id: '76201c5b-b20f-44b4-ba54-d6f933f53e62',
     name: 'Geometry',
     level: 5,
     strand: MathStrand.MEASUREMENT_AND_GEOMETRY,
     subStrand: MathSubStrand.GEOMETRY,
-    subTopics: [
+    subStrandTopics: [
       {
-        id: 'angles',
+        id: 'e4b0716d-0bed-4e1d-a848-d7e9025083ce',
         name: 'Angles',
         difficulty: 5,
         objectives: [
@@ -1645,7 +1158,7 @@ export const MATH_TOPICS: MathTopic[] = [
         ],
       },
       {
-        id: 'triangles',
+        id: 'f6fe0131-5269-4ddf-84f6-e20f2add4d09',
         name: 'Triangles',
         difficulty: 5,
         objectives: [
@@ -1667,7 +1180,7 @@ export const MATH_TOPICS: MathTopic[] = [
         ],
       },
       {
-        id: 'quadrilaterals',
+        id: '12b35d3f-9b85-492b-b7df-7db403c095eb',
         name: 'Quadrilaterals',
         difficulty: 5,
         objectives: [
@@ -1688,16 +1201,15 @@ export const MATH_TOPICS: MathTopic[] = [
       },
     ],
   },
-  // Primary 6
   {
-    id: 'p6-fractions',
+    id: '272c724e-9178-4ff0-8529-4951ee9b0e72',
     name: 'Fractions',
     level: 6,
     strand: MathStrand.NUMBER_AND_ALGEBRA,
     subStrand: MathSubStrand.FRACTIONS,
-    subTopics: [
+    subStrandTopics: [
       {
-        id: 'four-operations',
+        id: '3e7bb46a-8165-40e9-b9c2-a4fbbd589350',
         name: 'Four Operations',
         difficulty: 6,
         objectives: [
@@ -1716,14 +1228,14 @@ export const MATH_TOPICS: MathTopic[] = [
     ],
   },
   {
-    id: 'p6-percentage',
+    id: 'e448b3b5-bab5-43ef-a415-69ae92c1f2b8',
     name: 'Percentage',
     level: 6,
     strand: MathStrand.NUMBER_AND_ALGEBRA,
     subStrand: MathSubStrand.PERCENTAGE,
-    subTopics: [
+    subStrandTopics: [
       {
-        id: 'percentage',
+        id: '8e4d67ca-7ecf-47ca-a127-9d4c1b80b9e8',
         name: 'Percentage',
         difficulty: 6,
         objectives: [
@@ -1743,14 +1255,14 @@ export const MATH_TOPICS: MathTopic[] = [
     ],
   },
   {
-    id: 'p6-ratio',
+    id: '511c4850-6da1-4434-a6b5-e1cc48d1cc50',
     name: 'Ratio',
     level: 6,
     strand: MathStrand.NUMBER_AND_ALGEBRA,
     subStrand: MathSubStrand.RATIO,
-    subTopics: [
+    subStrandTopics: [
       {
-        id: 'ratio',
+        id: 'fd4687a6-6749-421e-86f2-8083c87bc605',
         name: 'Ratio',
         difficulty: 6,
         objectives: [
@@ -1776,14 +1288,14 @@ export const MATH_TOPICS: MathTopic[] = [
     ],
   },
   {
-    id: 'p6-algebra',
+    id: 'b4d96087-ff55-4a18-9253-719c03890670',
     name: 'Algebra',
     level: 6,
     strand: MathStrand.NUMBER_AND_ALGEBRA,
     subStrand: MathSubStrand.ALGEBRA,
-    subTopics: [
+    subStrandTopics: [
       {
-        id: 'algebra',
+        id: '376c9b48-d198-4c6f-8949-5c621dcaa48a',
         name: 'Algebra',
         difficulty: 6,
         objectives: [
@@ -1805,14 +1317,14 @@ export const MATH_TOPICS: MathTopic[] = [
     ],
   },
   {
-    id: 'p6-area-and-volume',
+    id: '3a2901bd-58dd-4cf0-bf74-5dad88d76d56',
     name: 'Area and Volume',
     level: 6,
     strand: MathStrand.MEASUREMENT_AND_GEOMETRY,
     subStrand: MathSubStrand.AREA_AND_VOLUME,
-    subTopics: [
+    subStrandTopics: [
       {
-        id: 'area-and-circumference-of-circle',
+        id: 'ee561c4d-9fe1-4f1a-9b76-21c3631d78ed',
         name: 'Area and Circumference of Circle',
         difficulty: 6,
         objectives: [
@@ -1831,7 +1343,7 @@ export const MATH_TOPICS: MathTopic[] = [
         ],
       },
       {
-        id: 'volume-of-cube-and-cuboid',
+        id: 'fc1f9d5a-14df-4345-ad80-1ff84ce6a04f',
         name: 'Volume of Cube and Cuboid',
         difficulty: 6,
         objectives: [
@@ -1855,14 +1367,14 @@ export const MATH_TOPICS: MathTopic[] = [
     ],
   },
   {
-    id: 'p6-special-quadrilaterals',
+    id: '35b36126-7574-4e5e-9599-eeb352b4de55',
     name: 'Special Quadrilaterals',
     level: 6,
     strand: MathStrand.MEASUREMENT_AND_GEOMETRY,
     subStrand: MathSubStrand.GEOMETRY,
-    subTopics: [
+    subStrandTopics: [
       {
-        id: 'special-quadrilaterals',
+        id: '7ea76274-0a70-4b58-9076-4f66d04d8027',
         name: 'Special Quadrilaterals',
         difficulty: 6,
         objectives: [
@@ -1881,14 +1393,14 @@ export const MATH_TOPICS: MathTopic[] = [
     ],
   },
   {
-    id: 'p6-data-analysis',
+    id: '5933f320-f501-4d8a-a6f9-63d25a3a5342',
     name: 'Data Analysis',
     level: 6,
     strand: MathStrand.STATISTICS,
     subStrand: MathSubStrand.DATA_ANALYSIS,
-    subTopics: [
+    subStrandTopics: [
       {
-        id: 'average-of-a-set-of-data',
+        id: 'c7750314-a2b9-40f8-8d86-84c8f17c83a1',
         name: 'Average of a Set of Data',
         difficulty: 6,
         objectives: [
@@ -1908,13 +1420,4 @@ export const MATH_TOPICS: MathTopic[] = [
       },
     ],
   },
-];
-
-export function getTopicsByLevel(
-  startLevel: number,
-  endLevel: number
-): MathTopic[] {
-  return MATH_TOPICS.filter(
-    (topic) => topic.level >= startLevel && topic.level <= endLevel
-  );
-}
+] as MathTopic[];

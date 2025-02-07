@@ -26,6 +26,7 @@ export type User = InferSelectModel<typeof user>;
 // ==================== Math Learning System ====================
 export const mathProblems = pgTable('math_problems', {
   id: uuid('id').primaryKey().defaultRandom(),
+  type: text('type').notNull(),
   question: text('question').notNull(),
   answer: integer('answer').notNull(),
   strand: text('strand').notNull(),
@@ -33,15 +34,14 @@ export const mathProblems = pgTable('math_problems', {
   difficulty: integer('difficulty').notNull(),
 });
 
-export const topics = pgTable('topics', {
+export const strands = pgTable('strands', {
   id: uuid('id').primaryKey().defaultRandom(),
   name: text('name').notNull(),
   level: integer('level').notNull(), // 1-6 for Primary levels
-  strand: text('strand').notNull(), // Will store MathStrand values
-  subStrand: text('sub_strand').notNull(), // Will store MathSubStrand values
   description: text('description'),
-  // New fields to match MATH_TOPICS structure
-  subTopics: json('sub_topics')
+  strand: text('strand').notNull(),
+  subStrand: text('sub_strand').notNull(),
+  subStrandTopics: json('sub_strand_topics')
     .$type<
       {
         id: string;
@@ -60,9 +60,10 @@ export const studentProgress = pgTable('student_progress', {
   isCorrect: boolean('is_correct').notNull(),
   timeSpent: integer('time_spent'),
   createdAt: timestamp('created_at').defaultNow(),
-  topicProgress: json('topic_progress').$type<
+  subStrandProgress: json('sub_strand_progress').$type<
     {
-      topicId: string;
+      subStrand: string;
+      level: number;
       questionsAttempted: number;
       correctAnswers: number;
       mistakes: string[];
