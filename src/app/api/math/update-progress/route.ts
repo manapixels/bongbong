@@ -50,7 +50,7 @@ export async function POST(request: Request) {
 
     await updateStudentProgress({
       userId: studentId,
-      problemId: questionId,
+      questionId,
       isCorrect,
       timeSpent: timeSpent || 0,
     });

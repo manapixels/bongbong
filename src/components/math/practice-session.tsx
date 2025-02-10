@@ -5,7 +5,7 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { ProblemDisplay } from './problem-display';
-import { MathTopic, Question } from '@/types/math';
+import { MathTopic, MathQuestion } from '@/types/math';
 import { useToast } from '@/components/ui/use-toast';
 
 interface PracticeSessionProps {
@@ -19,7 +19,9 @@ export function PracticeSession({
   studentId,
   onComplete,
 }: PracticeSessionProps) {
-  const [currentQuestion, setCurrentQuestion] = useState<Question | null>(null);
+  const [currentQuestion, setCurrentQuestion] = useState<MathQuestion | null>(
+    null
+  );
   const [isCorrect, setIsCorrect] = useState<boolean | undefined>();
   const [showSolution, setShowSolution] = useState(false);
   const [questionsAnswered, setQuestionsAnswered] = useState(0);

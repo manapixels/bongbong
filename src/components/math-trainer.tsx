@@ -6,6 +6,7 @@ import { Card } from './ui/card';
 import { Input } from './ui/input';
 import { useLocalUser } from '@/hooks/use-local-user';
 import { MathSubStrand } from '@/types/math';
+import Image from 'next/image';
 
 interface Problem {
   id: string;
@@ -15,6 +16,15 @@ interface Problem {
   subStrand: MathSubStrand;
   difficulty: number;
   topicId: string;
+  type?: string;
+  imageUrl?: string;
+}
+
+function formatSubStrand(subStrand: string): string {
+  return subStrand
+    .split('-')
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
 }
 
 export function MathTrainer() {
@@ -146,8 +156,21 @@ export function MathTrainer() {
         ) : (
           <div className="space-y-4">
             <div className="text-xl">{currentProblem.question}</div>
+
+            {currentProblem.imageUrl && (
+              <div className="my-4">
+                <Image
+                  src={currentProblem.imageUrl}
+                  alt="Problem visualization"
+                  width={500}
+                  height={300}
+                  className="max-w-full h-auto rounded-lg shadow-md"
+                />
+              </div>
+            )}
+
             <div className="text-sm text-gray-500">
-              Topic: {currentProblem.strand}
+              Topic: {formatSubStrand(currentProblem.subStrand)}
             </div>
             <Input
               type="number"

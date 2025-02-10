@@ -1,9 +1,8 @@
 import type { InferSelectModel } from 'drizzle-orm';
-import { achievements, studentAchievements } from '@/lib/db/schema';
+import { achievements } from '@/lib/db/schema';
 
 // Base types from schema
 export type Achievement = InferSelectModel<typeof achievements>;
-export type StudentAchievement = InferSelectModel<typeof studentAchievements>;
 
 export type AchievementType = 'streak' | 'total_correct' | 'speed';
 

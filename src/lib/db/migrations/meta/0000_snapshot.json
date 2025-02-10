@@ -1,5 +1,5 @@
 {
-  "id": "fa9a4229-7e15-4208-b7f8-62828bb9898d",
+  "id": "c67ce6ad-4e12-40f6-b556-d31a1bb5ed59",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -13,6 +13,12 @@
           "type": "text",
           "primaryKey": true,
           "notNull": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
         },
         "name": {
           "name": "name",
@@ -49,18 +55,39 @@
           "type": "integer",
           "primaryKey": false,
           "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
         }
       },
       "indexes": {},
-      "foreignKeys": {},
+      "foreignKeys": {
+        "achievements_user_id_User_id_fk": {
+          "name": "achievements_user_id_User_id_fk",
+          "tableFrom": "achievements",
+          "tableTo": "User",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.math_problems": {
-      "name": "math_problems",
+    "public.math_questions": {
+      "name": "math_questions",
       "schema": "",
       "columns": {
         "id": {
@@ -70,17 +97,19 @@
           "notNull": true,
           "default": "gen_random_uuid()"
         },
-        "template_id": {
-          "name": "template_id",
-          "type": "uuid",
+        "subject": {
+          "name": "subject",
+          "type": "subject",
+          "typeSchema": "public",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true,
+          "default": "'mathematics'"
         },
         "type": {
           "name": "type",
           "type": "text",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "question": {
           "name": "question",
@@ -88,14 +117,20 @@
           "primaryKey": false,
           "notNull": true
         },
-        "variables": {
-          "name": "variables",
+        "answer": {
+          "name": "answer",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "explanation": {
+          "name": "explanation",
           "type": "json",
           "primaryKey": false,
           "notNull": true
         },
-        "answer": {
-          "name": "answer",
+        "difficulty": {
+          "name": "difficulty",
           "type": "integer",
           "primaryKey": false,
           "notNull": true
@@ -112,17 +147,17 @@
           "primaryKey": false,
           "notNull": true
         },
-        "difficulty": {
-          "name": "difficulty",
-          "type": "integer",
+        "answer_formula": {
+          "name": "answer_formula",
+          "type": "text",
           "primaryKey": false,
           "notNull": true
         },
-        "context": {
-          "name": "context",
+        "variables": {
+          "name": "variables",
           "type": "json",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "created_at": {
           "name": "created_at",
@@ -133,21 +168,7 @@
         }
       },
       "indexes": {},
-      "foreignKeys": {
-        "math_problems_template_id_problem_templates_id_fk": {
-          "name": "math_problems_template_id_problem_templates_id_fk",
-          "tableFrom": "math_problems",
-          "tableTo": "problem_templates",
-          "columnsFrom": [
-            "template_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
+      "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},
@@ -243,8 +264,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.problem_templates": {
-      "name": "problem_templates",
+    "public.progress": {
+      "name": "progress",
       "schema": "",
       "columns": {
         "id": {
@@ -254,75 +275,27 @@
           "notNull": true,
           "default": "gen_random_uuid()"
         },
-        "type": {
-          "name": "type",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "structure": {
-          "name": "structure",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "variables": {
-          "name": "variables",
-          "type": "json",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "answer_formula": {
-          "name": "answer_formula",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "context": {
-          "name": "context",
-          "type": "json",
+        "user_id": {
+          "name": "user_id",
+          "type": "uuid",
           "primaryKey": false,
           "notNull": false
         },
-        "difficulty": {
-          "name": "difficulty",
+        "question_id": {
+          "name": "question_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "is_correct": {
+          "name": "is_correct",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "time_spent": {
+          "name": "time_spent",
           "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "strand": {
-          "name": "strand",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "sub_strand": {
-          "name": "sub_strand",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "skills": {
-          "name": "skills",
-          "type": "json",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "common_misconceptions": {
-          "name": "common_misconceptions",
-          "type": "json",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "explanation_template": {
-          "name": "explanation_template",
-          "type": "json",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "validation_rules": {
-          "name": "validation_rules",
-          "type": "json",
           "primaryKey": false,
           "notNull": false
         },
@@ -332,10 +305,43 @@
           "primaryKey": false,
           "notNull": false,
           "default": "now()"
+        },
+        "sub_strand_progress": {
+          "name": "sub_strand_progress",
+          "type": "json",
+          "primaryKey": false,
+          "notNull": false
         }
       },
       "indexes": {},
-      "foreignKeys": {},
+      "foreignKeys": {
+        "progress_user_id_User_id_fk": {
+          "name": "progress_user_id_User_id_fk",
+          "tableFrom": "progress",
+          "tableTo": "User",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "progress_question_id_math_questions_id_fk": {
+          "name": "progress_question_id_math_questions_id_fk",
+          "tableFrom": "progress",
+          "tableTo": "math_questions",
+          "columnsFrom": [
+            "question_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},
@@ -398,363 +404,6 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.student_achievements": {
-      "name": "student_achievements",
-      "schema": "",
-      "columns": {
-        "user_id": {
-          "name": "user_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "achievement_id": {
-          "name": "achievement_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "unlocked_at": {
-          "name": "unlocked_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "student_achievements_user_id_User_id_fk": {
-          "name": "student_achievements_user_id_User_id_fk",
-          "tableFrom": "student_achievements",
-          "tableTo": "User",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        },
-        "student_achievements_achievement_id_achievements_id_fk": {
-          "name": "student_achievements_achievement_id_achievements_id_fk",
-          "tableFrom": "student_achievements",
-          "tableTo": "achievements",
-          "columnsFrom": [
-            "achievement_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {
-        "student_achievements_user_id_achievement_id_pk": {
-          "name": "student_achievements_user_id_achievement_id_pk",
-          "columns": [
-            "user_id",
-            "achievement_id"
-          ]
-        }
-      },
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.student_problem_history": {
-      "name": "student_problem_history",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
-        },
-        "user_id": {
-          "name": "user_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "template_id": {
-          "name": "template_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "attempts": {
-          "name": "attempts",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "default": 0
-        },
-        "correct_attempts": {
-          "name": "correct_attempts",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "default": 0
-        },
-        "last_attempted": {
-          "name": "last_attempted",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "average_response_time": {
-          "name": "average_response_time",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "default": 0
-        },
-        "common_mistakes": {
-          "name": "common_mistakes",
-          "type": "json",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "'[]'::json"
-        },
-        "variations_used": {
-          "name": "variations_used",
-          "type": "json",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "'[]'::json"
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false,
-          "default": "now()"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false,
-          "default": "now()"
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "student_problem_history_user_id_User_id_fk": {
-          "name": "student_problem_history_user_id_User_id_fk",
-          "tableFrom": "student_problem_history",
-          "tableTo": "User",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        },
-        "student_problem_history_template_id_problem_templates_id_fk": {
-          "name": "student_problem_history_template_id_problem_templates_id_fk",
-          "tableFrom": "student_problem_history",
-          "tableTo": "problem_templates",
-          "columnsFrom": [
-            "template_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.student_progress": {
-      "name": "student_progress",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
-        },
-        "user_id": {
-          "name": "user_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "problem_id": {
-          "name": "problem_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "is_correct": {
-          "name": "is_correct",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "time_spent": {
-          "name": "time_spent",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false,
-          "default": "now()"
-        },
-        "sub_strand_progress": {
-          "name": "sub_strand_progress",
-          "type": "json",
-          "primaryKey": false,
-          "notNull": false
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "student_progress_user_id_User_id_fk": {
-          "name": "student_progress_user_id_User_id_fk",
-          "tableFrom": "student_progress",
-          "tableTo": "User",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        },
-        "student_progress_problem_id_math_problems_id_fk": {
-          "name": "student_progress_problem_id_math_problems_id_fk",
-          "tableFrom": "student_progress",
-          "tableTo": "math_problems",
-          "columnsFrom": [
-            "problem_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.student_skill_progress": {
-      "name": "student_skill_progress",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
-        },
-        "user_id": {
-          "name": "user_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "skill_id": {
-          "name": "skill_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "proficiency": {
-          "name": "proficiency",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "last_practiced": {
-          "name": "last_practiced",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "total_attempts": {
-          "name": "total_attempts",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "default": 0
-        },
-        "success_rate": {
-          "name": "success_rate",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "default": 0
-        },
-        "needs_review": {
-          "name": "needs_review",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": true,
-          "default": false
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false,
-          "default": "now()"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false,
-          "default": "now()"
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "student_skill_progress_user_id_User_id_fk": {
-          "name": "student_skill_progress_user_id_User_id_fk",
-          "tableFrom": "student_skill_progress",
-          "tableTo": "User",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
     "public.User": {
       "name": "User",
       "schema": "",
@@ -809,7 +458,18 @@
       "isRLSEnabled": false
     }
   },
-  "enums": {},
+  "enums": {
+    "public.subject": {
+      "name": "subject",
+      "schema": "public",
+      "values": [
+        "english",
+        "chinese",
+        "science",
+        "mathematics"
+      ]
+    }
+  },
   "schemas": {},
   "sequences": {},
   "roles": {},

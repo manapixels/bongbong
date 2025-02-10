@@ -5,12 +5,12 @@ import { TopicSelector } from './topic-selector';
 import { PracticeSession } from './practice-session';
 import { StudentDashboard } from '@/components/dashboard/student-dashboard';
 import { MathTopic } from '@/types/math';
-import type { StudentProgress } from '@/types/progress';
+import type { Progress } from '@/types/progress';
 
 interface PracticeLayoutProps {
   studentId: string;
   topics: MathTopic[];
-  studentProgress: StudentProgress;
+  studentProgress: Progress;
 }
 
 export function PracticeLayout({

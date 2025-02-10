@@ -29,7 +29,15 @@ export default async function MathPage() {
       <PracticeLayout
         studentId={session.user.id}
         topics={MATH_TOPICS}
-        studentProgress={defaultProgress}
+        studentProgress={{
+          id: crypto.randomUUID(),
+          userId: session.user.id,
+          questionId: null,
+          isCorrect: false,
+          timeSpent: null,
+          createdAt: new Date(),
+          subStrandProgress: [],
+        }}
       />
     );
   }

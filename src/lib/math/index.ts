@@ -1,9 +1,9 @@
-import type { StudentProgress } from '@/types/progress';
-import { MathSubStrand, MathTopic, Question } from '@/types/math';
+import { MathQuestion, MathSubStrand, SubStrandTopic } from '@/types/math';
 import { calculateDifficulty } from '@/lib/utils/math';
 import { MATH_TOPICS } from '@/types/math';
 import { singaporeContexts } from './singaporeContexts';
 import crypto from 'crypto';
+import { Progress } from '@/types';
 
 interface VariableRange {
   min: number;
@@ -18,14 +18,6 @@ interface QuestionTemplate {
   type: string;
   variables?: Record<string, VariableRange>;
   generateOptions?: (answer: number) => string[];
-}
-
-interface SubTopic {
-  id: string;
-  name: string;
-  difficulty: number;
-  objectives: string[];
-  sampleQuestions: Question[];
 }
 
 // Helper functions
@@ -73,17 +65,17 @@ function substituteContext(template: string): [string, Record<string, string>] {
   return [processedTemplate, contextVars];
 }
 
-function findSubtopicById(st: string): SubTopic | null {
+function findSubtopicById(st: string): SubStrandTopic | null {
   for (const topic of MATH_TOPICS) {
     const subtopic = topic.subStrandTopics.find((s) => s.id === st);
     if (subtopic) {
-      const { id, name, difficulty, objectives, sampleQuestions } = subtopic;
+      const { id, name, difficulty, skills, sampleQuestions } = subtopic;
       return {
         id,
         name,
         difficulty,
-        objectives,
-        sampleQuestions: [...sampleQuestions] as Question[],
+        skills,
+        sampleQuestions,
       };
     }
   }
@@ -94,7 +86,7 @@ function generateQuestionImpl(
   subStrand: MathSubStrand,
   level: number,
   previousMistakes: string[] = []
-): Question {
+): MathQuestion {
   if (!subStrand) {
     throw new Error(`No subStrand found for id: ${subStrand}`);
   }
@@ -171,48 +163,27 @@ function generateQuestionImpl(
 
   return {
     id: crypto.randomUUID(),
+    subject: 'mathematics',
     type: template.type,
     question,
-    answer,
-    explanation: explanation as string[],
+    answer: answer.toString(),
+    explanation,
     difficulty: topic.level,
     strand: topic.strand,
     subStrand,
+    answerFormula: template.answer?.toString() ?? '',
+    variables: variables as unknown as Record<string, string>,
+    createdAt: new Date(),
   };
-}
-
-function generateSimilarQuestionImpl(
-  originalQuestion: Question,
-  variation: 'easier' | 'harder' | 'same' = 'same'
-): Question {
-  const difficultyAdjustment = {
-    easier: -1,
-    harder: 1,
-    same: 0,
-  };
-
-  const newDifficulty = Math.max(
-    1,
-    Math.min(
-      6,
-      (originalQuestion.difficulty ?? 0) + difficultyAdjustment[variation]
-    )
-  );
-
-  if (!originalQuestion.subStrand) {
-    throw new Error(`No subStrand found for question ${originalQuestion.id}`);
-  }
-
-  return generateQuestionImpl(originalQuestion.subStrand, newDifficulty);
 }
 
 export function selectNextQuestion(
-  progress: StudentProgress,
+  progress: Progress,
   subStrand: MathSubStrand
-): Question {
+): MathQuestion {
   // Calculate success rate for current topic
   const topicStats = progress.subStrandProgress?.find(
-    (p) => p.subStrand === subStrand
+    (p: { subStrand: string }) => p.subStrand === subStrand
   );
 
   const successRate = topicStats
@@ -228,4 +199,3 @@ export function selectNextQuestion(
 
 // Export the functions
 export const generateQuestion = generateQuestionImpl;
-export const generateSimilarQuestion = generateSimilarQuestionImpl;

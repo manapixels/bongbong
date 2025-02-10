@@ -1,10 +1,12 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useTimer } from './use-timer';
 import { useToast } from '@/hooks/use-toast';
-import { Question, MathTopic } from '@/types/math';
+import { MathQuestion, MathTopic } from '@/types/math';
 
 export function usePracticeSession(topic: MathTopic, studentId: string) {
-  const [currentQuestion, setCurrentQuestion] = useState<Question | null>(null);
+  const [currentQuestion, setCurrentQuestion] = useState<MathQuestion | null>(
+    null
+  );
   const [isCorrect, setIsCorrect] = useState<boolean | undefined>();
   const [showSolution, setShowSolution] = useState(false);
   const [questionsAnswered, setQuestionsAnswered] = useState(0);

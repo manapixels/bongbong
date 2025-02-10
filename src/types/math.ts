@@ -1,9 +1,18 @@
+import { mathQuestions } from '@/lib/db/schema';
+import { InferSelectModel } from 'drizzle-orm';
+
+export type MathQuestion = InferSelectModel<typeof mathQuestions>;
+
 export interface SubStrandTopic {
   id: string;
   name: string;
   difficulty: number;
-  objectives: string[];
-  sampleQuestions: Question[];
+  skills: string[];
+  sampleQuestions: {
+    question: string;
+    answer: number | null;
+    explanation: string[];
+  }[];
 }
 export interface MathTopic {
   id: string;
@@ -12,17 +21,6 @@ export interface MathTopic {
   strand: MathStrand;
   subStrand: MathSubStrand;
   subStrandTopics: SubStrandTopic[];
-}
-
-export interface Question {
-  id?: string;
-  type: string;
-  question: string;
-  answer: number | string | number[] | null;
-  explanation: string[];
-  difficulty?: number;
-  strand?: MathStrand;
-  subStrand?: MathSubStrand;
 }
 
 export const enum MathStrand {
@@ -64,7 +62,7 @@ export const MATH_TOPICS = [
         id: '998f4fe6-4579-4aee-82f2-a7cb2f458503',
         name: 'Numbers up to 100',
         difficulty: 1,
-        objectives: [
+        skills: [
           'Counting to tell the number of objects in a given set',
           'Number notation, representations and place values (tens, ones)',
           'Reading and writing numbers in numerals and in words',
@@ -78,13 +76,11 @@ export const MATH_TOPICS = [
             question: 'What is the sum of 35 and 47?',
             answer: 82,
             explanation: ['35 + 47 = 82'],
-            type: 'numeric',
           },
           {
             question: 'What is the product of 7 and 8?',
             answer: 56,
             explanation: ['7 × 8 = 56'],
-            type: 'numeric',
           },
         ],
       },
@@ -92,7 +88,7 @@ export const MATH_TOPICS = [
         id: '7692a08c-3560-428c-bcf1-187711873dfd',
         name: 'Addition and Subtraction',
         difficulty: 1,
-        objectives: [
+        skills: [
           'Concepts of addition and subtraction',
           'Use of +, – and =',
           'Relationship between addition and subtraction',
@@ -107,13 +103,11 @@ export const MATH_TOPICS = [
             question: 'What is the sum of 23, 45, and 17?',
             answer: 85,
             explanation: ['23 + 45 + 17 = 85'],
-            type: 'numeric',
           },
           {
             question: 'What is the difference between 78 and 54?',
             answer: 24,
             explanation: ['78 - 54 = 24'],
-            type: 'numeric',
           },
         ],
       },
@@ -121,7 +115,7 @@ export const MATH_TOPICS = [
         id: '4cabf5ba-f3bb-4576-84c2-8b3e300ef778',
         name: 'Multiplication',
         difficulty: 1,
-        objectives: [
+        skills: [
           'Concepts of multiplication',
           'Use of ×',
           'Multiplying within 40',
@@ -131,13 +125,11 @@ export const MATH_TOPICS = [
             question: 'What is the product of 6 and 7?',
             answer: 42,
             explanation: ['6 × 7 = 42'],
-            type: 'numeric',
           },
           {
             question: 'What is the product of 8 and 5?',
             answer: 40,
             explanation: ['8 × 5 = 40'],
-            type: 'numeric',
           },
         ],
       },
@@ -145,19 +137,17 @@ export const MATH_TOPICS = [
         id: 'cef54c34-989b-4a3c-bc35-4bc187e4ba63',
         name: 'Division',
         difficulty: 1,
-        objectives: ['Concepts of division', 'Dividing within 20'],
+        skills: ['Concepts of division', 'Dividing within 20'],
         sampleQuestions: [
           {
             question: 'What is the quotient when 48 is divided by 6?',
             answer: 8,
             explanation: ['48 ÷ 6 = 8'],
-            type: 'numeric',
           },
           {
             question: 'What is the quotient when 56 is divided by 7?',
             answer: 8,
             explanation: ['56 ÷ 7 = 8'],
-            type: 'numeric',
           },
         ],
       },
@@ -174,7 +164,7 @@ export const MATH_TOPICS = [
         id: '4c8ade56-22c2-4b0e-9c9c-8a2793a09cf4',
         name: 'Counting Money',
         difficulty: 1,
-        objectives: [
+        skills: [
           'Counting amount of money in cents up to $1',
           'Counting amount of money in dollars up to $100',
         ],
@@ -183,13 +173,11 @@ export const MATH_TOPICS = [
             question: 'How many cents are there in $0.75?',
             answer: 75,
             explanation: ['$0.75 = 75 cents'],
-            type: 'numeric',
           },
           {
             question: 'How many dollars are there in 1000 cents?',
             answer: 10,
             explanation: ['1000 cents = 10 dollars'],
-            type: 'numeric',
           },
         ],
       },
@@ -206,7 +194,7 @@ export const MATH_TOPICS = [
         id: '62483d15-36e4-43e7-acb4-2a772806035e',
         name: 'Measuring of Length',
         difficulty: 1,
-        objectives: [
+        skills: [
           'Measuring length in centimetres',
           'Use of abbreviation cm',
           'Comparing and ordering lengths in cm',
@@ -217,13 +205,11 @@ export const MATH_TOPICS = [
             question: 'What is the length of a line that is 15 cm long?',
             answer: 15,
             explanation: ['The length is 15 cm'],
-            type: 'numeric',
           },
           {
             question: 'Draw a line segment that is 7 cm long.',
             answer: null,
             explanation: ['Draw a line segment that is 7 cm long'],
-            type: 'mcq',
           },
         ],
       },
@@ -231,7 +217,7 @@ export const MATH_TOPICS = [
         id: 'c7560517-82ac-4bb3-8e37-503e2ff4b0fe',
         name: 'Measurement of Time',
         difficulty: 1,
-        objectives: [
+        skills: [
           'Telling time to 5 minutes',
           'Use of "am" and "pm"',
           'Use of abbreviations h and min',
@@ -243,14 +229,12 @@ export const MATH_TOPICS = [
               'What time is it when the hour hand is on 3 and the minute hand is on 12?',
             answer: '3:00',
             explanation: ['It is 3:00'],
-            type: 'numeric',
           },
           {
             question:
               'What time is it when the hour hand is on 12 and the minute hand is on 30?',
             answer: '12:30',
             explanation: ['It is 12:30'],
-            type: 'numeric',
           },
         ],
       },
@@ -267,7 +251,7 @@ export const MATH_TOPICS = [
         id: '12d95fd0-60e1-4f99-8bf2-b8b1c4cb2554',
         name: 'Geometry 2D Shapes',
         difficulty: 1,
-        objectives: [
+        skills: [
           'Identifying, naming, describing and classifying 2D shape (rectangle)',
           'Identifying, naming, describing and classifying 2D shape (square)',
           'Identifying, naming, describing and classifying 2D shape (triangle)',
@@ -284,13 +268,11 @@ export const MATH_TOPICS = [
               'What is the area of a rectangle with length 5 cm and width 3 cm?',
             answer: 15,
             explanation: ['Area = length × width = 5 cm × 3 cm = 15 cm²'],
-            type: 'numeric',
           },
           {
             question: 'Draw a square.',
             answer: null,
             explanation: ['Draw a square'],
-            type: 'mcq',
           },
         ],
       },
@@ -307,13 +289,12 @@ export const MATH_TOPICS = [
         id: '4b350a48-1ebb-47d7-a1e9-d89879d83088',
         name: 'Picture Graphs',
         difficulty: 1,
-        objectives: ['Reading and interpreting data from picture graphs'],
+        skills: ['Reading and interpreting data from picture graphs'],
         sampleQuestions: [
           {
             question: 'How many students chose option A?',
             answer: 20,
             explanation: ['20 students chose option A'],
-            type: 'numeric',
           },
         ],
       },
@@ -330,7 +311,7 @@ export const MATH_TOPICS = [
         id: '40acff90-5cf1-45c6-a90a-030a8997dd89',
         name: 'Numbers up to 1000',
         difficulty: 2,
-        objectives: [
+        skills: [
           'Counting in tens/hundreds',
           'Number notation, representations and place values (hundreds, tens, ones)',
           'Reading and writing numbers in numerals and in words',
@@ -343,7 +324,6 @@ export const MATH_TOPICS = [
             question: 'What is the sum of 500, 300, and 200?',
             answer: 1000,
             explanation: ['500 + 300 + 200 = 1000'],
-            type: 'numeric',
           },
         ],
       },
@@ -351,7 +331,7 @@ export const MATH_TOPICS = [
         id: '7d32b8e9-c9cd-42f0-8c4b-8321ee098fa4',
         name: 'Whole Numbers Addition and Subtraction',
         difficulty: 2,
-        objectives: [
+        skills: [
           'Addition and subtraction algorithms (up to 3 digits)',
           'Mental calculation involving addition and subtraction of a 3-digit number and ones/tens/hundreds',
         ],
@@ -360,13 +340,11 @@ export const MATH_TOPICS = [
             question: 'What is the sum of 456 and 234?',
             answer: 690,
             explanation: ['456 + 234 = 690'],
-            type: 'numeric',
           },
           {
             question: 'What is the difference between 876 and 543?',
             answer: 333,
             explanation: ['876 - 543 = 333'],
-            type: 'numeric',
           },
         ],
       },
@@ -374,7 +352,7 @@ export const MATH_TOPICS = [
         id: '19edeffe-a8c2-4aef-b2e0-c66cce5a580b',
         name: 'Whole Numbers Multiplication and Division',
         difficulty: 2,
-        objectives: [
+        skills: [
           'Multiplication tables of 2, 3, 4, 5 and 10',
           'Use of ÷ symbol',
           'Relationship between multiplication and division',
@@ -386,13 +364,11 @@ export const MATH_TOPICS = [
             question: 'What is the product of 7 and 8?',
             answer: 56,
             explanation: ['7 × 8 = 56'],
-            type: 'numeric',
           },
           {
             question: 'What is the quotient when 48 is divided by 6?',
             answer: 8,
             explanation: ['48 ÷ 6 = 8'],
-            type: 'numeric',
           },
         ],
       },
@@ -409,7 +385,7 @@ export const MATH_TOPICS = [
         id: '17619218-12a1-4204-a375-28c1d3b6ef46',
         name: 'Fraction of a Whole',
         difficulty: 2,
-        objectives: [
+        skills: [
           'Fraction as part of a whole',
           'Notation and representations of fractions',
           'Comparing and ordering unitfractions with denominators not exceeding 12',
@@ -417,10 +393,9 @@ export const MATH_TOPICS = [
         ],
         sampleQuestions: [
           {
-            question: 'What is the fraction of the circle that is shaded?',
+            question: 'What fraction of the circle is shaded?',
             answer: 0.75,
             explanation: ['The shaded area is 3/4 of the circle'],
-            type: 'numeric',
           },
         ],
       },
@@ -428,7 +403,7 @@ export const MATH_TOPICS = [
         id: 'dc0508f5-673a-49ca-94f6-8c241b81c1fc',
         name: 'Fraction Addition and Subtraction',
         difficulty: 2,
-        objectives: [
+        skills: [
           'Adding and subtracting like fractions within one whole with denominators of given fractions not exceeding 12',
         ],
         sampleQuestions: [
@@ -436,7 +411,6 @@ export const MATH_TOPICS = [
             question: 'What is the sum of 1/4 and 1/4?',
             answer: 0.5,
             explanation: ['1/4 + 1/4 = 2/4 = 1/2'],
-            type: 'numeric',
           },
         ],
       },
@@ -453,7 +427,7 @@ export const MATH_TOPICS = [
         id: 'c9d4be29-ba85-4f21-969b-19e1653b82c7',
         name: 'Money Operations',
         difficulty: 2,
-        objectives: [
+        skills: [
           'Counting amount of money in dollars and cents',
           'Reading and writing money in decimal notation',
           'Comparing two or three amounts of money',
@@ -467,7 +441,6 @@ export const MATH_TOPICS = [
             explanation: [
               '3 quarters = $0.75, 2 dimes = $0.20, 0.75 + 0.20 = $0.95',
             ],
-            type: 'numeric',
           },
         ],
       },
@@ -484,7 +457,7 @@ export const MATH_TOPICS = [
         id: 'ef0f0734-2e16-4251-ab4f-9b47c69be3bd',
         name: 'Length, Mass and Volume',
         difficulty: 2,
-        objectives: [
+        skills: [
           'Measuring length in metres',
           'Measuring mass in kilograms/grams',
           'Measuring volume of liquid in litres',
@@ -498,7 +471,6 @@ export const MATH_TOPICS = [
             question: 'What is the length of a table that is 1.2 meters long?',
             answer: 1.2,
             explanation: ['The length is 1.2 meters'],
-            type: 'numeric',
           },
         ],
       },
@@ -506,7 +478,7 @@ export const MATH_TOPICS = [
         id: 'dd24f2c2-8d07-4f18-91d0-0aaa14da15ad',
         name: 'Measurement Time',
         difficulty: 2,
-        objectives: [
+        skills: [
           'Telling time to the minute',
           'Measuring time in hours and minutes',
           'Converting time in hours and minutes to minutes only, and vice versa',
@@ -517,7 +489,6 @@ export const MATH_TOPICS = [
               'What time is it when the hour hand is on 3 and the minute hand is on 12?',
             answer: '3:00',
             explanation: ['It is 3:00'],
-            type: 'numeric',
           },
         ],
       },
@@ -534,7 +505,7 @@ export const MATH_TOPICS = [
         id: '0dab254d-261f-4a96-9390-73149f30fa47',
         name: '2D Shapes',
         difficulty: 2,
-        objectives: [
+        skills: [
           'Making/completing patterns with 2D shapes according to one or two of the following attributes: size, shape, color, orientation',
         ],
         sampleQuestions: [
@@ -542,7 +513,6 @@ export const MATH_TOPICS = [
             question: 'Draw a rectangle.',
             answer: null,
             explanation: ['Draw a rectangle'],
-            type: 'mcq',
           },
         ],
       },
@@ -550,7 +520,7 @@ export const MATH_TOPICS = [
         id: 'f3751a7a-ab22-4041-b986-7549f72132ff',
         name: '3D Shapes',
         difficulty: 2,
-        objectives: [
+        skills: [
           'Identifying, naming, describing and classifying 3D shapes: cube, cuboid, cone, cylinder, sphere',
         ],
         sampleQuestions: [
@@ -558,7 +528,6 @@ export const MATH_TOPICS = [
             question: "What is the shape of a Rubik's cube?",
             answer: 'cube',
             explanation: ["A Rubik's cube is a cube"],
-            type: 'mcq',
           },
         ],
       },
@@ -575,7 +544,7 @@ export const MATH_TOPICS = [
         id: '49152e60-2b58-40a1-b4a3-824fdaaea2a6',
         name: 'Picture Graphs with Scales',
         difficulty: 2,
-        objectives: [
+        skills: [
           'Reading and interpreting data from picture graphs with scales',
         ],
         sampleQuestions: [
@@ -583,7 +552,6 @@ export const MATH_TOPICS = [
             question: 'How many students chose option B?',
             answer: 15,
             explanation: ['15 students chose option B'],
-            type: 'numeric',
           },
         ],
       },
@@ -600,7 +568,7 @@ export const MATH_TOPICS = [
         id: 'f52a4eaf-3f5e-475d-b19e-8f4a37da4bcf',
         name: 'Numbers up to 10000',
         difficulty: 3,
-        objectives: [
+        skills: [
           'Counting in hundreds/thousands',
           'Number notation, representations and place values (thousands, hundreds, tens, ones)',
           'Reading and writing numbers in numerals and in words',
@@ -612,7 +580,6 @@ export const MATH_TOPICS = [
             question: 'What is the sum of 5,000, 3,000, and 2,000?',
             answer: 10000,
             explanation: ['5,000 + 3,000 + 2,000 = 10,000'],
-            type: 'numeric',
           },
         ],
       },
@@ -620,7 +587,7 @@ export const MATH_TOPICS = [
         id: '799d2311-750d-462e-9f5a-da180a12f658',
         name: 'Addition and Subtraction',
         difficulty: 3,
-        objectives: [
+        skills: [
           'Addition and subtraction algorithms (up to 4 digits)',
           'Mental calculation involving addition and subtraction of two 2-digit numbers',
         ],
@@ -629,13 +596,11 @@ export const MATH_TOPICS = [
             question: 'What is the sum of 4,567 and 2,345?',
             answer: 6912,
             explanation: ['4,567 + 2,345 = 6,912'],
-            type: 'numeric',
           },
           {
             question: 'What is the difference between 8,765 and 3,456?',
             answer: 5309,
             explanation: ['8,765 - 3,456 = 5,309'],
-            type: 'numeric',
           },
         ],
       },
@@ -643,7 +608,7 @@ export const MATH_TOPICS = [
         id: '26fafdfa-f587-40ef-863b-469d29372657',
         name: 'Multiplication and Division',
         difficulty: 3,
-        objectives: [
+        skills: [
           'Multiplication tables of 6, 7, 8 and 9',
           'Multiplying and dividing within the multiplication tables',
           'Division with remainder',
@@ -655,13 +620,11 @@ export const MATH_TOPICS = [
             question: 'What is the product of 6 and 7?',
             answer: 42,
             explanation: ['6 × 7 = 42'],
-            type: 'numeric',
           },
           {
             question: 'What is the quotient when 42 is divided by 6?',
             answer: 7,
             explanation: ['42 ÷ 6 = 7'],
-            type: 'numeric',
           },
         ],
       },
@@ -678,7 +641,7 @@ export const MATH_TOPICS = [
         id: '75f07d13-6b93-4b92-9590-de059db3e7b5',
         name: 'Equivalent Fractions',
         difficulty: 3,
-        objectives: [
+        skills: [
           'Equivalent fractions',
           'Expressing a fraction in its simplest form',
           'Comparing and ordering unlike fractions with denominators not exceeding 12',
@@ -689,7 +652,6 @@ export const MATH_TOPICS = [
             question: 'What is the simplest form of 4/8?',
             answer: 0.5,
             explanation: ['4/8 = 1/2'],
-            type: 'numeric',
           },
         ],
       },
@@ -697,7 +659,7 @@ export const MATH_TOPICS = [
         id: '8ba9d78e-1aa6-47f2-a2eb-67b34576dee3',
         name: 'Fraction Addition and Subtraction',
         difficulty: 3,
-        objectives: [
+        skills: [
           'Adding and subtracting two related fractions within one whole',
           'Denominators of given fractions not exceeding 12',
         ],
@@ -706,7 +668,6 @@ export const MATH_TOPICS = [
             question: 'What is the sum of 1/4 and 1/4?',
             answer: 0.5,
             explanation: ['1/4 + 1/4 = 2/4 = 1/2'],
-            type: 'numeric',
           },
         ],
       },
@@ -723,14 +684,13 @@ export const MATH_TOPICS = [
         id: 'c9d4be29-ba85-4f21-969b-19e1653b82c7',
         name: 'Money Operations',
         difficulty: 3,
-        objectives: ['Adding and subtracting money in decimal notation'],
+        skills: ['Adding and subtracting money in decimal notation'],
         sampleQuestions: [
           {
             question:
               'What is the total amount of money if you have $0.75 and $0.20?',
             answer: 0.95,
             explanation: ['$0.75 + $0.20 = $0.95'],
-            type: 'numeric',
           },
         ],
       },
@@ -747,7 +707,7 @@ export const MATH_TOPICS = [
         id: 'ef0f0734-2e16-4251-ab4f-9b47c69be3bd',
         name: 'Length, Mass and Volume',
         difficulty: 3,
-        objectives: [
+        skills: [
           'Measuring length in kilometres (km)',
           'Measuring volume of liquid in millilitres (ml)',
           'Measuring length/mass/volume in compound units',
@@ -761,7 +721,6 @@ export const MATH_TOPICS = [
             question: 'What is the length of a road that is 5 kilometers long?',
             answer: 5,
             explanation: ['The length is 5 kilometers'],
-            type: 'numeric',
           },
         ],
       },
@@ -769,7 +728,7 @@ export const MATH_TOPICS = [
         id: 'cc793e52-fd19-4ed1-9002-86c54dda9aa0',
         name: 'Time',
         difficulty: 3,
-        objectives: [
+        skills: [
           'Measuring time in seconds',
           'Finding starting time, finishing time or duration',
           '24-hour clock',
@@ -780,7 +739,6 @@ export const MATH_TOPICS = [
               'What time is it when the hour hand is on 3 and the minute hand is on 12?',
             answer: '3:00',
             explanation: ['It is 3:00'],
-            type: 'numeric',
           },
         ],
       },
@@ -797,7 +755,7 @@ export const MATH_TOPICS = [
         id: '3d8d1794-76b1-490e-bd07-4da12c185a66',
         name: 'Area and Perimeter',
         difficulty: 3,
-        objectives: [
+        skills: [
           'Concepts of area and perimeter of a plane figure',
           'Measuring area in square units, cm² and m²',
           'Perimeter of rectilinear figure',
@@ -812,7 +770,6 @@ export const MATH_TOPICS = [
               'What is the area of a rectangle with length 5 cm and width 3 cm?',
             answer: 15,
             explanation: ['Area = length × width = 5 cm × 3 cm = 15 cm²'],
-            type: 'numeric',
           },
         ],
       },
@@ -829,7 +786,7 @@ export const MATH_TOPICS = [
         id: 'e4b0716d-0bed-4e1d-a848-d7e9025083ce',
         name: 'Angles',
         difficulty: 3,
-        objectives: [
+        skills: [
           'Concepts of angle',
           'Right angles',
           'Angles greater than/smaller than a right angle',
@@ -839,7 +796,6 @@ export const MATH_TOPICS = [
             question: 'What is the measure of angle ABC?',
             answer: 90,
             explanation: ['Angle ABC is a right angle'],
-            type: 'numeric',
           },
         ],
       },
@@ -847,7 +803,7 @@ export const MATH_TOPICS = [
         id: 'db0e73c2-c426-43cb-af4d-77be7fc93379',
         name: 'Perpendicular and Parallel Lines',
         difficulty: 3,
-        objectives: [
+        skills: [
           'Perpendicular and parallel lines',
           'Drawing perpendicular and parallel lines',
         ],
@@ -856,7 +812,6 @@ export const MATH_TOPICS = [
             question: 'Draw a perpendicular line to line AB.',
             answer: null,
             explanation: ['Draw a perpendicular line to line AB'],
-            type: 'mcq',
           },
         ],
       },
@@ -873,7 +828,7 @@ export const MATH_TOPICS = [
         id: '26c66f6d-8be5-4fb8-8171-a04960326a34',
         name: 'Bar Graphs',
         difficulty: 3,
-        objectives: [
+        skills: [
           'Reading and interpreting data from bar graphs',
           'Using different scales on axis',
         ],
@@ -882,7 +837,6 @@ export const MATH_TOPICS = [
             question: 'How many students chose option A?',
             answer: 20,
             explanation: ['20 students chose option A'],
-            type: 'numeric',
           },
         ],
       },
@@ -899,7 +853,7 @@ export const MATH_TOPICS = [
         id: 'ebb0afa6-f43d-4742-9732-ebe44087a7d4',
         name: 'Numbers up to 10 million',
         difficulty: 5,
-        objectives: [
+        skills: [
           'Reading and writing numbers in numerals and in words up to 10 million',
         ],
         sampleQuestions: [
@@ -910,7 +864,6 @@ export const MATH_TOPICS = [
             explanation: [
               'The number for one million nine hundred and ninety-nine thousand is 1999000',
             ],
-            type: 'numeric',
           },
           {
             question: 'Write the number 1,999,000 in words.',
@@ -918,7 +871,6 @@ export const MATH_TOPICS = [
             explanation: [
               'The number 1,999,000 in words is one million nine hundred and ninety-nine thousand',
             ],
-            type: 'word-problem',
           },
         ],
       },
@@ -935,7 +887,7 @@ export const MATH_TOPICS = [
         id: '3e7bb46a-8165-40e9-b9c2-a4fbbd589350',
         name: 'Four Operations',
         difficulty: 5,
-        objectives: [
+        skills: [
           'Multiplying and dividing by 10, 100, 1000 and their multiples without calculator',
           'Order of operations without calculator',
           'Use of brackets without calculator',
@@ -945,7 +897,6 @@ export const MATH_TOPICS = [
             question: 'What is the product of 10 and 100?',
             answer: 1000,
             explanation: ['10 × 100 = 1000'],
-            type: 'numeric',
           },
         ],
       },
@@ -962,7 +913,7 @@ export const MATH_TOPICS = [
         id: '5aeb6594-9e8b-4b27-8b83-fa814d0e19e1',
         name: 'Fraction and Division',
         difficulty: 5,
-        objectives: [
+        skills: [
           'Dividing a whole number by a whole number with quotient as a fraction',
           'Expressing fractions as decimals',
         ],
@@ -971,7 +922,6 @@ export const MATH_TOPICS = [
             question: 'What is the quotient when 4 is divided by 8?',
             answer: 0.5,
             explanation: ['4 ÷ 8 = 0.5'],
-            type: 'numeric',
           },
         ],
       },
@@ -979,7 +929,7 @@ export const MATH_TOPICS = [
         id: 'cd65fa82-1618-4b08-a6c3-af10b23f0820',
         name: 'Fraction and Four Operations',
         difficulty: 5,
-        objectives: [
+        skills: [
           'Adding and subtracting mixed numbers',
           'Multiplying a proper/improper fraction and a whole number without calculator',
           'Multiplying a proper fraction and a proper/improper fraction without calculator',
@@ -991,7 +941,6 @@ export const MATH_TOPICS = [
             question: 'What is the sum of 2 1/4 and 1 3/4?',
             answer: 4,
             explanation: ['2 1/4 + 1 3/4 = 4'],
-            type: 'numeric',
           },
         ],
       },
@@ -1008,7 +957,7 @@ export const MATH_TOPICS = [
         id: 'a4b41fdd-18ea-4175-960f-16755d965124',
         name: 'Decimals and Four Operations',
         difficulty: 5,
-        objectives: [
+        skills: [
           'Multiplying and dividing decimals (up to 3 decimal places) by 10, 100, 1000 and their multiples without calculator',
           'Converting a measurement from a smaller unit to a larger unit in decimal form, and vice versa between km and m, kg and g, L and mL',
         ],
@@ -1017,7 +966,6 @@ export const MATH_TOPICS = [
             question: 'What is the product of 0.5 and 0.5?',
             answer: 0.25,
             explanation: ['0.5 × 0.5 = 0.25'],
-            type: 'numeric',
           },
         ],
       },
@@ -1034,7 +982,7 @@ export const MATH_TOPICS = [
         id: '8e4d67ca-7ecf-47ca-a127-9d4c1b80b9e8',
         name: 'Percentage',
         difficulty: 5,
-        objectives: [
+        skills: [
           'Finding the whole given a part and the percentage',
           'Finding percentage increase/decrease',
         ],
@@ -1044,7 +992,6 @@ export const MATH_TOPICS = [
               'What is the original price if a 20% discount reduces it to $80?',
             answer: 100,
             explanation: ['80 is 80% of the original price'],
-            type: 'numeric',
           },
         ],
       },
@@ -1061,7 +1008,7 @@ export const MATH_TOPICS = [
         id: '16b5f125-92a8-436b-9777-c9c11a559080',
         name: 'Rate',
         difficulty: 5,
-        objectives: [
+        skills: [
           'Rate as the amount of a quantity per unit of another quantity',
           'Finding rate given total amount and number of units',
           'Finding total amount given rate and number of units',
@@ -1073,7 +1020,6 @@ export const MATH_TOPICS = [
               'How much does each item cost if 100 of this item cost $500?',
             answer: 5,
             explanation: ['500 ÷ 100 = 5, so each item costs $5.'],
-            type: 'numeric',
           },
         ],
       },
@@ -1090,7 +1036,7 @@ export const MATH_TOPICS = [
         id: '19ad6e6f-09ac-41f0-b4d3-3cb7810e1845',
         name: 'Area of Triangle',
         difficulty: 5,
-        objectives: [
+        skills: [
           'Concepts of base and height of a triangle',
           'Area of triangle',
           'Finding area of composite figures with triangles',
@@ -1103,7 +1049,6 @@ export const MATH_TOPICS = [
             explanation: [
               'Area = 1/2 × base × height = 1/2 × 10 cm × 5 cm = 25 cm²',
             ],
-            type: 'numeric',
           },
         ],
       },
@@ -1111,7 +1056,7 @@ export const MATH_TOPICS = [
         id: 'fc1f9d5a-14df-4345-ad80-1ff84ce6a04f',
         name: 'Volume of Cube and Cuboid',
         difficulty: 5,
-        objectives: [
+        skills: [
           'Finding one dimension of a cuboid given its volume and the other dimensions',
           'Finding the length of one edge of a cube given its volume',
           'Finding the height of a cuboid given its volume and base area',
@@ -1125,7 +1070,6 @@ export const MATH_TOPICS = [
             explanation: [
               'Volume = side length³ = 4 cm × 4 cm × 4 cm = 64 cm³',
             ],
-            type: 'numeric',
           },
         ],
       },
@@ -1142,7 +1086,7 @@ export const MATH_TOPICS = [
         id: 'e4b0716d-0bed-4e1d-a848-d7e9025083ce',
         name: 'Angles',
         difficulty: 5,
-        objectives: [
+        skills: [
           'Angles on a straight line',
           'Angles at a point',
           'Vertically opposite angles',
@@ -1153,7 +1097,6 @@ export const MATH_TOPICS = [
             question: 'What is the measure of angle ABC?',
             answer: 90,
             explanation: ['Angle ABC is a right angle'],
-            type: 'numeric',
           },
         ],
       },
@@ -1161,7 +1104,7 @@ export const MATH_TOPICS = [
         id: 'f6fe0131-5269-4ddf-84f6-e20f2add4d09',
         name: 'Triangles',
         difficulty: 5,
-        objectives: [
+        skills: [
           'Properties of isosceles triangle',
           'Properties of equilateral triangle',
           'Properties of right-angled triangle',
@@ -1175,7 +1118,6 @@ export const MATH_TOPICS = [
             explanation: [
               'The triangle is isosceles, so the two base angles are equal',
             ],
-            type: 'numeric',
           },
         ],
       },
@@ -1183,7 +1125,7 @@ export const MATH_TOPICS = [
         id: '12b35d3f-9b85-492b-b7df-7db403c095eb',
         name: 'Quadrilaterals',
         difficulty: 5,
-        objectives: [
+        skills: [
           'Properties of parallelogram',
           'Properties of rhombus',
           'Properties of trapezium',
@@ -1195,7 +1137,6 @@ export const MATH_TOPICS = [
               'What is the measure of angle x in the given parallelogram?',
             answer: 120,
             explanation: ['The opposite angles in a parallelogram are equal'],
-            type: 'numeric',
           },
         ],
       },
@@ -1212,7 +1153,7 @@ export const MATH_TOPICS = [
         id: '3e7bb46a-8165-40e9-b9c2-a4fbbd589350',
         name: 'Four Operations',
         difficulty: 6,
-        objectives: [
+        skills: [
           'Dividing a proper fraction by a whole number',
           'Dividing a whole number/proper fraction by a proper fraction',
         ],
@@ -1221,7 +1162,6 @@ export const MATH_TOPICS = [
             question: 'What is the quotient when 4 is divided by 8?',
             answer: 0.5,
             explanation: ['4 ÷ 8 = 0.5'],
-            type: 'numeric',
           },
         ],
       },
@@ -1238,7 +1178,7 @@ export const MATH_TOPICS = [
         id: '8e4d67ca-7ecf-47ca-a127-9d4c1b80b9e8',
         name: 'Percentage',
         difficulty: 6,
-        objectives: [
+        skills: [
           'Finding the whole given a part and the percentage',
           'Finding percentage increase/decrease',
         ],
@@ -1248,7 +1188,6 @@ export const MATH_TOPICS = [
               'What is the original price if a 20% discount reduces it to $80?',
             answer: 100,
             explanation: ['80 is 80% of the original price'],
-            type: 'numeric',
           },
         ],
       },
@@ -1265,7 +1204,7 @@ export const MATH_TOPICS = [
         id: 'fd4687a6-6749-421e-86f2-8083c87bc605',
         name: 'Ratio',
         difficulty: 6,
-        objectives: [
+        skills: [
           'notation, representations and interpretation of a:b and a:b:c, where a, b and c are whole numbers',
           'excluding ratios involving fractions and decimals',
           'equivalent ratios',
@@ -1281,7 +1220,6 @@ export const MATH_TOPICS = [
               'What is the ratio of boys to girls if there are 12 boys and 8 girls?',
             answer: '3:2',
             explanation: ['12 ÷ 4 = 3, 8 ÷ 4 = 2'],
-            type: 'numeric',
           },
         ],
       },
@@ -1298,7 +1236,7 @@ export const MATH_TOPICS = [
         id: '376c9b48-d198-4c6f-8949-5c621dcaa48a',
         name: 'Algebra',
         difficulty: 6,
-        objectives: [
+        skills: [
           'using a letter to represent an unknown number ',
           'notation, representations and interpretation of simple algebraic expressions such as a+-3, ax3 or 3a, a ÷ 3 or a/3',
           'simplifying simple linear expressions excluding brackets',
@@ -1310,7 +1248,6 @@ export const MATH_TOPICS = [
             question: 'What is the value of x in the equation 2x + 3 = 7?',
             answer: 2,
             explanation: ['2x + 3 = 7, so 2x = 7 - 3, so x = 2'],
-            type: 'numeric',
           },
         ],
       },
@@ -1327,7 +1264,7 @@ export const MATH_TOPICS = [
         id: 'ee561c4d-9fe1-4f1a-9b76-21c3631d78ed',
         name: 'Area and Circumference of Circle',
         difficulty: 6,
-        objectives: [
+        skills: [
           'Area and circumference of circle',
           'Finding the area and perimeter of semicircle',
           'Finding the area and perimeter of quarter circle',
@@ -1338,7 +1275,6 @@ export const MATH_TOPICS = [
             question: 'What is the area of a circle with radius 5 cm?',
             answer: 78.5,
             explanation: ['Area = πr² = 3.14 × 5 cm × 5 cm = 78.5 cm²'],
-            type: 'numeric',
           },
         ],
       },
@@ -1346,7 +1282,7 @@ export const MATH_TOPICS = [
         id: 'fc1f9d5a-14df-4345-ad80-1ff84ce6a04f',
         name: 'Volume of Cube and Cuboid',
         difficulty: 6,
-        objectives: [
+        skills: [
           'Finding one dimension of a cuboid given its volume and the other dimensions',
           'Finding the length of one edge of a cube given its volume',
           'Finding the height of a cuboid given its volume and base area',
@@ -1360,7 +1296,6 @@ export const MATH_TOPICS = [
             explanation: [
               'Volume = side length³ = 4 cm × 4 cm × 4 cm = 64 cm³',
             ],
-            type: 'numeric',
           },
         ],
       },
@@ -1377,7 +1312,7 @@ export const MATH_TOPICS = [
         id: '7ea76274-0a70-4b58-9076-4f66d04d8027',
         name: 'Special Quadrilaterals',
         difficulty: 6,
-        objectives: [
+        skills: [
           'Finding unknown angles, without additional construction of lines, in composite geometric figures involving squares, rectangles, triangles, parallelograms, rhombuses and trapeziums',
         ],
         sampleQuestions: [
@@ -1386,7 +1321,6 @@ export const MATH_TOPICS = [
               'What is the measure of angle x in the given quadrilateral?',
             answer: 120,
             explanation: ['The sum of angles in a quadrilateral is 360°'],
-            type: 'numeric',
           },
         ],
       },
@@ -1403,7 +1337,7 @@ export const MATH_TOPICS = [
         id: 'c7750314-a2b9-40f8-8d86-84c8f17c83a1',
         name: 'Average of a Set of Data',
         difficulty: 6,
-        objectives: [
+        skills: [
           'Understanding average as "total value ÷ number of data"',
           'Finding average given total value and number of data',
           'Finding total value given average and number of data',
@@ -1414,7 +1348,6 @@ export const MATH_TOPICS = [
             question: 'What is the average of the numbers 2, 4, 6, 8, and 10?',
             answer: 6,
             explanation: ['(2 + 4 + 6 + 8 + 10) ÷ 5 = 30 ÷ 5 = 6'],
-            type: 'numeric',
           },
         ],
       },

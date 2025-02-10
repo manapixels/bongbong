@@ -1,5 +1,5 @@
 import { db } from '@/lib/db';
-import { achievements, studentAchievements } from '@/lib/db/schema';
+import { achievements } from '@/lib/db/schema';
 import { eq, and } from 'drizzle-orm';
 
 export async function checkAndUnlockAchievements(
@@ -31,15 +31,28 @@ export async function checkAndUnlockAchievements(
 }
 
 async function unlockAchievement(studentId: string, achievementId: string) {
-  const existingAchievement = await db.query.studentAchievements.findFirst({
-    where: eq(studentAchievements.userId, studentId),
-  });
+  const existingAchievement = await db
+    .select()
+    .from(achievements)
+    .where(
+      and(
+        eq(achievements.userId, studentId),
+        eq(achievements.id, achievementId)
+      )
+    )
+    .limit(1);
 
-  if (!existingAchievement) {
-    await db.insert(studentAchievements).values({
+  if (!existingAchievement.length) {
+    await db.insert(achievements).values({
+      id: achievementId,
+      name: achievementId.toLowerCase(),
+      type: 'achievement',
       userId: studentId,
-      achievementId: achievementId,
-      unlockedAt: new Date(),
+      createdAt: new Date(),
+      description: 'Achievement',
+      requiredValue: 0,
+      rewardCoins: 0,
+      rewardXP: 0,
     });
   }
 }

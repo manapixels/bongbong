@@ -3,13 +3,13 @@
 import { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
+import { Progress as ProgressBar } from '@/components/ui/progress';
 import { MathTopic } from '@/types/math';
-import type { StudentProgress } from '@/types/progress';
+import type { Progress } from '@/types/progress';
 
 interface TopicSelectorProps {
   topics: MathTopic[];
-  studentProgress: StudentProgress;
+  studentProgress: Progress;
   onSelectTopic: (topic: MathTopic) => void;
 }
 
@@ -55,7 +55,7 @@ export function TopicSelector({
             onClick={() => onSelectTopic(topic)}
           >
             <h3 className="font-medium mb-2">{topic.name}</h3>
-            <Progress value={getTopicProgress(topic.id)} className="h-2" />
+            <ProgressBar value={getTopicProgress(topic.id)} className="h-2" />
             <div className="mt-2 text-sm text-muted-foreground">
               {topic.subStrandTopics.length} subtopics
             </div>

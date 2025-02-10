@@ -6,15 +6,10 @@ import {
   json,
   uuid,
   text,
-  primaryKey,
   boolean,
   integer,
+  pgEnum,
 } from 'drizzle-orm/pg-core';
-import type {
-  VariableConstraint,
-  ProblemContext,
-  Skill,
-} from '@/types/problem-template';
 
 // ==================== User Management ====================
 export const user = pgTable('User', {
@@ -28,42 +23,30 @@ export const user = pgTable('User', {
 
 export type User = InferSelectModel<typeof user>;
 
-// ==================== Math Learning System ====================
-export const problemTemplates = pgTable('problem_templates', {
-  id: uuid('id').primaryKey().defaultRandom(),
-  type: text('type').notNull(),
-  structure: text('structure').notNull(),
-  variables: json('variables')
-    .$type<Record<string, VariableConstraint>>()
-    .notNull(),
-  answerFormula: text('answer_formula').notNull(),
-  context: json('context').$type<ProblemContext>(),
-  difficulty: integer('difficulty').notNull(),
-  strand: text('strand').notNull(),
-  subStrand: text('sub_strand').notNull(),
-  skills: json('skills').$type<Skill[]>().notNull(),
-  commonMisconceptions: json('common_misconceptions')
-    .$type<string[]>()
-    .notNull(),
-  explanationTemplate: json('explanation_template').$type<string[]>().notNull(),
-  validationRules: json('validation_rules'),
-  createdAt: timestamp('created_at').defaultNow(),
-});
+// ==================== Learning System ====================
 
-export const mathProblems = pgTable('math_problems', {
+export const subjectEnum = pgEnum('subject', [
+  'english',
+  'chinese',
+  'science',
+  'mathematics',
+]);
+
+export const mathQuestions = pgTable('math_questions', {
+  // Default question fields
   id: uuid('id').primaryKey().defaultRandom(),
-  templateId: uuid('template_id').references(() => problemTemplates.id),
-  type: text('type').notNull(),
+  subject: subjectEnum('subject').notNull().default('mathematics'),
+  type: text('type'),
   question: text('question').notNull(),
-  variables: json('variables').$type<Record<string, number>>().notNull(),
-  answer: integer('answer').notNull(),
+  answer: text('answer').notNull(),
+  explanation: json('explanation').$type<string[]>().notNull(),
+  difficulty: integer('difficulty').notNull(),
+
+  // Math-specific question fields
   strand: text('strand').notNull(),
   subStrand: text('sub_strand').notNull(),
-  difficulty: integer('difficulty').notNull(),
-  context: json('context').$type<{
-    theme: string;
-    substitutions: Record<string, string>;
-  }>(),
+  answerFormula: text('answer_formula').notNull(),
+  variables: json('variables').$type<Record<string, string>>().notNull(),
   createdAt: timestamp('created_at').defaultNow(),
 });
 
@@ -80,16 +63,17 @@ export const strands = pgTable('strands', {
         id: string;
         name: string;
         difficulty: number;
-        objectives?: string[];
+        skills?: string[];
       }[]
     >()
     .notNull(),
 });
 
-export const studentProgress = pgTable('student_progress', {
+// ==================== Achievement System ====================
+export const progress = pgTable('progress', {
   id: uuid('id').primaryKey().defaultRandom(),
   userId: uuid('user_id').references(() => user.id),
-  problemId: uuid('problem_id').references(() => mathProblems.id),
+  questionId: uuid('question_id').references(() => mathQuestions.id),
   isCorrect: boolean('is_correct').notNull(),
   timeSpent: integer('time_spent'),
   createdAt: timestamp('created_at').defaultNow(),
@@ -99,70 +83,23 @@ export const studentProgress = pgTable('student_progress', {
       level: number;
       questionsAttempted: number;
       correctAnswers: number;
+      lastAttempted: Date;
       mistakes: string[];
     }[]
   >(),
 });
-
-export const studentSkillProgress = pgTable('student_skill_progress', {
-  id: uuid('id').primaryKey().defaultRandom(),
-  userId: uuid('user_id').references(() => user.id),
-  skillId: text('skill_id').notNull(),
-  proficiency: integer('proficiency').notNull(),
-  lastPracticed: timestamp('last_practiced').notNull(),
-  totalAttempts: integer('total_attempts').notNull().default(0),
-  successRate: integer('success_rate').notNull().default(0),
-  needsReview: boolean('needs_review').notNull().default(false),
-  createdAt: timestamp('created_at').defaultNow(),
-  updatedAt: timestamp('updated_at').defaultNow(),
-});
-
-export const studentProblemHistory = pgTable('student_problem_history', {
-  id: uuid('id').primaryKey().defaultRandom(),
-  userId: uuid('user_id').references(() => user.id),
-  templateId: uuid('template_id').references(() => problemTemplates.id),
-  attempts: integer('attempts').notNull().default(0),
-  correctAttempts: integer('correct_attempts').notNull().default(0),
-  lastAttempted: timestamp('last_attempted').notNull(),
-  averageResponseTime: integer('average_response_time').notNull().default(0),
-  commonMistakes: json('common_mistakes')
-    .$type<string[]>()
-    .notNull()
-    .default([]),
-  variationsUsed: json('variations_used')
-    .$type<Record<string, number>[]>()
-    .notNull()
-    .default([]),
-  createdAt: timestamp('created_at').defaultNow(),
-  updatedAt: timestamp('updated_at').defaultNow(),
-});
-
-// ==================== Achievement System ====================
 export const achievements = pgTable('achievements', {
   id: text('id').primaryKey(),
+  userId: uuid('user_id').references(() => user.id),
   name: text('name').notNull(),
   description: text('description').notNull(),
   requiredValue: integer('required_value').notNull(),
   type: text('type').notNull(), // 'streak', 'total_correct', 'speed', etc.
   rewardCoins: integer('reward_coins').notNull(),
   rewardXP: integer('reward_xp').notNull(),
+  createdAt: timestamp('created_at').defaultNow(),
 });
 
-export const studentAchievements = pgTable(
-  'student_achievements',
-  {
-    userId: uuid('user_id')
-      .notNull()
-      .references(() => user.id),
-    achievementId: text('achievement_id')
-      .notNull()
-      .references(() => achievements.id),
-    unlockedAt: timestamp('unlocked_at').notNull(),
-  },
-  (table) => ({
-    pk: primaryKey(table.userId, table.achievementId),
-  })
-);
 // ==================== Practice Sessions ====================
 export const practiceSessions = pgTable('practice_sessions', {
   id: uuid('id').primaryKey().defaultRandom(),

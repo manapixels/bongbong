@@ -1,10 +1,13 @@
 import { auth } from '@/app/(auth)/auth';
 import { db } from '@/lib/db';
-import { mathProblems, studentProgress } from '@/lib/db/schema';
+import {
+  mathQuestions as mathQuestionsTable,
+  progress as progressTable,
+} from '@/lib/db/schema';
 import { MATH_TOPICS } from '@/types/math';
 import { selectNextQuestion } from '@/lib/math';
 import { getStudentProgress } from '@/lib/db/queries';
-import type { StudentProgress } from '@/types/progress';
+import type { Progress } from '@/types/progress';
 
 export async function GET(request: Request) {
   const session = await auth();
@@ -29,10 +32,10 @@ export async function GET(request: Request) {
 
     if (!progress) {
       // Create a progress record that matches the schema
-      const defaultProgress: StudentProgress = {
+      const defaultProgress: Progress = {
         id: crypto.randomUUID(),
         userId: session.user.id,
-        problemId: null,
+        questionId: null,
         isCorrect: false,
         timeSpent: null,
         createdAt: new Date(),
@@ -49,26 +52,29 @@ export async function GET(request: Request) {
 
     // First save the problem
     const [savedProblem] = await db
-      .insert(mathProblems)
+      .insert(mathQuestionsTable)
       .values({
-        type: question.type,
         question: question.question || '',
-        answer: Number(question.answer ?? 0),
+        answer: String(question.answer ?? ''),
+        answerFormula: '',
+        explanation: question.explanation || [],
         difficulty: question.difficulty ?? 0,
         strand: topic.strand,
         subStrand: topic.subStrand,
         variables: {},
+        createdAt: new Date(),
       })
       .returning();
 
     // Then create an initial progress entry for this problem
-    await db.insert(studentProgress).values({
+    await db.insert(progressTable).values({
       id: crypto.randomUUID(),
       userId: session.user.id,
-      problemId: savedProblem.id,
+      questionId: savedProblem.id,
       isCorrect: false,
       timeSpent: 0,
       createdAt: new Date(),
+      subStrandProgress: [],
     });
 
     return Response.json(question);

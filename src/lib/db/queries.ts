@@ -1,27 +1,22 @@
 import { eq, and, desc } from 'drizzle-orm';
-import { db } from '@/lib/db';
 import {
-  user,
-  studentProgress,
-  mathProblems,
-  studentSkillProgress,
-  studentProblemHistory,
-  problemTemplates,
-} from '@/lib/db/schema';
-import type { MathTopic, Question, MathSubStrand } from '@/types/math';
+  db,
+  user as userTable,
+  progress as progressTable,
+  mathQuestions as mathQuestionsTable,
+} from '@/lib/db';
+import type {
+  MathTopic,
+  MathSubStrand,
+  MathQuestion,
+  MathStrand,
+} from '@/types/math';
 import { MATH_TOPICS } from '@/types/math';
-import { StudentProgress } from '@/types/progress';
-import { User } from '@/types';
-import {
-  generateProblemFromTemplate,
-  findNextTemplate,
-  isSimilarProblem,
-} from '@/lib/math/problem-generator';
-import type { SkillProgress, ProblemTemplate } from '@/types/problem-template';
+import { Progress, User } from '@/types';
 import { sql } from 'drizzle-orm';
 
 export async function getUser(email: string): Promise<User[]> {
-  return db.select().from(user).where(eq(user.email, email));
+  return db.select().from(userTable).where(eq(userTable.email, email));
 }
 
 export async function createUser(
@@ -30,7 +25,7 @@ export async function createUser(
   specificId?: string
 ): Promise<User> {
   const [newUser] = await db
-    .insert(user)
+    .insert(userTable)
     .values({
       id: specificId,
       email,
@@ -45,7 +40,7 @@ export async function getStudentProfile(
   studentId: string
 ): Promise<User | undefined> {
   const student = await db.query.user.findFirst({
-    where: eq(user.id, studentId),
+    where: eq(userTable.id, studentId),
   });
   return student;
 }
@@ -54,56 +49,52 @@ export async function getStudentProgress({
   userId,
 }: {
   userId: string;
-}): Promise<StudentProgress | undefined> {
-  const [progress] = await db
+}): Promise<Progress | undefined> {
+  const [firstProgress] = await db
     .select()
-    .from(studentProgress)
-    .where(eq(studentProgress.userId, userId));
+    .from(progressTable)
+    .where(eq(progressTable.userId, userId));
 
-  return progress;
+  return firstProgress;
+}
+
+export async function getStudentSubStrandProgress({
+  userId,
+  subStrand,
+}: {
+  userId: string;
+  subStrand: MathSubStrand;
+}): Promise<Progress | undefined> {
+  const [firstProgress] = await db
+    .select()
+    .from(progressTable)
+    .where(
+      and(
+        eq(progressTable.userId, userId),
+        sql`${progressTable.subStrandProgress}->>'subStrand' = ${subStrand}`
+      )
+    );
+
+  return firstProgress;
 }
 
 export async function updateStudentProgress({
   userId,
-  problemId,
+  questionId,
   isCorrect,
   timeSpent,
 }: {
   userId: string;
-  problemId: string;
+  questionId: string;
   isCorrect: boolean;
   timeSpent: number;
 }) {
-  return await db.insert(studentProgress).values({
+  return await db.insert(progressTable).values({
     userId,
-    problemId,
+    questionId,
     isCorrect,
     timeSpent,
   });
-}
-
-export async function getStudentSkillProgress(
-  userId: string
-): Promise<SkillProgress[]> {
-  try {
-    const progress = await db
-      .select()
-      .from(studentSkillProgress)
-      .where(eq(studentSkillProgress.userId, userId));
-
-    return progress.map((p) => ({
-      skillId: p.skillId,
-      proficiency: p.proficiency / 100, // Convert from integer (0-100) to float (0-1)
-      lastPracticed: p.lastPracticed,
-      totalAttempts: p.totalAttempts,
-      successRate: p.successRate / 100, // Convert from integer (0-100) to float (0-1)
-      needsReview: p.needsReview,
-    }));
-  } catch (error) {
-    // If table doesn't exist or other error, return empty progress
-    console.warn('Could not fetch skill progress, using default:', error);
-    return [];
-  }
 }
 
 interface MasteryCheck {
@@ -113,7 +104,7 @@ interface MasteryCheck {
   nextLevel?: number;
 }
 
-export async function checkMastery(
+export async function getSubStrandSuccessRate(
   userId: string,
   strand: string,
   subStrand: MathSubStrand,
@@ -123,14 +114,14 @@ export async function checkMastery(
   // Get recent progress for this subStrand
   const recentProgress = await db
     .select()
-    .from(studentProgress)
+    .from(progressTable)
     .where(
       and(
-        eq(studentProgress.userId, userId),
-        sql`${studentProgress.subStrandProgress}->>'subStrand' = ${subStrand}`
+        eq(progressTable.userId, userId),
+        sql`${progressTable.subStrandProgress}->>'subStrand' = ${subStrand}`
       )
     )
-    .orderBy(desc(studentProgress.createdAt))
+    .orderBy(desc(progressTable.createdAt))
     .limit(10);
 
   if (recentProgress.length < 10) {
@@ -176,56 +167,39 @@ export async function checkMastery(
 
 export async function generateProblem(
   difficulty: number,
-  topics: string[],
-  progress: StudentProgress
-): Promise<Question> {
-  if (!topics || topics.length === 0) {
-    throw new Error('No topics provided');
+  subStrand: MathSubStrand,
+  progress: Progress
+): Promise<MathQuestion> {
+  if (!subStrand) {
+    throw new Error('No subStrand provided');
   }
 
   if (!progress.userId) {
     throw new Error('User ID is required');
   }
 
-  // Find the topic the student needs most practice with
-  const topicStats = progress?.subStrandProgress || [];
-
-  // Calculate success rates for each enabled topic
-  const topicSuccessRates = topics.map((subStrand) => {
-    const stats = topicStats.find((p) => p.subStrand === subStrand);
-    if (!stats) {
-      return {
-        subStrand,
-        successRate: 0, // New topics should be prioritized
-        totalAttempts: 0,
-      };
-    }
-
-    return {
+  // Find progress for this subStrand
+  const subStrandProgress = progress?.subStrandProgress?.find(
+    (p) => p.subStrand === subStrand
+  );
+  const topicSuccessRates = [
+    {
       subStrand,
-      successRate:
-        stats.questionsAttempted > 0
-          ? stats.correctAnswers / stats.questionsAttempted
-          : 0,
-      totalAttempts: stats.questionsAttempted,
-    };
-  });
-
-  // Sort by success rate and prioritize less attempted topics
-  topicSuccessRates.sort((a, b) => {
-    // If success rates are significantly different, use that
-    if (Math.abs(a.successRate - b.successRate) > 0.2) {
-      return a.successRate - b.successRate;
-    }
-    // Otherwise, prefer topics with fewer attempts
-    return a.totalAttempts - b.totalAttempts;
-  });
+      successRate: subStrandProgress
+        ? subStrandProgress.questionsAttempted > 0
+          ? subStrandProgress.correctAnswers /
+            subStrandProgress.questionsAttempted
+          : 0
+        : 0,
+      totalAttempts: subStrandProgress?.questionsAttempted ?? 0,
+    },
+  ];
 
   const topic: MathTopic =
-    MATH_TOPICS.find((t) => topics.includes(t.id)) || MATH_TOPICS[0];
+    MATH_TOPICS.find((t) => t.subStrand === subStrand) || MATH_TOPICS[0];
 
   // Check mastery and adjust difficulty if needed
-  const masteryCheck = await checkMastery(
+  const subStrandsToPractice = await getSubStrandSuccessRate(
     progress.userId,
     topic.strand,
     topicSuccessRates[0].subStrand as MathSubStrand,
@@ -233,123 +207,56 @@ export async function generateProblem(
     topic.level
   );
 
-  if (masteryCheck.canProgress) {
-    difficulty = masteryCheck.nextDifficulty || difficulty;
+  if (subStrandsToPractice.canProgress) {
+    difficulty = subStrandsToPractice.nextDifficulty || difficulty;
     // Update user's current level/difficulty in their progress
     await db
-      .update(studentProgress)
+      .update(progressTable)
       .set({
         subStrandProgress: sql`jsonb_set(
-          ${studentProgress.subStrandProgress},
+          ${progress.subStrandProgress},
           '{${topicSuccessRates[0].subStrand}}',
           jsonb_build_object(
-            'level', ${masteryCheck.nextLevel},
-            'difficulty', ${masteryCheck.nextDifficulty}
+            'level', ${subStrandsToPractice.nextLevel},
+            'difficulty', ${subStrandsToPractice.nextDifficulty}
           )
         )`,
       })
-      .where(eq(studentProgress.userId, progress.userId));
+      .where(eq(progressTable.userId, progress.userId));
   }
 
   try {
-    // Get student's skill progress
-    const skillProgress = await getStudentSkillProgress(progress.userId);
-
-    // Find the next best template based on student's progress
-    const template = await findNextTemplate(progress.userId, skillProgress);
-    if (!template) {
+    // Get sample problem from the subStrand
+    const problem = await db.query.mathQuestions.findFirst({
+      where: eq(mathQuestionsTable.subStrand, subStrand),
+    });
+    if (!problem) {
       // If no template found, get a random one
-      const [randomTemplate] = await db
+      const [question] = await db
         .select()
-        .from(problemTemplates)
+        .from(mathQuestionsTable)
         .orderBy(sql`RANDOM()`)
         .limit(1);
 
-      if (!randomTemplate) {
+      if (!question) {
         throw new Error('No problem templates available');
       }
 
-      // Convert database result to ProblemTemplate
-      const template = {
-        ...randomTemplate,
-        context: randomTemplate.context || undefined,
-        subStrand: randomTemplate.subStrand as MathSubStrand,
-        validationRules:
-          randomTemplate.validationRules as ProblemTemplate['validationRules'],
-      };
-
-      // Generate a problem from the random template
-      const problem = await generateProblemFromTemplate(
-        template,
-        progress.userId
-      );
-
-      // Store the generated problem
-      await db.insert(mathProblems).values({
-        id: problem.id,
-        templateId: template.id,
-        type: problem.type,
-        question: problem.question,
-        variables: problem.variables,
-        answer: problem.answer,
-        strand: problem.strand as string,
-        subStrand: problem.subStrand,
-        difficulty: problem.difficulty,
-        context: problem.context,
-      });
-
       return {
-        id: problem.id,
-        type: problem.type,
-        question: problem.question,
-        answer: problem.answer,
-        explanation: problem.explanation,
-        difficulty: problem.difficulty,
-        strand: problem.strand as Question['strand'],
-        subStrand: problem.subStrand,
+        id: question.id,
+        type: question.type,
+        question: question.question,
+        answer: question.answer,
+        explanation: question.explanation,
+        difficulty: question.difficulty,
+        strand: question.strand as MathStrand,
+        subStrand: question.subStrand,
+        subject: 'mathematics',
+        answerFormula: question.answerFormula ?? '',
+        variables: question.variables ?? {},
+        createdAt: question.createdAt ?? null,
       };
     }
-
-    // Generate a problem from the template
-    const historyResult = await db.query.studentProblemHistory.findFirst({
-      where: and(
-        eq(studentProblemHistory.userId, progress.userId),
-        eq(studentProblemHistory.templateId, template.id)
-      ),
-    });
-
-    // Transform database result to match StudentProblemHistory type
-    const history = historyResult
-      ? {
-          templateId: historyResult.templateId!,
-          attempts: historyResult.attempts,
-          correctAttempts: historyResult.correctAttempts,
-          lastAttempted: historyResult.lastAttempted,
-          averageResponseTime: historyResult.averageResponseTime,
-          commonMistakes: historyResult.commonMistakes,
-          variationsUsed: historyResult.variationsUsed,
-        }
-      : undefined;
-
-    const problem = await generateProblemFromTemplate(
-      template,
-      progress.userId,
-      history
-    );
-
-    // Store the generated problem
-    await db.insert(mathProblems).values({
-      id: problem.id,
-      templateId: template.id,
-      type: problem.type,
-      question: problem.question,
-      variables: problem.variables,
-      answer: problem.answer,
-      strand: problem.strand as string,
-      subStrand: problem.subStrand,
-      difficulty: problem.difficulty,
-      context: problem.context,
-    });
 
     return {
       id: problem.id,
@@ -358,8 +265,12 @@ export async function generateProblem(
       answer: problem.answer,
       explanation: problem.explanation,
       difficulty: problem.difficulty,
-      strand: problem.strand as Question['strand'],
+      strand: problem.strand as MathStrand,
       subStrand: problem.subStrand,
+      subject: 'mathematics',
+      answerFormula: problem.answerFormula ?? '',
+      variables: problem.variables ?? {},
+      createdAt: problem.createdAt ?? null,
     };
   } catch (error) {
     console.error('Error generating problem with template:', error);

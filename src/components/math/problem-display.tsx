@@ -5,10 +5,10 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Question } from '@/types/math';
+import { MathQuestion } from '@/types/math';
 
 interface ProblemDisplayProps {
-  problem: Question;
+  problem: MathQuestion;
   onAnswer: (answer: string) => void;
   isCorrect?: boolean;
   showSolution?: boolean;

@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { useLocalStorage } from '@/lib/hooks/useLocalStorage';
-import { TopicProgress, UserProgress } from '@/types/progress';
+import { Progress } from '@/types/progress';
 import { MathSubStrand } from '@/types/math';
 
 interface LocalUser {
@@ -10,9 +10,19 @@ interface LocalUser {
     topicsEnabled: string[];
   };
   progress: {
-    topics: Record<string, TopicProgress>;
+    topics: Record<string, Progress>;
     userProgress: UserProgress[];
   };
+}
+
+interface UserProgress {
+  userId: string;
+  category: MathSubStrand;
+  difficulty: number;
+  correctAnswers: number;
+  totalAttempts: number;
+  lastAttemptAt: Date;
+  mistakes: string[];
 }
 
 const DEFAULT_USER: LocalUser = {
@@ -69,23 +79,49 @@ export function useLocalUser() {
 
     // Update topic progress
     const currentTopicProgress = currentProgress.topics[topicId] || {
-      topicId,
+      id: crypto.randomUUID(),
+      userId: localUser.id,
+      questionId: null,
+      isCorrect: false,
+      timeSpent: null,
+      createdAt: now,
+      subStrandProgress: [],
+    };
+
+    // Find or create subStrand progress
+    let subStrandProgress = currentTopicProgress.subStrandProgress || [];
+    const currentSubStrandProgress = subStrandProgress.find(
+      (p) => p.subStrand === category
+    ) || {
+      subStrand: category,
+      level: Number(localUser.preferences.difficulty),
       questionsAttempted: 0,
       correctAnswers: 0,
-      averageScore: 0,
       lastAttempted: now,
       mistakes: [],
     };
 
-    const newTopicProgress: TopicProgress = {
-      ...currentTopicProgress,
-      questionsAttempted: currentTopicProgress.questionsAttempted + 1,
-      correctAnswers: currentTopicProgress.correctAnswers + (isCorrect ? 1 : 0),
-      averageScore:
-        ((currentTopicProgress.correctAnswers + (isCorrect ? 1 : 0)) /
-          (currentTopicProgress.questionsAttempted + 1)) *
-        100,
+    // Update subStrand progress
+    const updatedSubStrandProgress = {
+      ...currentSubStrandProgress,
+      questionsAttempted: currentSubStrandProgress.questionsAttempted + 1,
+      correctAnswers:
+        currentSubStrandProgress.correctAnswers + (isCorrect ? 1 : 0),
       lastAttempted: now,
+    };
+
+    // Update the subStrandProgress array
+    const newSubStrandProgress = subStrandProgress.some(
+      (p) => p.subStrand === category
+    )
+      ? subStrandProgress.map((p) =>
+          p.subStrand === category ? updatedSubStrandProgress : p
+        )
+      : [...subStrandProgress, updatedSubStrandProgress];
+
+    const newTopicProgress: Progress = {
+      ...currentTopicProgress,
+      subStrandProgress: newSubStrandProgress,
     };
 
     // Update user progress for the category

@@ -3,10 +3,8 @@ import { auth } from '@/app/(auth)/auth';
 import { db } from '@/lib/db';
 import {
   practiceSessions,
-  mathProblems,
   user,
-  studentProgress,
-  studentAchievements,
+  progress as progressTable,
   achievements,
 } from '@/lib/db/schema';
 import { eq, and, gte, sum } from 'drizzle-orm';
@@ -60,11 +58,11 @@ export async function GET(
   // Get progress data
   const progress = await db
     .select()
-    .from(studentProgress)
+    .from(progressTable)
     .where(
       and(
-        eq(studentProgress.userId, params.studentId),
-        gte(studentProgress.createdAt, startDate)
+        eq(progressTable.userId, params.studentId),
+        gte(progressTable.createdAt, startDate)
       )
     );
 
@@ -77,17 +75,14 @@ export async function GET(
   // Calculate XP and level from achievements
   const achievementsWithRewards = await db
     .select({
-      userId: studentAchievements.userId,
-      achievementId: studentAchievements.achievementId,
-      unlockedAt: studentAchievements.unlockedAt,
+      userId: achievements.userId,
+      achievementId: achievements.id,
+      unlockedAt: achievements.createdAt,
       rewardXP: achievements.rewardXP,
     })
-    .from(studentAchievements)
-    .innerJoin(
-      achievements,
-      eq(studentAchievements.achievementId, achievements.id)
-    )
-    .where(eq(studentAchievements.userId, params.studentId));
+    .from(achievements)
+    .innerJoin(achievements, eq(achievements.userId, achievements.id))
+    .where(eq(achievements.userId, params.studentId));
 
   const totalXP = achievementsWithRewards.reduce(
     (total, achievement) => total + (achievement.rewardXP || 0),
@@ -138,7 +133,7 @@ function calculatePerformanceData(
 }
 
 function calculateCategoryData(
-  progress: (typeof studentProgress.$inferSelect)[]
+  progress: (typeof progressTable.$inferSelect)[]
 ) {
   const categoryStats = progress.reduce(
     (acc, entry) => {
@@ -167,7 +162,7 @@ function calculateCategoryData(
   }));
 }
 
-function findWeakAreas(progress: (typeof studentProgress.$inferSelect)[]) {
+function findWeakAreas(progress: (typeof progressTable.$inferSelect)[]) {
   const categoryStats = calculateCategoryData(progress);
   return categoryStats
     .filter((stat) => stat.accuracy < 70)
