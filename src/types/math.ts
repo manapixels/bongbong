@@ -7,13 +7,22 @@ export interface SubStrandTopic {
   id: string;
   name: string;
   difficulty: number;
-  skills: string[];
-  sampleQuestions: {
-    question: string;
-    answer: number | null;
-    explanation: string[];
+  skills: {
+    id: string;
+    description: string;
+    questions: {
+      question: string;
+      answer: number | string | null;
+      explanation: string[];
+      variables: {
+        questionText: string;
+        min: number;
+        max: number;
+      }[];
+    }[];
   }[];
 }
+
 export interface MathTopic {
   id: string;
   name: string;
@@ -63,24 +72,89 @@ export const MATH_TOPICS = [
         name: 'Numbers up to 100',
         difficulty: 1,
         skills: [
-          'Counting to tell the number of objects in a given set',
-          'Number notation, representations and place values (tens, ones)',
-          'Reading and writing numbers in numerals and in words',
-          'Comparing the number of objects in two or more sets',
-          'Comparing and ordering numbers',
-          'Patterns in number sequences',
-          'Ordinal numbers (first, second, up to tenth) and symbols (1st, 2nd, 3rd, etc.)',
-        ],
-        sampleQuestions: [
           {
-            question: 'What is the sum of 35 and 47?',
-            answer: 82,
-            explanation: ['35 + 47 = 82'],
+            id: 'counting-objects',
+            description:
+              'Counting to tell the number of objects in a given set',
+            questions: [
+              {
+                question: 'How many apples are there in the basket?',
+                answer: null,
+                explanation: ['Count the total number of apples in the basket'],
+                variables: [
+                  {
+                    questionText:
+                      'How many {objects} are there in the {container}?',
+                    min: 1,
+                    max: 100,
+                  },
+                ],
+              },
+            ],
           },
           {
-            question: 'What is the product of 7 and 8?',
-            answer: 56,
-            explanation: ['7 × 8 = 56'],
+            id: 'place-values',
+            description:
+              'Number notation, representations and place values (tens, ones)',
+            questions: [
+              {
+                question: 'What is the value of the tens digit in 47?',
+                answer: 40,
+                explanation: ['In 47, the tens digit is 4, so the value is 40'],
+                variables: [
+                  {
+                    questionText:
+                      'What is the value of the tens digit in {number}?',
+                    min: 10,
+                    max: 99,
+                  },
+                ],
+              },
+              {
+                question: 'What is the value of the ones digit in 47?',
+                answer: 7,
+                explanation: ['In 47, the ones digit is 7'],
+                variables: [
+                  {
+                    questionText:
+                      'What is the value of the ones digit in {number}?',
+                    min: 10,
+                    max: 99,
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            id: 'number-operations',
+            description: 'Basic number operations within 100',
+            questions: [
+              {
+                question: 'What is the sum of 35 and 47?',
+                answer: 82,
+                explanation: ['35 + 47 = 82'],
+                variables: [
+                  {
+                    questionText: 'What is the sum of {number1} and {number2}?',
+                    min: 10,
+                    max: 50,
+                  },
+                ],
+              },
+              {
+                question: 'What is the product of 7 and 8?',
+                answer: 56,
+                explanation: ['7 × 8 = 56'],
+                variables: [
+                  {
+                    questionText:
+                      'What is the product of {number1} and {number2}?',
+                    min: 1,
+                    max: 10,
+                  },
+                ],
+              },
+            ],
           },
         ],
       },
@@ -89,25 +163,43 @@ export const MATH_TOPICS = [
         name: 'Addition and Subtraction',
         difficulty: 1,
         skills: [
-          'Concepts of addition and subtraction',
-          'Use of +, – and =',
-          'Relationship between addition and subtraction',
-          'Adding more than two 1-digit numbers',
-          'Adding and subtracting within 100',
-          'Mental calculation involving addition and subtraction within 20',
-          'Mental calculation involving addition and subtraction of a 2-digit number and ones without renaming',
-          'Mental calculation involving addition and subtraction of a 2-digit number and tens',
-        ],
-        sampleQuestions: [
           {
-            question: 'What is the sum of 23, 45, and 17?',
-            answer: 85,
-            explanation: ['23 + 45 + 17 = 85'],
+            id: 'addition-concepts',
+            description: 'Concepts of addition and subtraction',
+            questions: [
+              {
+                question: 'What is the sum of 23, 45, and 17?',
+                answer: 85,
+                explanation: ['23 + 45 + 17 = 85'],
+                variables: [
+                  {
+                    questionText:
+                      'What is the sum of {number1}, {number2}, and {number3}?',
+                    min: 10,
+                    max: 50,
+                  },
+                ],
+              },
+            ],
           },
           {
-            question: 'What is the difference between 78 and 54?',
-            answer: 24,
-            explanation: ['78 - 54 = 24'],
+            id: 'subtraction-concepts',
+            description: 'Use of +, – and =',
+            questions: [
+              {
+                question: 'What is the difference between 78 and 54?',
+                answer: 24,
+                explanation: ['78 - 54 = 24'],
+                variables: [
+                  {
+                    questionText:
+                      'What is the difference between {number1} and {number2}?',
+                    min: 50,
+                    max: 100,
+                  },
+                ],
+              },
+            ],
           },
         ],
       },
@@ -116,20 +208,64 @@ export const MATH_TOPICS = [
         name: 'Multiplication',
         difficulty: 1,
         skills: [
-          'Concepts of multiplication',
-          'Use of ×',
-          'Multiplying within 40',
-        ],
-        sampleQuestions: [
           {
-            question: 'What is the product of 6 and 7?',
-            answer: 42,
-            explanation: ['6 × 7 = 42'],
+            id: 'multiplication-concepts',
+            description: 'Concepts of multiplication',
+            questions: [
+              {
+                question: 'What is the product of 6 and 7?',
+                answer: 42,
+                explanation: ['6 × 7 = 42'],
+                variables: [
+                  {
+                    questionText:
+                      'What is the product of {number1} and {number2}?',
+                    min: 1,
+                    max: 10,
+                  },
+                ],
+              },
+            ],
           },
           {
-            question: 'What is the product of 8 and 5?',
-            answer: 40,
-            explanation: ['8 × 5 = 40'],
+            id: 'multiplication-symbol',
+            description: 'Use of ×',
+            questions: [
+              {
+                question: 'Write 6 times 7 using the multiplication symbol.',
+                answer: '6 × 7',
+                explanation: [
+                  'The multiplication symbol × is used to represent "times"',
+                ],
+                variables: [
+                  {
+                    questionText:
+                      'Write {number1} times {number2} using the multiplication symbol.',
+                    min: 1,
+                    max: 10,
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            id: 'multiply-within-40',
+            description: 'Multiplying within 40',
+            questions: [
+              {
+                question: 'What is the product of 8 and 5?',
+                answer: 40,
+                explanation: ['8 × 5 = 40'],
+                variables: [
+                  {
+                    questionText:
+                      'What is the product of {number1} and {number2}?',
+                    min: 1,
+                    max: 8,
+                  },
+                ],
+              },
+            ],
           },
         ],
       },
@@ -137,17 +273,44 @@ export const MATH_TOPICS = [
         id: 'cef54c34-989b-4a3c-bc35-4bc187e4ba63',
         name: 'Division',
         difficulty: 1,
-        skills: ['Concepts of division', 'Dividing within 20'],
-        sampleQuestions: [
+        skills: [
           {
-            question: 'What is the quotient when 48 is divided by 6?',
-            answer: 8,
-            explanation: ['48 ÷ 6 = 8'],
+            id: 'division-concepts',
+            description: 'Concepts of division',
+            questions: [
+              {
+                question: 'What is the quotient when 48 is divided by 6?',
+                answer: 8,
+                explanation: ['48 ÷ 6 = 8'],
+                variables: [
+                  {
+                    questionText:
+                      'What is the quotient when {number1} is divided by {number2}?',
+                    min: 1,
+                    max: 50,
+                  },
+                ],
+              },
+            ],
           },
           {
-            question: 'What is the quotient when 56 is divided by 7?',
-            answer: 8,
-            explanation: ['56 ÷ 7 = 8'],
+            id: 'division-within-20',
+            description: 'Dividing within 20',
+            questions: [
+              {
+                question: 'What is the quotient when 56 is divided by 7?',
+                answer: 8,
+                explanation: ['56 ÷ 7 = 8'],
+                variables: [
+                  {
+                    questionText:
+                      'What is the quotient when {number1} is divided by {number2}?',
+                    min: 1,
+                    max: 20,
+                  },
+                ],
+              },
+            ],
           },
         ],
       },
@@ -165,19 +328,42 @@ export const MATH_TOPICS = [
         name: 'Counting Money',
         difficulty: 1,
         skills: [
-          'Counting amount of money in cents up to $1',
-          'Counting amount of money in dollars up to $100',
-        ],
-        sampleQuestions: [
           {
-            question: 'How many cents are there in $0.75?',
-            answer: 75,
-            explanation: ['$0.75 = 75 cents'],
+            id: 'counting-cents',
+            description: 'Counting amount of money in cents up to $1',
+            questions: [
+              {
+                question: 'How many cents are there in $0.75?',
+                answer: 75,
+                explanation: ['$0.75 = 75 cents'],
+                variables: [
+                  {
+                    questionText: 'How many cents are there in ${amount}?',
+                    min: 1,
+                    max: 99,
+                  },
+                ],
+              },
+            ],
           },
           {
-            question: 'How many dollars are there in 1000 cents?',
-            answer: 10,
-            explanation: ['1000 cents = 10 dollars'],
+            id: 'counting-dollars',
+            description: 'Counting amount of money in dollars up to $100',
+            questions: [
+              {
+                question: 'How many dollars are there in 1000 cents?',
+                answer: 10,
+                explanation: ['1000 cents = 10 dollars'],
+                variables: [
+                  {
+                    questionText:
+                      'How many dollars are there in {cents} cents?',
+                    min: 100,
+                    max: 10000,
+                  },
+                ],
+              },
+            ],
           },
         ],
       },
@@ -195,21 +381,81 @@ export const MATH_TOPICS = [
         name: 'Measuring of Length',
         difficulty: 1,
         skills: [
-          'Measuring length in centimetres',
-          'Use of abbreviation cm',
-          'Comparing and ordering lengths in cm',
-          'Measuring and drawing a line segment to the nearest cm',
-        ],
-        sampleQuestions: [
           {
-            question: 'What is the length of a line that is 15 cm long?',
-            answer: 15,
-            explanation: ['The length is 15 cm'],
+            id: 'measuring-cm',
+            description: 'Measuring length in centimetres',
+            questions: [
+              {
+                question: 'What is the length of a line that is 15 cm long?',
+                answer: 15,
+                explanation: ['The length is 15 cm'],
+                variables: [
+                  {
+                    questionText:
+                      'What is the length of a line that is {length} cm long?',
+                    min: 1,
+                    max: 100,
+                  },
+                ],
+              },
+            ],
           },
           {
-            question: 'Draw a line segment that is 7 cm long.',
-            answer: null,
-            explanation: ['Draw a line segment that is 7 cm long'],
+            id: 'cm-abbreviation',
+            description: 'Use of abbreviation cm',
+            questions: [
+              {
+                question: 'What is the abbreviation for centimetre?',
+                answer: 'cm',
+                explanation: ['The abbreviation for centimetre is cm'],
+                variables: [
+                  {
+                    questionText: 'What is the abbreviation for centimetre?',
+                    min: 0,
+                    max: 0,
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            id: 'comparing-lengths',
+            description: 'Comparing and ordering lengths in cm',
+            questions: [
+              {
+                question: 'Which is longer: 7 cm or 15 cm?',
+                answer: '15 cm',
+                explanation: ['15 cm is longer than 7 cm'],
+                variables: [
+                  {
+                    questionText:
+                      'Which is longer: {length1} cm or {length2} cm?',
+                    min: 1,
+                    max: 100,
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            id: 'drawing-lines',
+            description:
+              'Measuring and drawing a line segment to the nearest cm',
+            questions: [
+              {
+                question: 'Draw a line segment that is 7 cm long.',
+                answer: null,
+                explanation: ['Draw a line segment that is 7 cm long'],
+                variables: [
+                  {
+                    questionText:
+                      'Draw a line segment that is {length} cm long.',
+                    min: 1,
+                    max: 20,
+                  },
+                ],
+              },
+            ],
           },
         ],
       },
@@ -218,23 +464,97 @@ export const MATH_TOPICS = [
         name: 'Measurement of Time',
         difficulty: 1,
         skills: [
-          'Telling time to 5 minutes',
-          'Use of "am" and "pm"',
-          'Use of abbreviations h and min',
-          'Duration of one hour/half hour',
-        ],
-        sampleQuestions: [
           {
-            question:
-              'What time is it when the hour hand is on 3 and the minute hand is on 12?',
-            answer: '3:00',
-            explanation: ['It is 3:00'],
+            id: 'telling-time',
+            description: 'Telling time to 5 minutes',
+            questions: [
+              {
+                question:
+                  'What time is it when the hour hand is on 3 and the minute hand is on 12?',
+                answer: '3:00',
+                explanation: ['It is 3:00'],
+                variables: [
+                  {
+                    questionText:
+                      'What time is it when the hour hand is on {hour} and the minute hand is on {minute}?',
+                    min: 1,
+                    max: 12,
+                  },
+                ],
+              },
+            ],
           },
           {
-            question:
-              'What time is it when the hour hand is on 12 and the minute hand is on 30?',
-            answer: '12:30',
-            explanation: ['It is 12:30'],
+            id: 'am-pm',
+            description: 'Use of "am" and "pm"',
+            questions: [
+              {
+                question:
+                  'What time is it when the hour hand is on 10 and the minute hand is on 30 in the morning?',
+                answer: '10:30 am',
+                explanation: ['When it is morning, we add "am" to the time'],
+                variables: [
+                  {
+                    questionText:
+                      'What time is it when the hour hand is on {hour} and the minute hand is on {minute} in the morning?',
+                    min: 1,
+                    max: 12,
+                  },
+                ],
+              },
+              {
+                question:
+                  'What time is it when the hour hand is on 8 and the minute hand is on 45 in the evening?',
+                answer: '8:45 pm',
+                explanation: ['When it is evening, we add "pm" to the time'],
+                variables: [
+                  {
+                    questionText:
+                      'What time is it when the hour hand is on {hour} and the minute hand is on {minute} in the evening?',
+                    min: 1,
+                    max: 12,
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            id: 'time-abbreviations',
+            description: 'Use of abbreviations h and min',
+            questions: [
+              {
+                question: 'Write 2 hours and 30 minutes using h and min.',
+                answer: '2 h 30 min',
+                explanation: ['Use h for hours and min for minutes'],
+                variables: [
+                  {
+                    questionText:
+                      'Write {hours} hours and {minutes} minutes using h and min.',
+                    min: 1,
+                    max: 12,
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            id: 'duration',
+            description: 'Duration of one hour/half hour',
+            questions: [
+              {
+                question: 'How many minutes are there in half an hour?',
+                answer: 30,
+                explanation: ['Half an hour = 30 minutes'],
+                variables: [
+                  {
+                    questionText:
+                      'How many minutes are there in {fraction} hour?',
+                    min: 1,
+                    max: 1,
+                  },
+                ],
+              },
+            ],
           },
         ],
       },
@@ -252,27 +572,88 @@ export const MATH_TOPICS = [
         name: 'Geometry 2D Shapes',
         difficulty: 1,
         skills: [
-          'Identifying, naming, describing and classifying 2D shape (rectangle)',
-          'Identifying, naming, describing and classifying 2D shape (square)',
-          'Identifying, naming, describing and classifying 2D shape (triangle)',
-          'Identifying, naming, describing and classifying 2D shape (circle)',
-          'Identifying, naming, describing and classifying 2D shape (half circle)',
-          'Identifying, naming, describing and classifying 2D shape (quarter circle)',
-          'Forming different 2D figures with rectangle, square, triangle, circle, half circle and quarter circle',
-          'Identifying the 2D shapes that make up a given figure',
-          'Copying figures on dot grid or square grid',
-        ],
-        sampleQuestions: [
           {
-            question:
-              'What is the area of a rectangle with length 5 cm and width 3 cm?',
-            answer: 15,
-            explanation: ['Area = length × width = 5 cm × 3 cm = 15 cm²'],
+            id: 'identify-rectangle',
+            description:
+              'Identifying, naming, describing and classifying 2D shape (rectangle)',
+            questions: [
+              {
+                question:
+                  'What is the area of a rectangle with length 5 cm and width 3 cm?',
+                answer: 15,
+                explanation: ['Area = length × width = 5 cm × 3 cm = 15 cm²'],
+                variables: [
+                  {
+                    questionText:
+                      'What is the area of a rectangle with length {length} cm and width {width} cm?',
+                    min: 1,
+                    max: 10,
+                  },
+                ],
+              },
+            ],
           },
           {
-            question: 'Draw a square.',
-            answer: null,
-            explanation: ['Draw a square'],
+            id: 'identify-square',
+            description:
+              'Identifying, naming, describing and classifying 2D shape (square)',
+            questions: [
+              {
+                question: 'What is special about a square?',
+                answer: 'All sides are equal',
+                explanation: [
+                  'A square has four equal sides and four right angles',
+                ],
+                variables: [
+                  {
+                    questionText: 'What is special about a square?',
+                    min: 0,
+                    max: 0,
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            id: 'identify-triangle',
+            description:
+              'Identifying, naming, describing and classifying 2D shape (triangle)',
+            questions: [
+              {
+                question: 'How many sides does a triangle have?',
+                answer: 3,
+                explanation: ['A triangle has three sides'],
+                variables: [
+                  {
+                    questionText: 'How many sides does a triangle have?',
+                    min: 0,
+                    max: 0,
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            id: 'identify-circle',
+            description:
+              'Identifying, naming, describing and classifying 2D shape (circle)',
+            questions: [
+              {
+                question: 'What shape has no corners and is perfectly round?',
+                answer: 'circle',
+                explanation: [
+                  'A circle is a perfectly round shape with no corners',
+                ],
+                variables: [
+                  {
+                    questionText:
+                      'What shape has no corners and is perfectly round?',
+                    min: 0,
+                    max: 0,
+                  },
+                ],
+              },
+            ],
           },
         ],
       },
@@ -289,12 +670,39 @@ export const MATH_TOPICS = [
         id: '4b350a48-1ebb-47d7-a1e9-d89879d83088',
         name: 'Picture Graphs',
         difficulty: 1,
-        skills: ['Reading and interpreting data from picture graphs'],
-        sampleQuestions: [
+        skills: [
           {
-            question: 'How many students chose option A?',
-            answer: 20,
-            explanation: ['20 students chose option A'],
+            id: 'reading-picture-graphs',
+            description: 'Reading and interpreting data from picture graphs',
+            questions: [
+              {
+                question: 'How many students chose option A?',
+                answer: 20,
+                explanation: ['20 students chose option A'],
+                variables: [
+                  {
+                    questionText: 'How many students chose option {option}?',
+                    min: 1,
+                    max: 50,
+                  },
+                ],
+              },
+              {
+                question: 'Which option was chosen by the most students?',
+                answer: 'A',
+                explanation: [
+                  'Option A was chosen by 20 students, which is the highest',
+                ],
+                variables: [
+                  {
+                    questionText:
+                      'Which option was chosen by the most students?',
+                    min: 0,
+                    max: 0,
+                  },
+                ],
+              },
+            ],
           },
         ],
       },
@@ -312,18 +720,137 @@ export const MATH_TOPICS = [
         name: 'Numbers up to 1000',
         difficulty: 2,
         skills: [
-          'Counting in tens/hundreds',
-          'Number notation, representations and place values (hundreds, tens, ones)',
-          'Reading and writing numbers in numerals and in words',
-          'Comparing and ordering numbers',
-          'Patterns in number sequences',
-          'Odd and even numbers',
-        ],
-        sampleQuestions: [
           {
-            question: 'What is the sum of 500, 300, and 200?',
-            answer: 1000,
-            explanation: ['500 + 300 + 200 = 1000'],
+            id: 'counting-hundreds',
+            description: 'Counting in tens/hundreds',
+            questions: [
+              {
+                question: 'What is the sum of 500, 300, and 200?',
+                answer: 1000,
+                explanation: ['500 + 300 + 200 = 1000'],
+                variables: [
+                  {
+                    questionText:
+                      'What is the sum of {number1}, {number2}, and {number3}?',
+                    min: 100,
+                    max: 900,
+                  },
+                ],
+              },
+              {
+                question: 'Count by hundreds from 100 to 1000',
+                answer: '100, 200, 300, 400, 500, 600, 700, 800, 900, 1000',
+                explanation: ['When counting by hundreds, add 100 each time'],
+                variables: [
+                  {
+                    questionText: 'Count by hundreds from {start} to {end}',
+                    min: 100,
+                    max: 1000,
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            id: 'place-values-3digit',
+            description:
+              'Number notation, representations and place values (hundreds, tens, ones)',
+            questions: [
+              {
+                question: 'What is the value of the hundreds digit in 456?',
+                answer: 400,
+                explanation: [
+                  'In 456, the hundreds digit is 4, so the value is 400',
+                ],
+                variables: [
+                  {
+                    questionText:
+                      'What is the value of the hundreds digit in {number}?',
+                    min: 100,
+                    max: 999,
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            id: 'number-words',
+            description: 'Reading and writing numbers in numerals and in words',
+            questions: [
+              {
+                question: 'Write 567 in words',
+                answer: 'five hundred and sixty-seven',
+                explanation: ['567 = five hundred and sixty-seven'],
+                variables: [
+                  {
+                    questionText: 'Write {number} in words',
+                    min: 100,
+                    max: 999,
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            id: 'comparing-numbers',
+            description: 'Comparing and ordering numbers',
+            questions: [
+              {
+                question: 'Which number is greater: 345 or 543?',
+                answer: 543,
+                explanation: ['543 is greater than 345'],
+                variables: [
+                  {
+                    questionText:
+                      'Which number is greater: {number1} or {number2}?',
+                    min: 100,
+                    max: 999,
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            id: 'number-patterns',
+            description: 'Patterns in number sequences',
+            questions: [
+              {
+                question:
+                  'What comes next in the sequence: 100, 200, 300, ___?',
+                answer: 400,
+                explanation: [
+                  'The pattern adds 100 each time, so after 300 comes 400',
+                ],
+                variables: [
+                  {
+                    questionText:
+                      'What comes next in the sequence: {start}, {second}, {third}, ___?',
+                    min: 100,
+                    max: 900,
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            id: 'odd-even',
+            description: 'Odd and even numbers',
+            questions: [
+              {
+                question: 'Is 456 an odd or even number?',
+                answer: 'even',
+                explanation: [
+                  '456 is even because it ends in 6, which is even',
+                ],
+                variables: [
+                  {
+                    questionText: 'Is {number} an odd or even number?',
+                    min: 100,
+                    max: 999,
+                  },
+                ],
+              },
+            ],
           },
         ],
       },
@@ -332,19 +859,55 @@ export const MATH_TOPICS = [
         name: 'Whole Numbers Addition and Subtraction',
         difficulty: 2,
         skills: [
-          'Addition and subtraction algorithms (up to 3 digits)',
-          'Mental calculation involving addition and subtraction of a 3-digit number and ones/tens/hundreds',
-        ],
-        sampleQuestions: [
           {
-            question: 'What is the sum of 456 and 234?',
-            answer: 690,
-            explanation: ['456 + 234 = 690'],
+            id: 'three-digit-operations',
+            description: 'Addition and subtraction algorithms (up to 3 digits)',
+            questions: [
+              {
+                question: 'What is the sum of 456 and 234?',
+                answer: 690,
+                explanation: ['456 + 234 = 690'],
+                variables: [
+                  {
+                    questionText: 'What is the sum of {number1} and {number2}?',
+                    min: 100,
+                    max: 999,
+                  },
+                ],
+              },
+              {
+                question: 'What is the difference between 876 and 543?',
+                answer: 333,
+                explanation: ['876 - 543 = 333'],
+                variables: [
+                  {
+                    questionText:
+                      'What is the difference between {number1} and {number2}?',
+                    min: 100,
+                    max: 999,
+                  },
+                ],
+              },
+            ],
           },
           {
-            question: 'What is the difference between 876 and 543?',
-            answer: 333,
-            explanation: ['876 - 543 = 333'],
+            id: 'mental-calculation',
+            description:
+              'Mental calculation involving addition and subtraction of a 3-digit number and ones/tens/hundreds',
+            questions: [
+              {
+                question: 'Add 100 to 456',
+                answer: 556,
+                explanation: ['456 + 100 = 556'],
+                variables: [
+                  {
+                    questionText: 'Add {addend} to {number}',
+                    min: 100,
+                    max: 999,
+                  },
+                ],
+              },
+            ],
           },
         ],
       },
@@ -353,22 +916,113 @@ export const MATH_TOPICS = [
         name: 'Whole Numbers Multiplication and Division',
         difficulty: 2,
         skills: [
-          'Multiplication tables of 2, 3, 4, 5 and 10',
-          'Use of ÷ symbol',
-          'Relationship between multiplication and division',
-          'Multiplying and dividing within the multiplication tables',
-          'Mental calculation involving multiplication and division',
-        ],
-        sampleQuestions: [
           {
-            question: 'What is the product of 7 and 8?',
-            answer: 56,
-            explanation: ['7 × 8 = 56'],
+            id: 'multiplication-tables',
+            description: 'Multiplication tables of 2, 3, 4, 5 and 10',
+            questions: [
+              {
+                question: 'What is 7 × 8?',
+                answer: 56,
+                explanation: ['7 × 8 = 56'],
+                variables: [
+                  {
+                    questionText: 'What is {number1} × {number2}?',
+                    min: 2,
+                    max: 10,
+                  },
+                ],
+              },
+              {
+                question:
+                  'Complete the multiplication table for 5: 5 × 1 = 5, 5 × 2 = 10, ...',
+                answer: '5, 10, 15, 20, 25, 30, 35, 40, 45, 50',
+                explanation: ['Multiply 5 by each number from 1 to 10'],
+                variables: [
+                  {
+                    questionText:
+                      'Complete the multiplication table for {number}: {number} × 1 = {first}, {number} × 2 = {second}, ...',
+                    min: 2,
+                    max: 10,
+                  },
+                ],
+              },
+            ],
           },
           {
-            question: 'What is the quotient when 48 is divided by 6?',
-            answer: 8,
-            explanation: ['48 ÷ 6 = 8'],
+            id: 'division-symbol',
+            description: 'Use of ÷ symbol',
+            questions: [
+              {
+                question: 'Write "48 divided by 6" using the division symbol',
+                answer: '48 ÷ 6',
+                explanation: ['The ÷ symbol represents division'],
+                variables: [
+                  {
+                    questionText:
+                      'Write "{number1} divided by {number2}" using the division symbol',
+                    min: 1,
+                    max: 100,
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            id: 'multiplication-division-relationship',
+            description: 'Relationship between multiplication and division',
+            questions: [
+              {
+                question: 'If 7 × 8 = 56, what is 56 ÷ 8?',
+                answer: 7,
+                explanation: ['Since 7 × 8 = 56, then 56 ÷ 8 = 7'],
+                variables: [
+                  {
+                    questionText:
+                      'If {number1} × {number2} = {product}, what is {product} ÷ {number2}?',
+                    min: 2,
+                    max: 10,
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            id: 'multiply-divide-tables',
+            description:
+              'Multiplying and dividing within the multiplication tables',
+            questions: [
+              {
+                question: 'What is 48 ÷ 6?',
+                answer: 8,
+                explanation: ['48 ÷ 6 = 8'],
+                variables: [
+                  {
+                    questionText: 'What is {number1} ÷ {number2}?',
+                    min: 2,
+                    max: 12,
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            id: 'mental-multiplication',
+            description:
+              'Mental calculation involving multiplication and division',
+            questions: [
+              {
+                question: 'Multiply 25 by 4 mentally',
+                answer: 100,
+                explanation: ['25 × 4 = 100'],
+                variables: [
+                  {
+                    questionText: 'Multiply {number1} by {number2} mentally',
+                    min: 2,
+                    max: 25,
+                  },
+                ],
+              },
+            ],
           },
         ],
       },
@@ -386,16 +1040,85 @@ export const MATH_TOPICS = [
         name: 'Fraction of a Whole',
         difficulty: 2,
         skills: [
-          'Fraction as part of a whole',
-          'Notation and representations of fractions',
-          'Comparing and ordering unitfractions with denominators not exceeding 12',
-          'Comparing and ordering like fractions with denominators not exceeding 12',
-        ],
-        sampleQuestions: [
           {
-            question: 'What fraction of the circle is shaded?',
-            answer: 0.75,
-            explanation: ['The shaded area is 3/4 of the circle'],
+            id: 'fraction-concept',
+            description: 'Fraction as part of a whole',
+            questions: [
+              {
+                question: 'What fraction of the circle is shaded?',
+                answer: 0.75,
+                explanation: ['The shaded area is 3/4 of the circle'],
+                variables: [
+                  {
+                    questionText: 'What fraction of the {shape} is shaded?',
+                    min: 0,
+                    max: 0,
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            id: 'fraction-notation',
+            description: 'Notation and representations of fractions',
+            questions: [
+              {
+                question: 'Write three-quarters as a fraction',
+                answer: '3/4',
+                explanation: ['Three-quarters is written as 3/4'],
+                variables: [
+                  {
+                    questionText: 'Write {fraction_word} as a fraction',
+                    min: 0,
+                    max: 0,
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            id: 'compare-unit-fractions',
+            description:
+              'Comparing and ordering unit fractions with denominators not exceeding 12',
+            questions: [
+              {
+                question: 'Which is larger: 1/4 or 1/3?',
+                answer: '1/3',
+                explanation: [
+                  '1/3 is larger than 1/4 because when the denominator is smaller, each part is larger',
+                ],
+                variables: [
+                  {
+                    questionText:
+                      'Which is larger: 1/{denominator1} or 1/{denominator2}?',
+                    min: 2,
+                    max: 12,
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            id: 'compare-like-fractions',
+            description:
+              'Comparing and ordering like fractions with denominators not exceeding 12',
+            questions: [
+              {
+                question: 'Which is larger: 3/5 or 2/5?',
+                answer: '3/5',
+                explanation: [
+                  '3/5 is larger than 2/5 because it has more equal parts',
+                ],
+                variables: [
+                  {
+                    questionText:
+                      'Which is larger: {numerator1}/{denominator} or {numerator2}/{denominator}?',
+                    min: 1,
+                    max: 12,
+                  },
+                ],
+              },
+            ],
           },
         ],
       },
@@ -404,13 +1127,38 @@ export const MATH_TOPICS = [
         name: 'Fraction Addition and Subtraction',
         difficulty: 2,
         skills: [
-          'Adding and subtracting like fractions within one whole with denominators of given fractions not exceeding 12',
-        ],
-        sampleQuestions: [
           {
-            question: 'What is the sum of 1/4 and 1/4?',
-            answer: 0.5,
-            explanation: ['1/4 + 1/4 = 2/4 = 1/2'],
+            id: 'add-subtract-like-fractions',
+            description:
+              'Adding and subtracting like fractions within one whole with denominators not exceeding 12',
+            questions: [
+              {
+                question: 'What is the sum of 1/4 and 1/4?',
+                answer: 0.5,
+                explanation: ['1/4 + 1/4 = 2/4 = 1/2'],
+                variables: [
+                  {
+                    questionText:
+                      'What is the sum of {numerator1}/{denominator} and {numerator2}/{denominator}?',
+                    min: 1,
+                    max: 12,
+                  },
+                ],
+              },
+              {
+                question: 'What is 3/8 minus 1/8?',
+                answer: 0.25,
+                explanation: ['3/8 - 1/8 = 2/8 = 1/4'],
+                variables: [
+                  {
+                    questionText:
+                      'What is {numerator1}/{denominator} minus {numerator2}/{denominator}?',
+                    min: 1,
+                    max: 12,
+                  },
+                ],
+              },
+            ],
           },
         ],
       },
@@ -428,18 +1176,84 @@ export const MATH_TOPICS = [
         name: 'Money Operations',
         difficulty: 2,
         skills: [
-          'Counting amount of money in dollars and cents',
-          'Reading and writing money in decimal notation',
-          'Comparing two or three amounts of money',
-          'Converting money in decimal notation to cents only, and vice versa',
-        ],
-        sampleQuestions: [
           {
-            question:
-              'What is the total amount of money if you have 3 quarters and 2 dimes?',
-            answer: 0.85,
-            explanation: [
-              '3 quarters = $0.75, 2 dimes = $0.20, 0.75 + 0.20 = $0.95',
+            id: 'count-money-mixed',
+            description: 'Counting amount of money in dollars and cents',
+            questions: [
+              {
+                question:
+                  'What is the total amount of money if you have 3 quarters and 2 dimes?',
+                answer: 0.85,
+                explanation: [
+                  '3 quarters = $0.75, 2 dimes = $0.20, 0.75 + 0.20 = $0.95',
+                ],
+                variables: [
+                  {
+                    questionText:
+                      'What is the total amount of money if you have {coin1_count} {coin1_type} and {coin2_count} {coin2_type}?',
+                    min: 1,
+                    max: 10,
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            id: 'decimal-notation',
+            description: 'Reading and writing money in decimal notation',
+            questions: [
+              {
+                question:
+                  'Write eighty-five cents using the dollar symbol and decimal notation',
+                answer: '$0.85',
+                explanation: ['Eighty-five cents is written as $0.85'],
+                variables: [
+                  {
+                    questionText:
+                      'Write {amount_in_words} using the dollar symbol and decimal notation',
+                    min: 0,
+                    max: 0,
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            id: 'compare-money',
+            description: 'Comparing two or three amounts of money',
+            questions: [
+              {
+                question: 'Which amount is larger: $1.25 or $1.52?',
+                answer: '$1.52',
+                explanation: ['$1.52 is larger than $1.25'],
+                variables: [
+                  {
+                    questionText:
+                      'Which amount is larger: ${amount1} or ${amount2}?',
+                    min: 1,
+                    max: 100,
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            id: 'convert-money',
+            description:
+              'Converting money in decimal notation to cents only, and vice versa',
+            questions: [
+              {
+                question: 'How many cents is $2.35?',
+                answer: 235,
+                explanation: ['$2.35 = 235 cents'],
+                variables: [
+                  {
+                    questionText: 'How many cents is ${dollars}?',
+                    min: 1,
+                    max: 10,
+                  },
+                ],
+              },
             ],
           },
         ],
@@ -458,19 +1272,100 @@ export const MATH_TOPICS = [
         name: 'Length, Mass and Volume',
         difficulty: 2,
         skills: [
-          'Measuring length in metres',
-          'Measuring mass in kilograms/grams',
-          'Measuring volume of liquid in litres',
-          'Using appropriate units of measurement and abbreviations (m, g, kg, ℓ)',
-          'Comparing and ordering lengths',
-          'Comparing and ordering masses',
-          'Comparing and ordering volumes',
-        ],
-        sampleQuestions: [
           {
-            question: 'What is the length of a table that is 1.2 meters long?',
-            answer: 1.2,
-            explanation: ['The length is 1.2 meters'],
+            id: 'measuring-metres',
+            description: 'Measuring length in metres',
+            questions: [
+              {
+                question:
+                  'What is the length of a table that is 1.2 meters long?',
+                answer: 1.2,
+                explanation: ['The length is 1.2 meters'],
+                variables: [
+                  {
+                    questionText:
+                      'What is the length of a {object} that is {length} meters long?',
+                    min: 1,
+                    max: 10,
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            id: 'measuring-mass',
+            description: 'Measuring mass in kilograms/grams',
+            questions: [
+              {
+                question: 'How many grams are in 2.5 kilograms?',
+                answer: 2500,
+                explanation: ['1 kilogram = 1000 grams, so 2.5 kg = 2500 g'],
+                variables: [
+                  {
+                    questionText: 'How many grams are in {number} kilograms?',
+                    min: 1,
+                    max: 10,
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            id: 'measuring-volume',
+            description: 'Measuring volume of liquid in litres',
+            questions: [
+              {
+                question: 'How many litres of water can a 2-litre bottle hold?',
+                answer: 2,
+                explanation: ['A 2-litre bottle can hold 2 litres'],
+                variables: [
+                  {
+                    questionText:
+                      'How many litres of water can a {capacity}-litre {container} hold?',
+                    min: 1,
+                    max: 10,
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            id: 'measurement-units',
+            description:
+              'Using appropriate units of measurement and abbreviations (m, g, kg, ℓ)',
+            questions: [
+              {
+                question: 'What is the abbreviation for kilogram?',
+                answer: 'kg',
+                explanation: ['The abbreviation for kilogram is kg'],
+                variables: [
+                  {
+                    questionText: 'What is the abbreviation for {unit}?',
+                    min: 0,
+                    max: 0,
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            id: 'compare-lengths',
+            description: 'Comparing and ordering lengths',
+            questions: [
+              {
+                question: 'Which is longer: 1.5 meters or 150 centimeters?',
+                answer: '150 centimeters',
+                explanation: ['1.5 meters = 150 centimeters, they are equal'],
+                variables: [
+                  {
+                    questionText:
+                      'Which is longer: {length1} {unit1} or {length2} {unit2}?',
+                    min: 1,
+                    max: 10,
+                  },
+                ],
+              },
+            ],
           },
         ],
       },
@@ -479,16 +1374,47 @@ export const MATH_TOPICS = [
         name: 'Measurement Time',
         difficulty: 2,
         skills: [
-          'Telling time to the minute',
-          'Measuring time in hours and minutes',
-          'Converting time in hours and minutes to minutes only, and vice versa',
-        ],
-        sampleQuestions: [
           {
-            question:
-              'What time is it when the hour hand is on 3 and the minute hand is on 12?',
-            answer: '3:00',
-            explanation: ['It is 3:00'],
+            id: 'telling-time-minute',
+            description: 'Telling time to the minute',
+            questions: [
+              {
+                question:
+                  'What time is it when the hour hand is on 3 and the minute hand is on 12?',
+                answer: '3:00',
+                explanation: [
+                  'When the minute hand is on 12, it is exactly the hour shown by the hour hand',
+                ],
+                variables: [
+                  {
+                    questionText:
+                      'What time is it when the hour hand is on {hour} and the minute hand is on {minute}?',
+                    min: 1,
+                    max: 12,
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            id: 'time-conversion',
+            description:
+              'Converting time in hours and minutes to minutes only, and vice versa',
+            questions: [
+              {
+                question: 'How many minutes are in 2 hours and 30 minutes?',
+                answer: 150,
+                explanation: ['2 hours = 120 minutes, 120 + 30 = 150 minutes'],
+                variables: [
+                  {
+                    questionText:
+                      'How many minutes are in {hours} hours and {minutes} minutes?',
+                    min: 1,
+                    max: 12,
+                  },
+                ],
+              },
+            ],
           },
         ],
       },
@@ -506,13 +1432,28 @@ export const MATH_TOPICS = [
         name: '2D Shapes',
         difficulty: 2,
         skills: [
-          'Making/completing patterns with 2D shapes according to one or two of the following attributes: size, shape, color, orientation',
-        ],
-        sampleQuestions: [
           {
-            question: 'Draw a rectangle.',
-            answer: null,
-            explanation: ['Draw a rectangle'],
+            id: 'shape-patterns',
+            description:
+              'Making/completing patterns with 2D shapes according to one or two of the following attributes: size, shape, color, orientation',
+            questions: [
+              {
+                question:
+                  'What comes next in the pattern: square, triangle, square, triangle, ___?',
+                answer: 'square',
+                explanation: [
+                  'The pattern alternates between square and triangle',
+                ],
+                variables: [
+                  {
+                    questionText:
+                      'What comes next in the pattern: {shape1}, {shape2}, {shape1}, {shape2}, ___?',
+                    min: 0,
+                    max: 0,
+                  },
+                ],
+              },
+            ],
           },
         ],
       },
@@ -521,13 +1462,36 @@ export const MATH_TOPICS = [
         name: '3D Shapes',
         difficulty: 2,
         skills: [
-          'Identifying, naming, describing and classifying 3D shapes: cube, cuboid, cone, cylinder, sphere',
-        ],
-        sampleQuestions: [
           {
-            question: "What is the shape of a Rubik's cube?",
-            answer: 'cube',
-            explanation: ["A Rubik's cube is a cube"],
+            id: 'identify-3d-shapes',
+            description:
+              'Identifying, naming, describing and classifying 3D shapes: cube, cuboid, cone, cylinder, sphere',
+            questions: [
+              {
+                question: "What is the shape of a Rubik's cube?",
+                answer: 'cube',
+                explanation: ["A Rubik's cube is a cube"],
+                variables: [
+                  {
+                    questionText: 'What is the shape of a {object}?',
+                    min: 0,
+                    max: 0,
+                  },
+                ],
+              },
+              {
+                question: 'How many faces does a cube have?',
+                answer: 6,
+                explanation: ['A cube has 6 square faces'],
+                variables: [
+                  {
+                    questionText: 'How many faces does a {shape} have?',
+                    min: 0,
+                    max: 0,
+                  },
+                ],
+              },
+            ],
           },
         ],
       },
@@ -544,16 +1508,18 @@ export const MATH_TOPICS = [
         id: '49152e60-2b58-40a1-b4a3-824fdaaea2a6',
         name: 'Picture Graphs with Scales',
         difficulty: 2,
-        skills: [
-          'Reading and interpreting data from picture graphs with scales',
-        ],
-        sampleQuestions: [
-          {
-            question: 'How many students chose option B?',
-            answer: 15,
-            explanation: ['15 students chose option B'],
-          },
-        ],
+        skills: {
+          id: 'reading-interpreting-data-from-picture-graphs-with-scales',
+          description:
+            'Reading and interpreting data from picture graphs with scales',
+          questions: [
+            {
+              question: 'How many students chose option B?',
+              answer: 15,
+              explanation: ['15 students chose option B'],
+            },
+          ],
+        },
       },
     ],
   },
@@ -569,17 +1535,62 @@ export const MATH_TOPICS = [
         name: 'Numbers up to 10000',
         difficulty: 3,
         skills: [
-          'Counting in hundreds/thousands',
-          'Number notation, representations and place values (thousands, hundreds, tens, ones)',
-          'Reading and writing numbers in numerals and in words',
-          'Comparing and ordering numbers',
-          'Patterns in number sequences',
-        ],
-        sampleQuestions: [
           {
-            question: 'What is the sum of 5,000, 3,000, and 2,000?',
-            answer: 10000,
-            explanation: ['5,000 + 3,000 + 2,000 = 10,000'],
+            id: 'counting-in-hundreds-thousands',
+            description: 'Counting in hundreds/thousands',
+            questions: [
+              {
+                question: 'What is the sum of 500, 3000, and 2000?',
+                answer: 5500,
+                explanation: ['500 + 3000 + 2000 = 5500'],
+              },
+            ],
+          },
+          {
+            id: 'number-notation-representations-place-values',
+            description:
+              'Number notation, representations and place values (thousands, hundreds, tens, ones)',
+            questions: [
+              {
+                question: '(undefined)',
+                answer: '(undefined)',
+                explanation: ['(undefined)'],
+              },
+            ],
+          },
+          {
+            id: 'reading-writing-numbers',
+            description: 'Reading and writing numbers in numerals and in words',
+            questions: [
+              {
+                question: 'Write 5500 in words',
+                answer: 'five thousand five hundred',
+                explanation: ['5500 in words is five thousand five hundred'],
+              },
+              {
+                question: 'Write five thousand five hundred in numerals',
+                answer: 5500,
+                explanation: ['five thousand five hundred in numerals is 5500'],
+              },
+            ],
+          },
+          {
+            id: 'patterns-in-number-sequences',
+            description: 'Patterns in number sequences',
+            questions: [
+              {
+                question:
+                  'Write down the next numbers in the sequence: 1000, 2000, 3000, 4000, ___',
+                answer: 5000,
+                explanation: ['The sequence increases by 1000 each time'],
+              },
+              {
+                question:
+                  'Write down the next numbers in the sequence: 6, 10, 14, 18, ___',
+                answer: 22,
+                explanation: ['The sequence increases by 4 each time'],
+              },
+            ],
           },
         ],
       },
@@ -588,19 +1599,38 @@ export const MATH_TOPICS = [
         name: 'Addition and Subtraction',
         difficulty: 3,
         skills: [
-          'Addition and subtraction algorithms (up to 4 digits)',
-          'Mental calculation involving addition and subtraction of two 2-digit numbers',
-        ],
-        sampleQuestions: [
           {
-            question: 'What is the sum of 4,567 and 2,345?',
-            answer: 6912,
-            explanation: ['4,567 + 2,345 = 6,912'],
+            id: 'addition-subtraction-algorithms',
+            description: 'Addition and subtraction algorithms (up to 4 digits)',
+            questions: [
+              {
+                question: 'What is the sum of 4,567 and 2,345?',
+                answer: 6912,
+                explanation: ['4,567 + 2,345 = 6,912'],
+              },
+              {
+                question: 'What is the difference between 8,765 and 3,456?',
+                answer: 5309,
+                explanation: ['8,765 - 3,456 = 5,309'],
+              },
+            ],
           },
           {
-            question: 'What is the difference between 8,765 and 3,456?',
-            answer: 5309,
-            explanation: ['8,765 - 3,456 = 5,309'],
+            id: 'mental-calculation',
+            description:
+              'Mental calculation involving addition and subtraction of two 2-digit numbers',
+            questions: [
+              {
+                question: 'What is 34 + 27?',
+                answer: 61,
+                explanation: ['34 + 27 = 61'],
+              },
+              {
+                question: 'What is 76 - 48?',
+                answer: 28,
+                explanation: ['76 - 48 = 28'],
+              },
+            ],
           },
         ],
       },
@@ -609,22 +1639,115 @@ export const MATH_TOPICS = [
         name: 'Multiplication and Division',
         difficulty: 3,
         skills: [
-          'Multiplication tables of 6, 7, 8 and 9',
-          'Multiplying and dividing within the multiplication tables',
-          'Division with remainder',
-          'Multiplication and division algorithms (up to 3 digits by 1 digit)',
-          'Mental calculation involving multiplication and division within multiplication tables',
-        ],
-        sampleQuestions: [
           {
-            question: 'What is the product of 6 and 7?',
-            answer: 42,
-            explanation: ['6 × 7 = 42'],
+            id: 'multiplication-tables-advanced',
+            description: 'Multiplication tables of 6, 7, 8 and 9',
+            questions: [
+              {
+                question: 'What is the product of 6 and 7?',
+                answer: 42,
+                explanation: ['6 × 7 = 42'],
+                variables: [
+                  {
+                    questionText:
+                      'What is the product of {number1} and {number2}?',
+                    min: 6,
+                    max: 9,
+                  },
+                ],
+              },
+              {
+                question:
+                  'Complete the multiplication table for 7: 7 × 1 = 7, 7 × 2 = 14, ...',
+                answer: '7, 14, 21, 28, 35, 42, 49, 56, 63, 70',
+                explanation: ['Multiply 7 by each number from 1 to 10'],
+                variables: [
+                  {
+                    questionText:
+                      'Complete the multiplication table for {number}: {number} × 1 = {first}, {number} × 2 = {second}, ...',
+                    min: 6,
+                    max: 9,
+                  },
+                ],
+              },
+            ],
           },
           {
-            question: 'What is the quotient when 42 is divided by 6?',
-            answer: 7,
-            explanation: ['42 ÷ 6 = 7'],
+            id: 'multiply-divide-tables-advanced',
+            description:
+              'Multiplying and dividing within the multiplication tables',
+            questions: [
+              {
+                question: 'What is 56 ÷ 7?',
+                answer: 8,
+                explanation: ['56 ÷ 7 = 8'],
+                variables: [
+                  {
+                    questionText: 'What is {number1} ÷ {number2}?',
+                    min: 6,
+                    max: 9,
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            id: 'division-remainder',
+            description: 'Division with remainder',
+            questions: [
+              {
+                question: 'What is the remainder when 47 is divided by 8?',
+                answer: 7,
+                explanation: ['47 = 8 × 5 + 7, so the remainder is 7'],
+                variables: [
+                  {
+                    questionText:
+                      'What is the remainder when {number1} is divided by {number2}?',
+                    min: 20,
+                    max: 100,
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            id: 'multiplication-algorithm',
+            description:
+              'Multiplication and division algorithms (up to 3 digits by 1 digit)',
+            questions: [
+              {
+                question: 'What is the product of 234 and 6?',
+                answer: 1404,
+                explanation: ['234 × 6 = 1404'],
+                variables: [
+                  {
+                    questionText:
+                      'What is the product of {number1} and {number2}?',
+                    min: 100,
+                    max: 999,
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            id: 'mental-calculation',
+            description:
+              'Mental calculation involving multiplication and division within multiplication tables',
+            questions: [
+              {
+                question: 'Multiply 25 by 4 mentally',
+                answer: 100,
+                explanation: ['25 × 4 = 100'],
+                variables: [
+                  {
+                    questionText: 'Multiply {number1} by {number2} mentally',
+                    min: 2,
+                    max: 12,
+                  },
+                ],
+              },
+            ],
           },
         ],
       },
@@ -642,16 +1765,55 @@ export const MATH_TOPICS = [
         name: 'Equivalent Fractions',
         difficulty: 3,
         skills: [
-          'Equivalent fractions',
-          'Expressing a fraction in its simplest form',
-          'Comparing and ordering unlike fractions with denominators not exceeding 12',
-          'Writing equivalent fractions given the denominator or numerator',
-        ],
-        sampleQuestions: [
           {
-            question: 'What is the simplest form of 4/8?',
-            answer: 0.5,
-            explanation: ['4/8 = 1/2'],
+            id: 'expressing-a-fraction-in-its-simplest-form',
+            description: 'Expressing a fraction in its simplest form',
+            questions: [
+              {
+                question: 'Reduce 4/8 to its simplest form',
+                answer: 0.5,
+                explanation: ['4/8 = 1/2'],
+              },
+            ],
+          },
+          {
+            id: 'comparing-ordering-fractions',
+            description:
+              'Comparing and ordering unlike fractions with denominators not exceeding 12',
+            questions: [
+              {
+                question: 'Which is greater: 2/3 or 3/4?',
+                answer: 3 / 4,
+                explanation: ['3/4 is greater than 2/3'],
+              },
+              {
+                question:
+                  'Order the fractions 1/2, 2/3, and 3/4 from least to greatest',
+                answer: [1 / 2, 2 / 3, 3 / 4],
+                explanation: [
+                  '1/2 = 0.5, 2/3 ≈ 0.67, 3/4 = 0.75, so the order is 1/2, 2/3, 3/4',
+                ],
+              },
+            ],
+          },
+          {
+            id: 'writing-equivalent-fractions',
+            description:
+              'Writing equivalent fractions given the denominator or numerator',
+            questions: [
+              {
+                question:
+                  'Write an equivalent fraction for 2/3 with a denominator of 9',
+                answer: 6 / 9,
+                explanation: ['2/3 = 6/9'],
+              },
+              {
+                question:
+                  'Write an equivalent fraction for 3/4 with a numerator of 6',
+                answer: 6 / 8,
+                explanation: ['3/4 = 6/8'],
+              },
+            ],
           },
         ],
       },
@@ -660,14 +1822,22 @@ export const MATH_TOPICS = [
         name: 'Fraction Addition and Subtraction',
         difficulty: 3,
         skills: [
-          'Adding and subtracting two related fractions within one whole',
-          'Denominators of given fractions not exceeding 12',
-        ],
-        sampleQuestions: [
           {
-            question: 'What is the sum of 1/4 and 1/4?',
-            answer: 0.5,
-            explanation: ['1/4 + 1/4 = 2/4 = 1/2'],
+            id: 'adding-subtracting-two-related-fractions',
+            description:
+              'Adding and subtracting two related fractions within one whole',
+            questions: [
+              {
+                question: 'What is the sum of 1/4 and 1/4?',
+                answer: 0.5,
+                explanation: ['1/4 + 1/4 = 2/4 = 1/2'],
+              },
+              {
+                question: 'What is the difference between 3/5 and 1/5?',
+                answer: 2 / 5,
+                explanation: ['3/5 - 1/5 = 2/5'],
+              },
+            ],
           },
         ],
       },
@@ -684,13 +1854,40 @@ export const MATH_TOPICS = [
         id: 'c9d4be29-ba85-4f21-969b-19e1653b82c7',
         name: 'Money Operations',
         difficulty: 3,
-        skills: ['Adding and subtracting money in decimal notation'],
-        sampleQuestions: [
+        skills: [
           {
-            question:
-              'What is the total amount of money if you have $0.75 and $0.20?',
-            answer: 0.95,
-            explanation: ['$0.75 + $0.20 = $0.95'],
+            id: 'add-subtract-money',
+            description: 'Adding and subtracting money in decimal notation',
+            questions: [
+              {
+                question:
+                  'What is the total amount of money if you have $0.75 and $0.20?',
+                answer: 0.95,
+                explanation: ['$0.75 + $0.20 = $0.95'],
+                variables: [
+                  {
+                    questionText:
+                      'What is the total amount of money if you have ${amount1} and ${amount2}?',
+                    min: 0.01,
+                    max: 10.0,
+                  },
+                ],
+              },
+              {
+                question:
+                  'If you have $5.00 and spend $2.50, how much money do you have left?',
+                answer: 2.5,
+                explanation: ['$5.00 - $2.50 = $2.50'],
+                variables: [
+                  {
+                    questionText:
+                      'If you have ${initial} and spend ${spent}, how much money do you have left?',
+                    min: 0.01,
+                    max: 20.0,
+                  },
+                ],
+              },
+            ],
           },
         ],
       },
@@ -708,19 +1905,101 @@ export const MATH_TOPICS = [
         name: 'Length, Mass and Volume',
         difficulty: 3,
         skills: [
-          'Measuring length in kilometres (km)',
-          'Measuring volume of liquid in millilitres (ml)',
-          'Measuring length/mass/volume in compound units',
-          'Converting a compound unit to the smaller unit (kilometres and metres)',
-          'Converting a compound unit to the larger unit (metres and centimetres)',
-          'Converting a compound unit to the smaller unit (kilograms and grams)',
-          'Converting a compound unit to the larger unit (litres and millilitres)',
-        ],
-        sampleQuestions: [
           {
-            question: 'What is the length of a road that is 5 kilometers long?',
-            answer: 5,
-            explanation: ['The length is 5 kilometers'],
+            id: 'measure-km',
+            description: 'Measuring length in kilometres (km)',
+            questions: [
+              {
+                question:
+                  'What is the length of a road that is 5 kilometers long?',
+                answer: 5,
+                explanation: ['The length is 5 kilometers'],
+                variables: [
+                  {
+                    questionText:
+                      'What is the length of a {object} that is {length} kilometers long?',
+                    min: 1,
+                    max: 100,
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            id: 'measure-ml',
+            description: 'Measuring volume of liquid in millilitres (ml)',
+            questions: [
+              {
+                question: 'How many milliliters are in 2.5 litres?',
+                answer: 2500,
+                explanation: ['1 litre = 1000 millilitres, so 2.5 L = 2500 mL'],
+                variables: [
+                  {
+                    questionText:
+                      'How many milliliters are in {number} litres?',
+                    min: 1,
+                    max: 10,
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            id: 'compound-units',
+            description: 'Measuring length/mass/volume in compound units',
+            questions: [
+              {
+                question: 'Express 2500 meters as kilometers and meters',
+                answer: '2 km 500 m',
+                explanation: ['2500 m = 2 km 500 m (since 1 km = 1000 m)'],
+                variables: [
+                  {
+                    questionText:
+                      'Express {meters} meters as kilometers and meters',
+                    min: 1000,
+                    max: 9999,
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            id: 'convert-smaller-unit',
+            description:
+              'Converting a compound unit to the smaller unit (kilometres and metres)',
+            questions: [
+              {
+                question: 'How many metres are in 3 km 500 m?',
+                answer: 3500,
+                explanation: ['3 km = 3000 m, so 3 km 500 m = 3500 m'],
+                variables: [
+                  {
+                    questionText: 'How many metres are in {km} km {m} m?',
+                    min: 1,
+                    max: 10,
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            id: 'convert-larger-unit',
+            description:
+              'Converting a compound unit to the larger unit (metres and centimetres)',
+            questions: [
+              {
+                question: 'Express 325 cm as metres and centimetres',
+                answer: '3 m 25 cm',
+                explanation: ['325 cm = 3 m 25 cm (since 1 m = 100 cm)'],
+                variables: [
+                  {
+                    questionText: 'Express {cm} cm as metres and centimetres',
+                    min: 100,
+                    max: 999,
+                  },
+                ],
+              },
+            ],
           },
         ],
       },
@@ -729,16 +2008,67 @@ export const MATH_TOPICS = [
         name: 'Time',
         difficulty: 3,
         skills: [
-          'Measuring time in seconds',
-          'Finding starting time, finishing time or duration',
-          '24-hour clock',
-        ],
-        sampleQuestions: [
           {
-            question:
-              'What time is it when the hour hand is on 3 and the minute hand is on 12?',
-            answer: '3:00',
-            explanation: ['It is 3:00'],
+            id: 'measuring-seconds',
+            description: 'Measuring time in seconds',
+            questions: [
+              {
+                question: 'How many seconds are in 2 minutes?',
+                answer: 120,
+                explanation: [
+                  '1 minute = 60 seconds, so 2 minutes = 120 seconds',
+                ],
+                variables: [
+                  {
+                    questionText: 'How many seconds are in {minutes} minutes?',
+                    min: 1,
+                    max: 10,
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            id: 'time-duration',
+            description: 'Finding starting time, finishing time or duration',
+            questions: [
+              {
+                question:
+                  'If an event starts at 2:30 PM and ends at 4:00 PM, how long did it last?',
+                answer: '1:30',
+                explanation: [
+                  'Duration = end time - start time = 4:00 PM - 2:30 PM = 1 hour 30 minutes',
+                ],
+                variables: [
+                  {
+                    questionText:
+                      'If an event starts at {start_time} and ends at {end_time}, how long did it last?',
+                    min: 1,
+                    max: 12,
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            id: '24-hour-clock',
+            description: '24-hour clock',
+            questions: [
+              {
+                question: 'What is 3:30 PM in 24-hour time?',
+                answer: '15:30',
+                explanation: [
+                  'In 24-hour time, add 12 to hours after noon, so 3:30 PM = 15:30',
+                ],
+                variables: [
+                  {
+                    questionText: 'What is {time} in 24-hour time?',
+                    min: 1,
+                    max: 12,
+                  },
+                ],
+              },
+            ],
           },
         ],
       },
@@ -756,20 +2086,107 @@ export const MATH_TOPICS = [
         name: 'Area and Perimeter',
         difficulty: 3,
         skills: [
-          'Concepts of area and perimeter of a plane figure',
-          'Measuring area in square units, cm² and m²',
-          'Perimeter of rectilinear figure',
-          'Perimeter of rectangle',
-          'Perimeter of square',
-          'Area of rectangle',
-          'Area of square',
-        ],
-        sampleQuestions: [
           {
-            question:
-              'What is the area of a rectangle with length 5 cm and width 3 cm?',
-            answer: 15,
-            explanation: ['Area = length × width = 5 cm × 3 cm = 15 cm²'],
+            id: 'area-concept',
+            description: 'Concepts of area and perimeter of a plane figure',
+            questions: [
+              {
+                question:
+                  'What is the perimeter of a square with side length 5 cm?',
+                answer: 20,
+                explanation: ['Perimeter = 4 × side length = 4 × 5 cm = 20 cm'],
+                variables: [
+                  {
+                    questionText:
+                      'What is the perimeter of a square with side length {length} cm?',
+                    min: 1,
+                    max: 20,
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            id: 'area-units',
+            description: 'Measuring area in square units, cm² and m²',
+            questions: [
+              {
+                question: 'How many square centimeters are in 1 square meter?',
+                answer: 10000,
+                explanation: ['1 m² = 100 cm × 100 cm = 10,000 cm²'],
+                variables: [
+                  {
+                    questionText:
+                      'How many square centimeters are in {number} square meter?',
+                    min: 1,
+                    max: 10,
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            id: 'rectilinear-perimeter',
+            description: 'Perimeter of rectilinear figure',
+            questions: [
+              {
+                question:
+                  'What is the perimeter of a rectilinear figure with sides 3 cm, 4 cm, 3 cm, and 4 cm?',
+                answer: 14,
+                explanation: [
+                  'Perimeter = sum of all sides = 3 cm + 4 cm + 3 cm + 4 cm = 14 cm',
+                ],
+                variables: [
+                  {
+                    questionText:
+                      'What is the perimeter of a rectilinear figure with sides {side1} cm, {side2} cm, {side3} cm, and {side4} cm?',
+                    min: 1,
+                    max: 20,
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            id: 'rectangle-area',
+            description: 'Area of rectangle',
+            questions: [
+              {
+                question:
+                  'What is the area of a rectangle with length 6 cm and width 4 cm?',
+                answer: 24,
+                explanation: ['Area = length × width = 6 cm × 4 cm = 24 cm²'],
+                variables: [
+                  {
+                    questionText:
+                      'What is the area of a rectangle with length {length} cm and width {width} cm?',
+                    min: 1,
+                    max: 20,
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            id: 'square-area',
+            description: 'Area of square',
+            questions: [
+              {
+                question: 'What is the area of a square with side length 5 cm?',
+                answer: 25,
+                explanation: [
+                  'Area = side length × side length = 5 cm × 5 cm = 25 cm²',
+                ],
+                variables: [
+                  {
+                    questionText:
+                      'What is the area of a square with side length {length} cm?',
+                    min: 1,
+                    max: 20,
+                  },
+                ],
+              },
+            ],
           },
         ],
       },
@@ -787,15 +2204,66 @@ export const MATH_TOPICS = [
         name: 'Angles',
         difficulty: 3,
         skills: [
-          'Concepts of angle',
-          'Right angles',
-          'Angles greater than/smaller than a right angle',
-        ],
-        sampleQuestions: [
           {
-            question: 'What is the measure of angle ABC?',
-            answer: 90,
-            explanation: ['Angle ABC is a right angle'],
+            id: 'angle-concept',
+            description: 'Concepts of angle',
+            questions: [
+              {
+                question: 'What is an angle?',
+                answer:
+                  'The amount of turn between two lines around their common point',
+                explanation: [
+                  'An angle is formed when two lines meet at a point',
+                ],
+                variables: [
+                  {
+                    questionText: 'What is an angle?',
+                    min: 0,
+                    max: 0,
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            id: 'right-angles',
+            description: 'Right angles',
+            questions: [
+              {
+                question: 'How many degrees are in a right angle?',
+                answer: 90,
+                explanation: ['A right angle is 90 degrees'],
+                variables: [
+                  {
+                    questionText: 'How many degrees are in a right angle?',
+                    min: 0,
+                    max: 0,
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            id: 'angle-comparison',
+            description: 'Angles greater than/smaller than a right angle',
+            questions: [
+              {
+                question:
+                  'Is 120 degrees greater than or smaller than a right angle?',
+                answer: 'greater than',
+                explanation: [
+                  '120 degrees is greater than a right angle (90 degrees)',
+                ],
+                variables: [
+                  {
+                    questionText:
+                      'Is {degrees} degrees greater than or smaller than a right angle?',
+                    min: 0,
+                    max: 180,
+                  },
+                ],
+              },
+            ],
           },
         ],
       },
@@ -804,14 +2272,61 @@ export const MATH_TOPICS = [
         name: 'Perpendicular and Parallel Lines',
         difficulty: 3,
         skills: [
-          'Perpendicular and parallel lines',
-          'Drawing perpendicular and parallel lines',
-        ],
-        sampleQuestions: [
           {
-            question: 'Draw a perpendicular line to line AB.',
-            answer: null,
-            explanation: ['Draw a perpendicular line to line AB'],
+            id: 'line-concepts',
+            description: 'Perpendicular and parallel lines',
+            questions: [
+              {
+                question: 'What is the angle between perpendicular lines?',
+                answer: 90,
+                explanation: [
+                  'Perpendicular lines meet at a right angle (90 degrees)',
+                ],
+                variables: [
+                  {
+                    questionText:
+                      'What is the angle between perpendicular lines?',
+                    min: 0,
+                    max: 0,
+                  },
+                ],
+              },
+              {
+                question: 'What is special about parallel lines?',
+                answer: 'They never meet',
+                explanation: [
+                  'Parallel lines are always the same distance apart and never intersect',
+                ],
+                variables: [
+                  {
+                    questionText: 'What is special about parallel lines?',
+                    min: 0,
+                    max: 0,
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            id: 'drawing-lines',
+            description: 'Drawing perpendicular and parallel lines',
+            questions: [
+              {
+                question: 'Draw a line perpendicular to line AB at point P.',
+                answer: null,
+                explanation: [
+                  'Use a set square to draw a line at 90 degrees to line AB through point P',
+                ],
+                variables: [
+                  {
+                    questionText:
+                      'Draw a line perpendicular to line {line} at point {point}.',
+                    min: 0,
+                    max: 0,
+                  },
+                ],
+              },
+            ],
           },
         ],
       },
@@ -829,14 +2344,63 @@ export const MATH_TOPICS = [
         name: 'Bar Graphs',
         difficulty: 3,
         skills: [
-          'Reading and interpreting data from bar graphs',
-          'Using different scales on axis',
-        ],
-        sampleQuestions: [
           {
-            question: 'How many students chose option A?',
-            answer: 20,
-            explanation: ['20 students chose option A'],
+            id: 'read-bar-graphs',
+            description: 'Reading and interpreting data from bar graphs',
+            questions: [
+              {
+                question: 'How many students chose option A in the bar graph?',
+                answer: 20,
+                explanation: [
+                  'Looking at the bar for option A, we can see it reaches 20 on the vertical axis',
+                ],
+                variables: [
+                  {
+                    questionText:
+                      'How many students chose option {option} in the bar graph?',
+                    min: 1,
+                    max: 50,
+                  },
+                ],
+              },
+              {
+                question: 'Which option was chosen by the most students?',
+                answer: 'A',
+                explanation: [
+                  'Looking at all bars, option A has the highest bar reaching 20 students',
+                ],
+                variables: [
+                  {
+                    questionText:
+                      'Which option was chosen by the most students?',
+                    min: 0,
+                    max: 0,
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            id: 'scale-usage',
+            description: 'Using different scales on axis',
+            questions: [
+              {
+                question:
+                  'If each unit on the vertical axis represents 5 students, how many students chose option B?',
+                answer: 25,
+                explanation: [
+                  'The bar for option B reaches 5 units, and each unit represents 5 students, so 5 × 5 = 25 students',
+                ],
+                variables: [
+                  {
+                    questionText:
+                      'If each unit on the vertical axis represents {scale} students, how many students chose option {option}?',
+                    min: 1,
+                    max: 10,
+                  },
+                ],
+              },
+            ],
           },
         ],
       },
@@ -854,22 +2418,40 @@ export const MATH_TOPICS = [
         name: 'Numbers up to 10 million',
         difficulty: 5,
         skills: [
-          'Reading and writing numbers in numerals and in words up to 10 million',
-        ],
-        sampleQuestions: [
           {
-            question:
-              'What is the number for one million nine hundred and ninety-nine thousand?',
-            answer: 1999000,
-            explanation: [
-              'The number for one million nine hundred and ninety-nine thousand is 1999000',
-            ],
-          },
-          {
-            question: 'Write the number 1,999,000 in words.',
-            answer: 'one million nine hundred and ninety-nine thousand',
-            explanation: [
-              'The number 1,999,000 in words is one million nine hundred and ninety-nine thousand',
+            id: 'read-write-numbers',
+            description:
+              'Reading and writing numbers in numerals and in words up to 10 million',
+            questions: [
+              {
+                question: 'Write 1,999,000 in words',
+                answer: 'one million nine hundred and ninety-nine thousand',
+                explanation: [
+                  'Break down the number: 1 million + 999 thousand = one million nine hundred and ninety-nine thousand',
+                ],
+                variables: [
+                  {
+                    questionText: 'Write {number} in words',
+                    min: 1000000,
+                    max: 9999999,
+                  },
+                ],
+              },
+              {
+                question:
+                  'Write the number for five million three hundred thousand',
+                answer: 5300000,
+                explanation: [
+                  '5 million = 5,000,000, three hundred thousand = 300,000, so 5,300,000',
+                ],
+                variables: [
+                  {
+                    questionText: 'Write the number for {number_in_words}',
+                    min: 1000000,
+                    max: 9999999,
+                  },
+                ],
+              },
             ],
           },
         ],
@@ -888,15 +2470,79 @@ export const MATH_TOPICS = [
         name: 'Four Operations',
         difficulty: 5,
         skills: [
-          'Multiplying and dividing by 10, 100, 1000 and their multiples without calculator',
-          'Order of operations without calculator',
-          'Use of brackets without calculator',
-        ],
-        sampleQuestions: [
           {
-            question: 'What is the product of 10 and 100?',
-            answer: 1000,
-            explanation: ['10 × 100 = 1000'],
+            id: 'multiply-divide-powers',
+            description:
+              'Multiplying and dividing by 10, 100, 1000 and their multiples without calculator',
+            questions: [
+              {
+                question: 'What is 456 × 100?',
+                answer: 45600,
+                explanation: [
+                  'When multiplying by 100, add two zeros to the end of the number',
+                ],
+                variables: [
+                  {
+                    questionText: 'What is {number} × {multiplier}?',
+                    min: 100,
+                    max: 999,
+                  },
+                ],
+              },
+              {
+                question: 'What is 45600 ÷ 1000?',
+                answer: 45.6,
+                explanation: [
+                  'When dividing by 1000, move the decimal point 3 places to the left',
+                ],
+                variables: [
+                  {
+                    questionText: 'What is {number} ÷ {divisor}?',
+                    min: 1000,
+                    max: 999999,
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            id: 'order-operations',
+            description: 'Order of operations without calculator',
+            questions: [
+              {
+                question: 'What is 5 + 3 × 4?',
+                answer: 17,
+                explanation: [
+                  'Multiplication before addition: 3 × 4 = 12, then 5 + 12 = 17',
+                ],
+                variables: [
+                  {
+                    questionText: 'What is {number1} + {number2} × {number3}?',
+                    min: 1,
+                    max: 10,
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            id: 'use-brackets',
+            description: 'Use of brackets without calculator',
+            questions: [
+              {
+                question: 'What is (5 + 3) × 4?',
+                answer: 32,
+                explanation: ['Brackets first: 5 + 3 = 8, then 8 × 4 = 32'],
+                variables: [
+                  {
+                    questionText:
+                      'What is ({number1} + {number2}) × {number3}?',
+                    min: 1,
+                    max: 10,
+                  },
+                ],
+              },
+            ],
           },
         ],
       },
@@ -914,14 +2560,44 @@ export const MATH_TOPICS = [
         name: 'Fraction and Division',
         difficulty: 5,
         skills: [
-          'Dividing a whole number by a whole number with quotient as a fraction',
-          'Expressing fractions as decimals',
-        ],
-        sampleQuestions: [
           {
-            question: 'What is the quotient when 4 is divided by 8?',
-            answer: 0.5,
-            explanation: ['4 ÷ 8 = 0.5'],
+            id: 'division-as-fraction',
+            description:
+              'Dividing a whole number by a whole number with quotient as a fraction',
+            questions: [
+              {
+                question: 'Express 3 ÷ 4 as a fraction',
+                answer: '3/4',
+                explanation: [
+                  'When dividing whole numbers, the result can be written as a fraction: 3 ÷ 4 = 3/4',
+                ],
+                variables: [
+                  {
+                    questionText: 'Express {number1} ÷ {number2} as a fraction',
+                    min: 1,
+                    max: 12,
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            id: 'fraction-to-decimal',
+            description: 'Expressing fractions as decimals',
+            questions: [
+              {
+                question: 'Convert 3/4 to a decimal',
+                answer: 0.75,
+                explanation: ['3/4 = 3 ÷ 4 = 0.75'],
+                variables: [
+                  {
+                    questionText: 'Convert {fraction} to a decimal',
+                    min: 1,
+                    max: 12,
+                  },
+                ],
+              },
+            ],
           },
         ],
       },
@@ -930,17 +2606,77 @@ export const MATH_TOPICS = [
         name: 'Fraction and Four Operations',
         difficulty: 5,
         skills: [
-          'Adding and subtracting mixed numbers',
-          'Multiplying a proper/improper fraction and a whole number without calculator',
-          'Multiplying a proper fraction and a proper/improper fraction without calculator',
-          'Multiplying two improper fractions',
-          'Multiplying a mixed number and a whole number',
-        ],
-        sampleQuestions: [
           {
-            question: 'What is the sum of 2 1/4 and 1 3/4?',
-            answer: 4,
-            explanation: ['2 1/4 + 1 3/4 = 4'],
+            id: 'mixed-numbers',
+            description: 'Adding and subtracting mixed numbers',
+            questions: [
+              {
+                question: 'What is 2 1/4 + 1 3/4?',
+                answer: 4,
+                explanation: [
+                  'First add whole numbers: 2 + 1 = 3, then add fractions: 1/4 + 3/4 = 1, so total is 4',
+                ],
+                variables: [
+                  {
+                    questionText:
+                      'What is {whole1} {fraction1} + {whole2} {fraction2}?',
+                    min: 1,
+                    max: 10,
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            id: 'multiply-fractions',
+            description:
+              'Multiplying proper/improper fractions and whole numbers',
+            questions: [
+              {
+                question: 'What is 2/3 × 6?',
+                answer: 4,
+                explanation: ['2/3 × 6 = (2 × 6)/(3 × 1) = 12/3 = 4'],
+                variables: [
+                  {
+                    questionText: 'What is {fraction} × {whole}?',
+                    min: 1,
+                    max: 12,
+                  },
+                ],
+              },
+              {
+                question: 'What is 3/4 × 2/3?',
+                answer: 0.5,
+                explanation: ['3/4 × 2/3 = (3 × 2)/(4 × 3) = 6/12 = 1/2 = 0.5'],
+                variables: [
+                  {
+                    questionText: 'What is {fraction1} × {fraction2}?',
+                    min: 1,
+                    max: 12,
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            id: 'multiply-mixed-numbers',
+            description: 'Multiplying mixed numbers and whole numbers',
+            questions: [
+              {
+                question: 'What is 1 1/2 × 4?',
+                answer: 6,
+                explanation: [
+                  'Convert 1 1/2 to improper fraction: 3/2, then 3/2 × 4 = 12/2 = 6',
+                ],
+                variables: [
+                  {
+                    questionText: 'What is {mixed} × {whole}?',
+                    min: 1,
+                    max: 12,
+                  },
+                ],
+              },
+            ],
           },
         ],
       },
@@ -958,14 +2694,127 @@ export const MATH_TOPICS = [
         name: 'Decimals and Four Operations',
         difficulty: 5,
         skills: [
-          'Multiplying and dividing decimals (up to 3 decimal places) by 10, 100, 1000 and their multiples without calculator',
-          'Converting a measurement from a smaller unit to a larger unit in decimal form, and vice versa between km and m, kg and g, L and mL',
-        ],
-        sampleQuestions: [
           {
-            question: 'What is the product of 0.5 and 0.5?',
-            answer: 0.25,
-            explanation: ['0.5 × 0.5 = 0.25'],
+            id: 'multiplying-dividing-decimals-by-10-100-1000-and-their-multiples-without-calculator',
+            questions: [
+              {
+                question: 'What is 2.41 × 100?',
+                answer: 241,
+                explanation: [
+                  'When multiplying by 100, move the decimal point 2 places to the right',
+                ],
+                variables: [
+                  {
+                    questionText: 'What is {number} × {multiplier}?',
+                    min: 100,
+                    max: 999,
+                  },
+                ],
+              },
+              {
+                question: 'What is 241 ÷ 1000?',
+                answer: 0.241,
+                explanation: [
+                  'When dividing by 1000, move the decimal point 3 places to the left',
+                ],
+                variables: [
+                  {
+                    questionText: 'What is {number} ÷ {divisor}?',
+                    min: 1000,
+                    max: 999999,
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            id: 'converting-a-measurement-from-a-smaller-unit-to-a-larger-unit-in-decimal-form-and-vice-versa-between-km-and-m-kg-and-g-l-and-ml',
+            questions: [
+              {
+                question: 'What is 2.41 km in meters?',
+                answer: 2410,
+                explanation: [
+                  '1 km = 1000 m, so 2.41 km = 2.41 × 1000 m = 2410 m',
+                ],
+                variables: [
+                  {
+                    questionText: 'What is {number} km in meters?',
+                    min: 1,
+                    max: 10,
+                  },
+                ],
+              },
+              {
+                question: 'What is 2410 m in kilometers?',
+                answer: 2.41,
+                explanation: [
+                  '1 km = 1000 m, so 2410 m = 2410 ÷ 1000 km = 2.41 km',
+                ],
+                variables: [
+                  {
+                    questionText: 'What is {number} m in kilometers?',
+                    min: 1000,
+                    max: 999999,
+                  },
+                ],
+              },
+              {
+                question: 'What is 2.41 kg in grams?',
+                answer: 2410,
+                explanation: [
+                  '1 kg = 1000 g, so 2.41 kg = 2.41 × 1000 g = 2410 g',
+                ],
+                variables: [
+                  {
+                    questionText: 'What is {number} kg in grams?',
+                    min: 1,
+                    max: 10,
+                  },
+                ],
+              },
+              {
+                question: 'What is 2410 g in kilograms?',
+                answer: 2.41,
+                explanation: [
+                  '1 kg = 1000 g, so 2410 g = 2410 ÷ 1000 kg = 2.41 kg',
+                ],
+                variables: [
+                  {
+                    questionText: 'What is {number} g in kilograms?',
+                    min: 1000,
+                    max: 999999,
+                  },
+                ],
+              },
+              {
+                question: 'What is 2.41 L in milliliters?',
+                answer: 2410,
+                explanation: [
+                  '1 L = 1000 mL, so 2.41 L = 2.41 × 1000 mL = 2410 mL',
+                ],
+                variables: [
+                  {
+                    questionText: 'What is {number} L in milliliters?',
+                    min: 1,
+                    max: 10,
+                  },
+                ],
+              },
+              {
+                question: 'What is 2410 mL in liters?',
+                answer: 2.41,
+                explanation: [
+                  '1 L = 1000 mL, so 2410 mL = 2410 ÷ 1000 L = 2.41 L',
+                ],
+                variables: [
+                  {
+                    questionText: 'What is {number} mL in liters?',
+                    min: 1000,
+                    max: 999999,
+                  },
+                ],
+              },
+            ],
           },
         ],
       },
@@ -983,15 +2832,46 @@ export const MATH_TOPICS = [
         name: 'Percentage',
         difficulty: 5,
         skills: [
-          'Finding the whole given a part and the percentage',
-          'Finding percentage increase/decrease',
-        ],
-        sampleQuestions: [
           {
-            question:
-              'What is the original price if a 20% discount reduces it to $80?',
-            answer: 100,
-            explanation: ['80 is 80% of the original price'],
+            id: 'finding-the-whole-given-a-part-and-the-percentage',
+            description: 'Finding the whole given a part and the percentage',
+            questions: [
+              {
+                question:
+                  'What is the original price if a 20% discount reduces it to $80?',
+                answer: 100,
+                explanation: ['80 is 80% of the original price'],
+                variables: [
+                  {
+                    questionText:
+                      'What is the original price if a {percentage}% discount reduces it to ${part}?',
+                    min: 1,
+                    max: 100,
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            id: 'finding-percentage-increase-decrease',
+            description: 'Finding percentage increase/decrease',
+            questions: [
+              {
+                question: 'What is the percentage increase from 100 to 120?',
+                answer: 20,
+                explanation: [
+                  'Percentage increase = ((new value - original value) / original value) × 100%',
+                ],
+                variables: [
+                  {
+                    questionText:
+                      'What is the percentage increase from {original} to {new}?',
+                    min: 1,
+                    max: 100,
+                  },
+                ],
+              },
+            ],
           },
         ],
       },
@@ -1009,17 +2889,94 @@ export const MATH_TOPICS = [
         name: 'Rate',
         difficulty: 5,
         skills: [
-          'Rate as the amount of a quantity per unit of another quantity',
-          'Finding rate given total amount and number of units',
-          'Finding total amount given rate and number of units',
-          'Finding number of units given rate and total amount',
-        ],
-        sampleQuestions: [
           {
-            question:
-              'How much does each item cost if 100 of this item cost $500?',
-            answer: 5,
-            explanation: ['500 ÷ 100 = 5, so each item costs $5.'],
+            id: 'rate-concept',
+            description:
+              'Rate as the amount of a quantity per unit of another quantity',
+            questions: [
+              {
+                question:
+                  'If a car travels 240 kilometers in 3 hours, what is its rate in kilometers per hour?',
+                answer: 80,
+                explanation: [
+                  'Rate = Total distance ÷ Total time = 240 km ÷ 3 h = 80 km/h',
+                ],
+                variables: [
+                  {
+                    questionText:
+                      'If a car travels {distance} kilometers in {time} hours, what is its rate in kilometers per hour?',
+                    min: 60,
+                    max: 500,
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            id: 'find-rate',
+            description: 'Finding rate given total amount and number of units',
+            questions: [
+              {
+                question:
+                  'How much does each item cost if 100 of this item cost $500?',
+                answer: 5,
+                explanation: [
+                  'Rate = Total cost ÷ Number of items = $500 ÷ 100 = $5 per item',
+                ],
+                variables: [
+                  {
+                    questionText:
+                      'How much does each item cost if {quantity} of this item cost ${total}?',
+                    min: 10,
+                    max: 1000,
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            id: 'find-total',
+            description: 'Finding total amount given rate and number of units',
+            questions: [
+              {
+                question:
+                  'If each item costs $5 and you buy 20 items, what is the total cost?',
+                answer: 100,
+                explanation: [
+                  'Total cost = Rate × Number of items = $5 × 20 = $100',
+                ],
+                variables: [
+                  {
+                    questionText:
+                      'If each item costs ${rate} and you buy {quantity} items, what is the total cost?',
+                    min: 1,
+                    max: 100,
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            id: 'find-units',
+            description: 'Finding number of units given rate and total amount',
+            questions: [
+              {
+                question:
+                  'If each item costs $4 and you spent $100, how many items did you buy?',
+                answer: 25,
+                explanation: [
+                  'Number of items = Total cost ÷ Rate = $100 ÷ $4 = 25 items',
+                ],
+                variables: [
+                  {
+                    questionText:
+                      'If each item costs ${rate} and you spent ${total}, how many items did you buy?',
+                    min: 1,
+                    max: 100,
+                  },
+                ],
+              },
+            ],
           },
         ],
       },
@@ -1037,17 +2994,70 @@ export const MATH_TOPICS = [
         name: 'Area of Triangle',
         difficulty: 5,
         skills: [
-          'Concepts of base and height of a triangle',
-          'Area of triangle',
-          'Finding area of composite figures with triangles',
-        ],
-        sampleQuestions: [
           {
-            question:
-              'What is the area of a triangle with base 10 cm and height 5 cm?',
-            answer: 25,
-            explanation: [
-              'Area = 1/2 × base × height = 1/2 × 10 cm × 5 cm = 25 cm²',
+            id: 'triangle-base-height',
+            description: 'Concepts of base and height of a triangle',
+            questions: [
+              {
+                question:
+                  'What is the height of a triangle if its base is 6 cm and area is 15 cm²?',
+                answer: 5,
+                explanation: [
+                  'Area = 1/2 × base × height, so height = (2 × area) ÷ base = (2 × 15) ÷ 6 = 5 cm',
+                ],
+                variables: [
+                  {
+                    questionText:
+                      'What is the height of a triangle if its base is {base} cm and area is {area} cm²?',
+                    min: 1,
+                    max: 20,
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            id: 'triangle-area',
+            description: 'Area of triangle',
+            questions: [
+              {
+                question:
+                  'What is the area of a triangle with base 10 cm and height 5 cm?',
+                answer: 25,
+                explanation: [
+                  'Area = 1/2 × base × height = 1/2 × 10 cm × 5 cm = 25 cm²',
+                ],
+                variables: [
+                  {
+                    questionText:
+                      'What is the area of a triangle with base {base} cm and height {height} cm?',
+                    min: 1,
+                    max: 20,
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            id: 'composite-area',
+            description: 'Finding area of composite figures with triangles',
+            questions: [
+              {
+                question:
+                  'What is the total area of a rectangle with base 8 cm and height 6 cm combined with a triangle with base 8 cm and height 4 cm?',
+                answer: 64,
+                explanation: [
+                  'Rectangle area = 8 × 6 = 48 cm², Triangle area = 1/2 × 8 × 4 = 16 cm², Total = 48 + 16 = 64 cm²',
+                ],
+                variables: [
+                  {
+                    questionText:
+                      'What is the total area of a rectangle with base {rect_base} cm and height {rect_height} cm combined with a triangle with base {tri_base} cm and height {tri_height} cm?',
+                    min: 1,
+                    max: 20,
+                  },
+                ],
+              },
             ],
           },
         ],
@@ -1057,244 +3067,114 @@ export const MATH_TOPICS = [
         name: 'Volume of Cube and Cuboid',
         difficulty: 5,
         skills: [
-          'Finding one dimension of a cuboid given its volume and the other dimensions',
-          'Finding the length of one edge of a cube given its volume',
-          'Finding the height of a cuboid given its volume and base area',
-          'Finding the area of a face of a cuboid given its volume and one dimension',
-          'Use of square root and cube root',
-        ],
-        sampleQuestions: [
           {
-            question: 'What is the volume of a cube with side length 4 cm?',
-            answer: 64,
-            explanation: [
-              'Volume = side length³ = 4 cm × 4 cm × 4 cm = 64 cm³',
+            id: 'find-dimension',
+            description:
+              'Finding one dimension of a cuboid given its volume and the other dimensions',
+            questions: [
+              {
+                question:
+                  'A cuboid has volume 120 cm³, length 6 cm, and width 4 cm. What is its height?',
+                answer: 5,
+                explanation: [
+                  'Volume = length × width × height, so height = volume ÷ (length × width) = 120 ÷ (6 × 4) = 5 cm',
+                ],
+                variables: [
+                  {
+                    questionText:
+                      'A cuboid has volume {volume} cm³, length {length} cm, and width {width} cm. What is its height?',
+                    min: 1,
+                    max: 100,
+                  },
+                ],
+              },
             ],
           },
-        ],
-      },
-    ],
-  },
-  {
-    id: '76201c5b-b20f-44b4-ba54-d6f933f53e62',
-    name: 'Geometry',
-    level: 5,
-    strand: MathStrand.MEASUREMENT_AND_GEOMETRY,
-    subStrand: MathSubStrand.GEOMETRY,
-    subStrandTopics: [
-      {
-        id: 'e4b0716d-0bed-4e1d-a848-d7e9025083ce',
-        name: 'Angles',
-        difficulty: 5,
-        skills: [
-          'Angles on a straight line',
-          'Angles at a point',
-          'Vertically opposite angles',
-          'Finding unknown angles',
-        ],
-        sampleQuestions: [
           {
-            question: 'What is the measure of angle ABC?',
-            answer: 90,
-            explanation: ['Angle ABC is a right angle'],
-          },
-        ],
-      },
-      {
-        id: 'f6fe0131-5269-4ddf-84f6-e20f2add4d09',
-        name: 'Triangles',
-        difficulty: 5,
-        skills: [
-          'Properties of isosceles triangle',
-          'Properties of equilateral triangle',
-          'Properties of right-angled triangle',
-          'Angle sum of a triangle',
-          'Finding unknown angles without additional construction',
-        ],
-        sampleQuestions: [
-          {
-            question: 'What is the measure of angle x in the given triangle?',
-            answer: 45,
-            explanation: [
-              'The triangle is isosceles, so the two base angles are equal',
+            id: 'cube-edge',
+            description:
+              'Finding the length of one edge of a cube given its volume',
+            questions: [
+              {
+                question:
+                  'What is the length of each edge of a cube with volume 64 cm³?',
+                answer: 4,
+                explanation: [
+                  'For a cube, volume = edge³, so edge = ∛volume = ∛64 = 4 cm',
+                ],
+                variables: [
+                  {
+                    questionText:
+                      'What is the length of each edge of a cube with volume {volume} cm³?',
+                    min: 1,
+                    max: 1000,
+                  },
+                ],
+              },
             ],
           },
-        ],
-      },
-      {
-        id: '12b35d3f-9b85-492b-b7df-7db403c095eb',
-        name: 'Quadrilaterals',
-        difficulty: 5,
-        skills: [
-          'Properties of parallelogram',
-          'Properties of rhombus',
-          'Properties of trapezium',
-          'Finding unknown angles without additional construction',
-        ],
-        sampleQuestions: [
           {
-            question:
-              'What is the measure of angle x in the given parallelogram?',
-            answer: 120,
-            explanation: ['The opposite angles in a parallelogram are equal'],
+            id: 'cuboid-height',
+            description:
+              'Finding the height of a cuboid given its volume and base area',
+            questions: [
+              {
+                question:
+                  'A cuboid has volume 90 cm³ and base area 18 cm². What is its height?',
+                answer: 5,
+                explanation: [
+                  'Volume = base area × height, so height = volume ÷ base area = 90 ÷ 18 = 5 cm',
+                ],
+                variables: [
+                  {
+                    questionText:
+                      'A cuboid has volume {volume} cm³ and base area {area} cm². What is its height?',
+                    min: 1,
+                    max: 100,
+                  },
+                ],
+              },
+            ],
           },
-        ],
-      },
-    ],
-  },
-  {
-    id: '272c724e-9178-4ff0-8529-4951ee9b0e72',
-    name: 'Fractions',
-    level: 6,
-    strand: MathStrand.NUMBER_AND_ALGEBRA,
-    subStrand: MathSubStrand.FRACTIONS,
-    subStrandTopics: [
-      {
-        id: '3e7bb46a-8165-40e9-b9c2-a4fbbd589350',
-        name: 'Four Operations',
-        difficulty: 6,
-        skills: [
-          'Dividing a proper fraction by a whole number',
-          'Dividing a whole number/proper fraction by a proper fraction',
-        ],
-        sampleQuestions: [
           {
-            question: 'What is the quotient when 4 is divided by 8?',
-            answer: 0.5,
-            explanation: ['4 ÷ 8 = 0.5'],
+            id: 'face-area',
+            description:
+              'Finding the area of a face of a cuboid given its volume and one dimension',
+            questions: [
+              {
+                question:
+                  'A cuboid has volume 120 cm³ and height 5 cm. What is the area of its base?',
+                answer: 24,
+                explanation: [
+                  'Volume = base area × height, so base area = volume ÷ height = 120 ÷ 5 = 24 cm²',
+                ],
+                variables: [
+                  {
+                    questionText:
+                      'A cuboid has volume {volume} cm³ and height {height} cm. What is the area of its base?',
+                    min: 1,
+                    max: 100,
+                  },
+                ],
+              },
+            ],
           },
-        ],
-      },
-    ],
-  },
-  {
-    id: 'e448b3b5-bab5-43ef-a415-69ae92c1f2b8',
-    name: 'Percentage',
-    level: 6,
-    strand: MathStrand.NUMBER_AND_ALGEBRA,
-    subStrand: MathSubStrand.PERCENTAGE,
-    subStrandTopics: [
-      {
-        id: '8e4d67ca-7ecf-47ca-a127-9d4c1b80b9e8',
-        name: 'Percentage',
-        difficulty: 6,
-        skills: [
-          'Finding the whole given a part and the percentage',
-          'Finding percentage increase/decrease',
-        ],
-        sampleQuestions: [
           {
-            question:
-              'What is the original price if a 20% discount reduces it to $80?',
-            answer: 100,
-            explanation: ['80 is 80% of the original price'],
-          },
-        ],
-      },
-    ],
-  },
-  {
-    id: '511c4850-6da1-4434-a6b5-e1cc48d1cc50',
-    name: 'Ratio',
-    level: 6,
-    strand: MathStrand.NUMBER_AND_ALGEBRA,
-    subStrand: MathSubStrand.RATIO,
-    subStrandTopics: [
-      {
-        id: 'fd4687a6-6749-421e-86f2-8083c87bc605',
-        name: 'Ratio',
-        difficulty: 6,
-        skills: [
-          'notation, representations and interpretation of a:b and a:b:c, where a, b and c are whole numbers',
-          'excluding ratios involving fractions and decimals',
-          'equivalent ratios',
-          'dividing a quantity in a given ratio',
-          'expressing a ratio in its simplest form',
-          'finding the ratio of two or three given quantities',
-          'finding the missing term in a pair of equivalent ratios',
-          'relationship between fraction and ratio',
-        ],
-        sampleQuestions: [
-          {
-            question:
-              'What is the ratio of boys to girls if there are 12 boys and 8 girls?',
-            answer: '3:2',
-            explanation: ['12 ÷ 4 = 3, 8 ÷ 4 = 2'],
-          },
-        ],
-      },
-    ],
-  },
-  {
-    id: 'b4d96087-ff55-4a18-9253-719c03890670',
-    name: 'Algebra',
-    level: 6,
-    strand: MathStrand.NUMBER_AND_ALGEBRA,
-    subStrand: MathSubStrand.ALGEBRA,
-    subStrandTopics: [
-      {
-        id: '376c9b48-d198-4c6f-8949-5c621dcaa48a',
-        name: 'Algebra',
-        difficulty: 6,
-        skills: [
-          'using a letter to represent an unknown number ',
-          'notation, representations and interpretation of simple algebraic expressions such as a+-3, ax3 or 3a, a ÷ 3 or a/3',
-          'simplifying simple linear expressions excluding brackets',
-          'evaluating simple linear expressions by substitution',
-          'simple linear equations involving whole number coefficient only',
-        ],
-        sampleQuestions: [
-          {
-            question: 'What is the value of x in the equation 2x + 3 = 7?',
-            answer: 2,
-            explanation: ['2x + 3 = 7, so 2x = 7 - 3, so x = 2'],
-          },
-        ],
-      },
-    ],
-  },
-  {
-    id: '3a2901bd-58dd-4cf0-bf74-5dad88d76d56',
-    name: 'Area and Volume',
-    level: 6,
-    strand: MathStrand.MEASUREMENT_AND_GEOMETRY,
-    subStrand: MathSubStrand.AREA_AND_VOLUME,
-    subStrandTopics: [
-      {
-        id: 'ee561c4d-9fe1-4f1a-9b76-21c3631d78ed',
-        name: 'Area and Circumference of Circle',
-        difficulty: 6,
-        skills: [
-          'Area and circumference of circle',
-          'Finding the area and perimeter of semicircle',
-          'Finding the area and perimeter of quarter circle',
-          'Finding the area and perimeter of composite figures made up of square, rectangle, triangle, semicircle and quarter circle ',
-        ],
-        sampleQuestions: [
-          {
-            question: 'What is the area of a circle with radius 5 cm?',
-            answer: 78.5,
-            explanation: ['Area = πr² = 3.14 × 5 cm × 5 cm = 78.5 cm²'],
-          },
-        ],
-      },
-      {
-        id: 'fc1f9d5a-14df-4345-ad80-1ff84ce6a04f',
-        name: 'Volume of Cube and Cuboid',
-        difficulty: 6,
-        skills: [
-          'Finding one dimension of a cuboid given its volume and the other dimensions',
-          'Finding the length of one edge of a cube given its volume',
-          'Finding the height of a cuboid given its volume and base area',
-          'Finding the area of a face of a cuboid given its volume and one dimension',
-          'Use of square root and cube root',
-        ],
-        sampleQuestions: [
-          {
-            question: 'What is the volume of a cube with side length 4 cm?',
-            answer: 64,
-            explanation: [
-              'Volume = side length³ = 4 cm × 4 cm × 4 cm = 64 cm³',
+            id: 'roots',
+            description: 'Use of square root and cube root',
+            questions: [
+              {
+                question: 'What is the cube root of 125?',
+                answer: 5,
+                explanation: ['∛125 = 5 because 5³ = 5 × 5 × 5 = 125'],
+                variables: [
+                  {
+                    questionText: 'What is the cube root of {number}?',
+                    min: 1,
+                    max: 1000,
+                  },
+                ],
+              },
             ],
           },
         ],
@@ -1313,14 +3193,314 @@ export const MATH_TOPICS = [
         name: 'Special Quadrilaterals',
         difficulty: 6,
         skills: [
-          'Finding unknown angles, without additional construction of lines, in composite geometric figures involving squares, rectangles, triangles, parallelograms, rhombuses and trapeziums',
-        ],
-        sampleQuestions: [
           {
-            question:
-              'What is the measure of angle x in the given quadrilateral?',
-            answer: 120,
-            explanation: ['The sum of angles in a quadrilateral is 360°'],
+            id: 'unknown-angles',
+            description:
+              'Finding unknown angles, without additional construction of lines, in composite geometric figures involving squares, rectangles, triangles, parallelograms, rhombuses and trapeziums',
+            questions: [
+              {
+                question:
+                  'In a parallelogram, if one angle is 60°, what are the other angles?',
+                answer: '120°, 60°, 120°',
+                explanation: [
+                  'In a parallelogram, opposite angles are equal and adjacent angles are supplementary (sum to 180°)',
+                ],
+                variables: [
+                  {
+                    questionText:
+                      'In a parallelogram, if one angle is {angle}°, what are the other angles?',
+                    min: 1,
+                    max: 179,
+                  },
+                ],
+              },
+              {
+                question: 'In a rectangle, what is the measure of each angle?',
+                answer: 90,
+                explanation: [
+                  'All angles in a rectangle are right angles (90°)',
+                ],
+                variables: [
+                  {
+                    questionText:
+                      'In a rectangle, what is the measure of each angle?',
+                    min: 0,
+                    max: 0,
+                  },
+                ],
+              },
+              {
+                question:
+                  'In a trapezium, if three angles are 90°, 60°, and 90°, what is the fourth angle?',
+                answer: 120,
+                explanation: [
+                  'The sum of angles in a quadrilateral is 360°, so 360° - (90° + 60° + 90°) = 120°',
+                ],
+                variables: [
+                  {
+                    questionText:
+                      'In a trapezium, if three angles are {angle1}°, {angle2}°, and {angle3}°, what is the fourth angle?',
+                    min: 1,
+                    max: 178,
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            id: 'properties-relationships',
+            description:
+              'Understanding and applying the properties and relationships of special quadrilaterals including squares, rectangles, parallelograms, rhombuses, and trapeziums',
+            questions: [
+              {
+                question:
+                  'Which of these is always true for a rhombus? a) All sides are equal b) All angles are equal c) Diagonals are equal',
+                answer: 'a) All sides are equal',
+                explanation: [
+                  'A rhombus is a quadrilateral with four equal sides',
+                  'The angles in a rhombus are not necessarily equal',
+                  'The diagonals in a rhombus are not necessarily equal',
+                ],
+                variables: [],
+              },
+              {
+                question:
+                  'If a quadrilateral has exactly one pair of parallel sides, what type of quadrilateral is it?',
+                answer: 'Trapezium',
+                explanation: [
+                  'A trapezium is defined as a quadrilateral with exactly one pair of parallel sides',
+                ],
+                variables: [],
+              },
+              {
+                question:
+                  'What special type of parallelogram has perpendicular diagonals that bisect each other?',
+                answer: 'Rhombus',
+                explanation: [
+                  'A rhombus has diagonals that are perpendicular and bisect each other',
+                  'This is a unique property that distinguishes rhombuses from other parallelograms',
+                ],
+                variables: [],
+              },
+            ],
+          },
+          {
+            id: 'diagonal-properties',
+            description:
+              'Understanding and applying the properties of diagonals in special quadrilaterals',
+            questions: [
+              {
+                question: 'In a rectangle, what is true about the diagonals?',
+                answer:
+                  'The diagonals are equal in length and bisect each other',
+                explanation: [
+                  'Rectangle diagonals have two key properties: they are equal in length and they bisect each other',
+                ],
+                variables: [],
+              },
+              {
+                question:
+                  'If the diagonals of a quadrilateral bisect each other at right angles and are equal in length, what type of quadrilateral is it?',
+                answer: 'Square',
+                explanation: [
+                  'This combination of diagonal properties - equal length, perpendicular, and bisecting - is unique to squares',
+                ],
+                variables: [],
+              },
+              {
+                question:
+                  'In a parallelogram, what is the one property that is always true about the diagonals?',
+                answer: 'The diagonals bisect each other',
+                explanation: [
+                  'While the diagonals of a parallelogram may not be equal or perpendicular, they always bisect each other',
+                ],
+                variables: [],
+              },
+            ],
+          },
+          {
+            id: 'area-perimeter',
+            description:
+              'Calculating and comparing areas and perimeters of special quadrilaterals',
+            questions: [
+              {
+                question:
+                  'A square has a side length of 6 cm. What is its area?',
+                answer: '36',
+                explanation: [
+                  'The area of a square is side length squared',
+                  'Area = 6 × 6 = 36 square centimeters',
+                ],
+                variables: [
+                  {
+                    questionText:
+                      'A square has a side length of {length} cm. What is its area?',
+                    min: 1,
+                    max: 20,
+                  },
+                ],
+              },
+              {
+                question:
+                  'A rectangle has length 8 cm and width 5 cm. What is its perimeter?',
+                answer: '26',
+                explanation: [
+                  'The perimeter of a rectangle is 2(length + width)',
+                  'Perimeter = 2(8 + 5) = 2(13) = 26 centimeters',
+                ],
+                variables: [
+                  {
+                    questionText:
+                      'A rectangle has length {length} cm and width {width} cm. What is its perimeter?',
+                    min: 1,
+                    max: 15,
+                  },
+                ],
+              },
+              {
+                question:
+                  'A parallelogram has base 7 cm and height 4 cm. What is its area?',
+                answer: '28',
+                explanation: [
+                  'The area of a parallelogram is base × height',
+                  'Area = 7 × 4 = 28 square centimeters',
+                ],
+                variables: [
+                  {
+                    questionText:
+                      'A parallelogram has base {base} cm and height {height} cm. What is its area?',
+                    min: 1,
+                    max: 12,
+                  },
+                ],
+              },
+              {
+                question:
+                  'A trapezium has parallel sides of lengths 6 cm and 10 cm, and a height of 4 cm. What is its area?',
+                answer: '32',
+                explanation: [
+                  'The area of a trapezium is h(a + b)/2 where h is height and a,b are parallel sides',
+                  'Area = 4(6 + 10)/2 = 4 × 16/2 = 32 square centimeters',
+                ],
+                variables: [
+                  {
+                    questionText:
+                      'A trapezium has parallel sides of lengths {side1} cm and {side2} cm, and a height of {height} cm. What is its area?',
+                    min: 2,
+                    max: 15,
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            id: 'problem-solving',
+            description:
+              'Solving real-world problems involving special quadrilaterals and their properties',
+            questions: [
+              {
+                question:
+                  'A rectangular garden is 15m long and 10m wide. How much fencing is needed to enclose it completely?',
+                answer: '50',
+                explanation: [
+                  'This is a perimeter problem',
+                  'Perimeter = 2(length + width) = 2(15 + 10) = 2(25) = 50 meters',
+                ],
+                variables: [
+                  {
+                    questionText:
+                      'A rectangular garden is {length}m long and {width}m wide. How much fencing is needed to enclose it completely?',
+                    min: 5,
+                    max: 25,
+                  },
+                ],
+              },
+              {
+                question:
+                  'A square tile has an area of 36 square centimeters. What is the length of each side?',
+                answer: '6',
+                explanation: [
+                  'For a square, side length is the square root of area',
+                  'Side length = √36 = 6 centimeters',
+                ],
+                variables: [
+                  {
+                    questionText:
+                      'A square tile has an area of {area} square centimeters. What is the length of each side?',
+                    min: 4,
+                    max: 100,
+                  },
+                ],
+              },
+              {
+                question:
+                  'A parallelogram-shaped sign has a base of 8m and an area of 40 square meters. What is its height?',
+                answer: '5',
+                explanation: [
+                  'Area of parallelogram = base × height',
+                  'Height = Area ÷ base = 40 ÷ 8 = 5 meters',
+                ],
+                variables: [
+                  {
+                    questionText:
+                      'A parallelogram-shaped sign has a base of {base}m and an area of {area} square meters. What is its height?',
+                    min: 2,
+                    max: 20,
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            id: 'similarity-congruence',
+            description:
+              'Understanding similarity and congruence in special quadrilaterals',
+            questions: [
+              {
+                question:
+                  'If two rectangles have the same length-to-width ratio but different sizes, what can we say about them?',
+                answer: 'They are similar',
+                explanation: [
+                  'Rectangles with the same length-to-width ratio are similar',
+                  'Similar shapes have the same shape but may have different sizes',
+                ],
+                variables: [],
+              },
+              {
+                question:
+                  'If two squares have sides of 5cm, what can we say about them?',
+                answer: 'They are congruent',
+                explanation: [
+                  'Squares with equal sides are congruent',
+                  'Congruent shapes have exactly the same size and shape',
+                ],
+                variables: [
+                  {
+                    questionText:
+                      'If two squares have sides of {length}cm, what can we say about them?',
+                    min: 1,
+                    max: 20,
+                  },
+                ],
+              },
+              {
+                question:
+                  'A rectangle has length 12cm and width 8cm. Another rectangle has length 6cm and width 4cm. What is the relationship between these rectangles?',
+                answer: 'Similar',
+                explanation: [
+                  'Both rectangles have a length-to-width ratio of 3:2',
+                  'The second rectangle is a half-scale version of the first',
+                ],
+                variables: [
+                  {
+                    questionText:
+                      'A rectangle has length {length1}cm and width {width1}cm. Another rectangle has length {length2}cm and width {width2}cm. What is the relationship between these rectangles?',
+                    min: 2,
+                    max: 16,
+                  },
+                ],
+              },
+            ],
           },
         ],
       },
@@ -1338,16 +3518,70 @@ export const MATH_TOPICS = [
         name: 'Average of a Set of Data',
         difficulty: 6,
         skills: [
-          'Understanding average as "total value ÷ number of data"',
-          'Finding average given total value and number of data',
-          'Finding total value given average and number of data',
-          'Finding number of data given average and total value',
-        ],
-        sampleQuestions: [
           {
-            question: 'What is the average of the numbers 2, 4, 6, 8, and 10?',
-            answer: 6,
-            explanation: ['(2 + 4 + 6 + 8 + 10) ÷ 5 = 30 ÷ 5 = 6'],
+            id: 'understanding-average-as-total-value-number-of-data',
+            description:
+              'Understanding average as "total value ÷ number of data"',
+            questions: [
+              {
+                question:
+                  'What is the average of the numbers 2, 4, 6, 8, and 10?',
+                answer: 6,
+                explanation: ['(2 + 4 + 6 + 8 + 10) ÷ 5 = 30 ÷ 5 = 6'],
+                variables: [
+                  {
+                    questionText:
+                      'What is the average of the numbers {number1}, {number2}, {number3}, {number4}, and {number5}?',
+                    min: 1,
+                    max: 10,
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            id: 'finding-average-given-total-value-and-number-of-data',
+            description: 'Finding average given total value and number of data',
+            questions: [
+              {
+                question:
+                  'Adam bought 4 bags of rice. The total weight of the rice is 20 kg. What is the average weight of the rice?',
+                answer: 5,
+                explanation: [
+                  'Average weight = total weight ÷ number of bags = 20 kg ÷ 4 = 5 kg',
+                ],
+                variables: [
+                  {
+                    questionText:
+                      'Adam bought {number} bags of rice. The total weight of the rice is {total} kg. What is the average weight of the rice?',
+                    min: 1,
+                    max: 10,
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            id: 'finding-total-value-given-average-and-number-of-data',
+            description: 'Finding total value given average and number of data',
+            questions: [
+              {
+                question:
+                  'The average weight of 5 apples is 100 g. What is the total weight of the 5 apples?',
+                answer: 500,
+                explanation: [
+                  'Total weight = average weight × number of data = 100 g × 5 = 500 g',
+                ],
+                variables: [
+                  {
+                    questionText:
+                      'The average weight of {number} apples is {average} g. What is the total weight of the {number} apples?',
+                    min: 1,
+                    max: 10,
+                  },
+                ],
+              },
+            ],
           },
         ],
       },

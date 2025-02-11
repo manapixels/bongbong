@@ -2,7 +2,6 @@ import { db } from './index';
 import { strands } from './schema';
 import { MATH_TOPICS, MathTopic } from '@/types/math';
 import { mathQuestions } from './schema';
-import { extractVariablesFromQuestion } from '../math/utils';
 import { generateAnswerFormula } from '../math/utils';
 
 // Seed the topics table with the MathTopic array
@@ -18,7 +17,7 @@ async function seedStrands(): Promise<void> {
           id: subTopic.id,
           name: subTopic.name,
           difficulty: subTopic.difficulty,
-          skills: subTopic.skills || [],
+          skills: subTopic.skills,
         })),
         description: null,
       }))
@@ -38,21 +37,24 @@ async function seedProblems() {
     // Transform topics and their sample questions into database format
     const dbQuestions = MATH_TOPICS.flatMap((topic) =>
       topic.subStrandTopics.flatMap((subTopic) =>
-        subTopic.sampleQuestions.map((question) => ({
-          question: question.question,
-          answer: question.answer?.toString() || '',
-          explanation: question.explanation,
-          difficulty: subTopic.difficulty,
-          strand: topic.strand,
-          subStrand: topic.subStrand,
-          skills: subTopic.skills,
-          variables: extractVariablesFromQuestion(question.question),
-          answerFormula: generateAnswerFormula(question.question),
-          metadata: {
-            topicId: topic.id,
-            subTopicId: subTopic.id,
-          },
-        }))
+        subTopic.skills.flatMap((skill) =>
+          skill.questions.map((question) => ({
+            question: question.question,
+            answer: question.answer?.toString() || '',
+            explanation: question.explanation,
+            difficulty: subTopic.difficulty,
+            strand: topic.strand,
+            subStrand: topic.subStrand,
+            skills: [skill.id],
+            variables: question.variables || [],
+            answerFormula: generateAnswerFormula(question.question),
+            metadata: {
+              topicId: topic.id,
+              subTopicId: subTopic.id,
+              skillId: skill.id,
+            },
+          }))
+        )
       )
     );
 

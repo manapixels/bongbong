@@ -15,9 +15,21 @@ interface QuestionTemplate {
   question: string;
   answer: number | string | number[] | null;
   explanation: string[];
-  type: string;
-  variables?: Record<string, VariableRange>;
+  variables?: {
+    questionText: string;
+    min: number;
+    max: number;
+  }[];
+  type?: string;
   generateOptions?: (answer: number) => string[];
+}
+
+interface GeneratedQuestion extends MathQuestion {
+  metadata?: {
+    skillId: string;
+    skillDescription: string;
+    subTopicId: string;
+  };
 }
 
 // Helper functions
@@ -69,13 +81,12 @@ function findSubtopicById(st: string): SubStrandTopic | null {
   for (const topic of MATH_TOPICS) {
     const subtopic = topic.subStrandTopics.find((s) => s.id === st);
     if (subtopic) {
-      const { id, name, difficulty, skills, sampleQuestions } = subtopic;
+      const { id, name, difficulty, skills } = subtopic;
       return {
         id,
         name,
         difficulty,
         skills,
-        sampleQuestions,
       };
     }
   }
@@ -105,22 +116,34 @@ function generateQuestionImpl(
   const topic =
     eligibleTopics[Math.floor(Math.random() * eligibleTopics.length)];
 
-  // Get sample questions
-  const sampleQuestions = topic.subStrandTopics.flatMap(
-    (s) => s.sampleQuestions
+  // Get all questions from all skills in all subtopics
+  const allQuestions = topic.subStrandTopics.flatMap((subTopic) =>
+    subTopic.skills.flatMap((skill) =>
+      skill.questions.map((question) => ({
+        ...question,
+        skillId: skill.id,
+        skillDescription: skill.description,
+        subTopicId: subTopic.id,
+      }))
+    )
   );
-  if (!sampleQuestions || sampleQuestions.length === 0) {
-    throw new Error(`No sample questions found for subtopic ${topic.id}`);
+
+  if (!allQuestions || allQuestions.length === 0) {
+    throw new Error(`No questions found for topic ${topic.id}`);
   }
 
-  // Select a random sample question
-  const template = randomChoice(sampleQuestions) as QuestionTemplate;
+  // Select a random question
+  const template = randomChoice(allQuestions) as QuestionTemplate & {
+    skillId: string;
+    skillDescription: string;
+    subTopicId: string;
+  };
 
   // Generate variables if template has them
   const variables: Record<string, number> = {};
   if (template.variables) {
     Object.entries(template.variables).forEach(([key, range]) => {
-      variables[key] = getRandomNumber(range.min, range.max, range.step);
+      variables[key] = getRandomNumber(range.min, range.max, 1);
     });
   }
 
@@ -164,7 +187,7 @@ function generateQuestionImpl(
   return {
     id: crypto.randomUUID(),
     subject: 'mathematics',
-    type: template.type,
+    type: template.type || 'standard',
     question,
     answer: answer.toString(),
     explanation,
@@ -174,7 +197,12 @@ function generateQuestionImpl(
     answerFormula: template.answer?.toString() ?? '',
     variables: variables as unknown as Record<string, string>,
     createdAt: new Date(),
-  };
+    metadata: {
+      skillId: template.skillId,
+      skillDescription: template.skillDescription,
+      subTopicId: template.subTopicId,
+    },
+  } as GeneratedQuestion;
 }
 
 export function selectNextQuestion(

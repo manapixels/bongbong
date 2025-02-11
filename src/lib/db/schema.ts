@@ -63,7 +63,20 @@ export const strands = pgTable('strands', {
         id: string;
         name: string;
         difficulty: number;
-        skills?: string[];
+        skills: {
+          id: string;
+          description: string;
+          questions: {
+            question: string;
+            answer: number | string | null;
+            explanation: string[];
+            variables: {
+              questionText: string;
+              min: number;
+              max: number;
+            }[];
+          }[];
+        }[];
       }[]
     >()
     .notNull(),
