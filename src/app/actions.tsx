@@ -38,7 +38,7 @@ Always:
 // Generate Practice Questions
 export async function generateMathPractice(
   topic: string,
-  difficulty: 'easy' | 'medium' | 'hard'
+  difficulty: 1 | 2 | 3 | 4 | 5 | 6
 ) {
   const stream = createStreamableUI();
 

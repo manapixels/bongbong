@@ -36,9 +36,24 @@ async function seedProblems() {
   try {
     // Transform topics and their sample questions into database format
     const dbQuestions = MATH_TOPICS.flatMap((topic) =>
-      topic.subStrandTopics.flatMap((subTopic) =>
-        subTopic.skills.flatMap((skill) =>
-          skill.questions.map((question) => ({
+      topic.subStrandTopics.flatMap((subTopic) => {
+        // Check if skills exists and is an array
+        if (!Array.isArray(subTopic.skills)) {
+          console.warn(
+            `Warning: skills is not an array for subTopic: ${subTopic.name}`
+          );
+          return [];
+        }
+
+        return subTopic.skills.flatMap((skill) => {
+          if (!skill.questions || !Array.isArray(skill.questions)) {
+            console.warn(
+              `Warning: questions is not an array for skill: ${skill.id}`
+            );
+            return [];
+          }
+
+          return skill.questions.map((question) => ({
             question: question.question,
             answer: question.answer?.toString() || '',
             explanation: question.explanation,
@@ -53,9 +68,9 @@ async function seedProblems() {
               subTopicId: subTopic.id,
               skillId: skill.id,
             },
-          }))
-        )
-      )
+          }));
+        });
+      })
     );
 
     // Insert all questions

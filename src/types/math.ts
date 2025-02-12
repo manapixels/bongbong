@@ -32,13 +32,13 @@ export interface MathTopic {
   subStrandTopics: SubStrandTopic[];
 }
 
-export const enum MathStrand {
+export enum MathStrand {
   NUMBER_AND_ALGEBRA = 'number-and-algebra',
   MEASUREMENT_AND_GEOMETRY = 'measurement-and-geometry',
   STATISTICS = 'statistics',
 }
 
-export const enum MathSubStrand {
+export enum MathSubStrand {
   // Number and Algebra sub-strands
   WHOLE_NUMBERS = 'whole-numbers',
   MONEY = 'money',
@@ -3588,3 +3588,12 @@ export const MATH_TOPICS = [
     ],
   },
 ] as MathTopic[];
+
+// Helper function to validate and get all valid substrands
+export function getValidSubStrands(): string[] {
+  return Object.values(MathSubStrand);
+}
+
+export function isValidSubStrand(value: string): value is MathSubStrand {
+  return getValidSubStrands().includes(value);
+}

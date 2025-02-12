@@ -1,24 +1,11 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Button } from './ui/button';
 import { Card } from './ui/card';
 import { Input } from './ui/input';
-import { useLocalUser } from '@/hooks/use-local-user';
-import { MathSubStrand } from '@/types/math';
-import Image from 'next/image';
-
-interface Problem {
-  id: string;
-  question: string;
-  answer: number;
-  strand: string;
-  subStrand: MathSubStrand;
-  difficulty: number;
-  topicId: string;
-  type?: string;
-  imageUrl?: string;
-}
+import { useUserProgress } from '@/hooks/use-user-progress';
+import { MathQuestion, MathSubStrand } from '@/types/math';
 
 function formatSubStrand(subStrand: string): string {
   return subStrand
@@ -27,18 +14,25 @@ function formatSubStrand(subStrand: string): string {
     .join(' ');
 }
 
-export function MathTrainer() {
-  const { localUser, updateProgress, getTotalProgress } = useLocalUser();
-  const [answer, setAnswer] = useState('');
-  const [currentProblem, setCurrentProblem] = useState<Problem | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [isInitialized, setIsInitialized] = useState(false);
+const DEFAULT_PREFERENCES = {
+  difficulty: 1,
+  topicsEnabled: [MathSubStrand.WHOLE_NUMBERS],
+};
 
-  useEffect(() => {
-    if (localUser.id && !isInitialized) {
-      setIsInitialized(true);
-    }
-  }, [localUser.id, isInitialized]);
+export function MathTrainer() {
+  const {
+    user,
+    userId,
+    progress,
+    isLoading,
+    updateProgress,
+    getTotalProgress,
+  } = useUserProgress();
+  const [answer, setAnswer] = useState('');
+  const [currentProblem, setCurrentProblem] = useState<MathQuestion | null>(
+    null
+  );
+  const [error, setError] = useState<string | null>(null);
 
   const generateNewProblem = async () => {
     try {
@@ -49,13 +43,10 @@ export function MathTrainer() {
         },
         body: JSON.stringify({
           profile: {
-            id: localUser.id,
-            preferences: localUser.preferences,
+            id: userId,
+            preferences: user?.preferences || DEFAULT_PREFERENCES,
           },
-          progress: {
-            ...localUser.progress,
-            userId: localUser.id,
-          },
+          progress,
         }),
       });
 
@@ -64,8 +55,8 @@ export function MathTrainer() {
       }
 
       const data = await response.json();
-      if (!data) {
-        throw new Error('No data received from server');
+      if (!data || !data.answer) {
+        throw new Error('Invalid problem data received from server');
       }
 
       setCurrentProblem(data);
@@ -78,17 +69,24 @@ export function MathTrainer() {
   };
 
   const checkAnswer = async () => {
-    if (!currentProblem) return;
+    if (!currentProblem || !answer.trim()) {
+      setError('Please enter an answer');
+      return;
+    }
 
     try {
-      const isCorrect = Number(answer) === currentProblem.answer;
+      // Clean up the answer string and convert to number if needed
+      const userAnswer = answer.trim().toLowerCase();
+      const correctAnswer = String(currentProblem.answer).toLowerCase();
+      const isCorrect = userAnswer === correctAnswer;
 
       const requestBody = {
-        studentId: localUser.id,
+        studentId: userId,
         questionId: currentProblem.id,
-        topicId: currentProblem.topicId || currentProblem.strand,
+        topicId: currentProblem.strand,
         isCorrect,
         timeSpent: 0,
+        category: currentProblem.subStrand,
       };
 
       const response = await fetch('/api/math/update-progress', {
@@ -100,21 +98,23 @@ export function MathTrainer() {
       });
 
       if (!response.ok) {
+        const errorData = await response.json();
+        console.error('Progress update failed:', errorData);
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      // Update local progress
-      updateProgress(
-        currentProblem.topicId || currentProblem.strand,
+      // Update progress
+      await updateProgress(
+        currentProblem.strand,
         isCorrect,
-        currentProblem.subStrand
+        currentProblem.subStrand as MathSubStrand
       );
 
       // Show feedback before moving to next problem
       setError(
         isCorrect
           ? '✅ Correct!'
-          : '❌ Incorrect. The answer was ' + currentProblem.answer
+          : `❌ Incorrect. The answer was ${currentProblem.answer}`
       );
 
       // Wait a moment before generating new problem
@@ -128,7 +128,7 @@ export function MathTrainer() {
   };
 
   // Don't render until initialization is complete
-  if (!isInitialized) {
+  if (isLoading) {
     return (
       <div className="flex items-center justify-center h-screen">
         <div className="text-lg">Loading...</div>
@@ -151,29 +151,15 @@ export function MathTrainer() {
           </div>
         )}
 
-        {!currentProblem ? (
-          <Button onClick={generateNewProblem}>Start Practice</Button>
-        ) : (
+        {currentProblem ? (
           <div className="space-y-4">
             <div className="text-xl">{currentProblem.question}</div>
-
-            {currentProblem.imageUrl && (
-              <div className="my-4">
-                <Image
-                  src={currentProblem.imageUrl}
-                  alt="Problem visualization"
-                  width={500}
-                  height={300}
-                  className="max-w-full h-auto rounded-lg shadow-md"
-                />
-              </div>
-            )}
 
             <div className="text-sm text-gray-500">
               Topic: {formatSubStrand(currentProblem.subStrand)}
             </div>
             <Input
-              type="number"
+              type="text"
               value={answer}
               onChange={(e) => setAnswer(e.target.value)}
               placeholder="Enter your answer"
@@ -182,6 +168,8 @@ export function MathTrainer() {
 
             <Button onClick={checkAnswer}>Submit Answer</Button>
           </div>
+        ) : (
+          <Button onClick={generateNewProblem}>Start Practice</Button>
         )}
 
         {/* Progress Summary */}

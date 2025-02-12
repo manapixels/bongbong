@@ -65,7 +65,8 @@ CREATE TABLE "User" (
 	"password" varchar(64),
 	"is_student" boolean DEFAULT false NOT NULL,
 	"xp_points" integer DEFAULT 0 NOT NULL,
-	"coins" integer DEFAULT 0 NOT NULL
+	"coins" integer DEFAULT 0 NOT NULL,
+	"preferences" json DEFAULT '{"difficulty":"medium","topicsEnabled":["addition","subtraction","multiplication","division"]}'::json
 );
 --> statement-breakpoint
 ALTER TABLE "achievements" ADD CONSTRAINT "achievements_user_id_User_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."User"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint

@@ -1,15 +1,17 @@
 import { NextResponse } from 'next/server';
+import { updateStudentProgress, getOrCreateUser } from '@/lib/db/queries';
 import {
-  updateStudentProgress,
-  getStudentProfile,
-  createUser,
-} from '@/lib/db/queries';
+  MathSubStrand,
+  getValidSubStrands,
+  isValidSubStrand,
+} from '@/types/math';
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
     console.log('Received request body:', body);
-    const { studentId, questionId, topicId, isCorrect, timeSpent } = body;
+    const { studentId, questionId, topicId, isCorrect, timeSpent, category } =
+      body;
 
     // Log individual fields
     console.log('Validation check:', {
@@ -17,6 +19,7 @@ export async function POST(request: Request) {
       hasQuestionId: !!questionId,
       hasTopicId: !!topicId,
       isCorrectType: typeof isCorrect === 'boolean',
+      category,
     });
 
     // Validate required fields
@@ -24,7 +27,8 @@ export async function POST(request: Request) {
       !studentId ||
       !questionId ||
       !topicId ||
-      typeof isCorrect !== 'boolean'
+      typeof isCorrect !== 'boolean' ||
+      !category
     ) {
       return NextResponse.json(
         {
@@ -34,19 +38,27 @@ export async function POST(request: Request) {
             questionId,
             topicId,
             isCorrect: typeof isCorrect,
+            category,
           },
         },
         { status: 400 }
       );
     }
 
-    // First check if the user exists, if not create a new one
-    let user = await getStudentProfile(studentId);
-    if (!user) {
-      // Create a new local user with the studentId as the ID
-      user = await createUser(`local_${studentId}@local.dev`, '', studentId);
-      console.log('Created new local user:', user);
+    // Validate that category is a valid MathSubStrand
+    if (!isValidSubStrand(category)) {
+      return NextResponse.json(
+        {
+          error: 'Invalid category',
+          received: category,
+          validCategories: getValidSubStrands(),
+        },
+        { status: 400 }
+      );
     }
+
+    // Get or create user
+    await getOrCreateUser(studentId);
 
     await updateStudentProgress({
       userId: studentId,

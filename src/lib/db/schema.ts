@@ -19,6 +19,15 @@ export const user = pgTable('User', {
   isStudent: boolean('is_student').notNull().default(false),
   xpPoints: integer('xp_points').notNull().default(0),
   coins: integer('coins').notNull().default(0),
+  preferences: json('preferences')
+    .$type<{
+      difficulty: string;
+      topicsEnabled: string[];
+    }>()
+    .default({
+      difficulty: 'medium',
+      topicsEnabled: ['addition', 'subtraction', 'multiplication', 'division'],
+    }),
 });
 
 export type User = InferSelectModel<typeof user>;

@@ -49,8 +49,30 @@ function substituteVariables(
   return template.replace(/\{(\w+)\}/g, (_, key) => variables[key].toString());
 }
 
-function evaluateExpression(expression: string): number {
-  return eval(expression);
+function evaluateExpression(
+  expression: string,
+  variables: Record<string, number> = {}
+): number {
+  try {
+    // Create a function with the variables in scope
+    const varNames = Object.keys(variables);
+    const varValues = Object.values(variables);
+    const fn = new Function(
+      ...varNames,
+      `"use strict"; return (${expression})`
+    );
+
+    const result = fn(...varValues);
+
+    if (typeof result !== 'number' || !isFinite(result)) {
+      throw new Error('Expression evaluation resulted in invalid number');
+    }
+
+    return result;
+  } catch (error) {
+    console.error('Failed to evaluate expression:', expression, error);
+    throw new Error(`Invalid mathematical expression: ${expression}`);
+  }
 }
 
 // Helper to substitute Singapore context
@@ -161,7 +183,8 @@ function generateQuestionImpl(
   let answer: string | number;
   if (typeof template.answer === 'string' && template.variables) {
     answer = evaluateExpression(
-      substituteVariables(template.answer, variables)
+      substituteVariables(template.answer, variables),
+      variables
     );
   } else if (
     typeof template.answer === 'string' ||
@@ -207,12 +230,18 @@ function generateQuestionImpl(
 
 export function selectNextQuestion(
   progress: Progress,
-  subStrand: MathSubStrand
+  subStrand: MathSubStrand,
+  preferredDifficulty?: number
 ): MathQuestion {
   // Calculate success rate for current topic
   const topicStats = progress.subStrandProgress?.find(
     (p: { subStrand: string }) => p.subStrand === subStrand
   );
+
+  // If preferred difficulty is provided, use it
+  if (typeof preferredDifficulty === 'number') {
+    return generateQuestionImpl(subStrand, preferredDifficulty);
+  }
 
   const successRate = topicStats
     ? topicStats.correctAnswers / topicStats.questionsAttempted

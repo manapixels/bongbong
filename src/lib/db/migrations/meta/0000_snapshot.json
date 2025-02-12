@@ -1,5 +1,5 @@
 {
-  "id": "c67ce6ad-4e12-40f6-b556-d31a1bb5ed59",
+  "id": "8c2180a6-9e4e-45e6-9f4a-0690528eb192",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -447,6 +447,13 @@
           "primaryKey": false,
           "notNull": true,
           "default": 0
+        },
+        "preferences": {
+          "name": "preferences",
+          "type": "json",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'{\"difficulty\":\"medium\",\"topicsEnabled\":[\"addition\",\"subtraction\",\"multiplication\",\"division\"]}'::json"
         }
       },
       "indexes": {},

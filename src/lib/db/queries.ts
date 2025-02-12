@@ -36,13 +36,23 @@ export async function createUser(
   return newUser;
 }
 
-export async function getStudentProfile(
-  studentId: string
+export async function getUserProfile(
+  userId: string
 ): Promise<User | undefined> {
-  const student = await db.query.user.findFirst({
-    where: eq(userTable.id, studentId),
+  const user = await db.query.user.findFirst({
+    where: eq(userTable.id, userId),
   });
-  return student;
+  return user;
+}
+
+export async function getOrCreateUser(userId: string): Promise<User> {
+  let user = await getUserProfile(userId);
+  if (!user) {
+    // Create a new local user with the userId as the ID
+    user = await createUser(`local_${userId}@local.dev`, '', userId);
+    console.log('Created new local user:', user);
+  }
+  return user;
 }
 
 export async function getStudentProgress({
