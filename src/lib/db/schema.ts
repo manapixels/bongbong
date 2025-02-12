@@ -10,6 +10,7 @@ import {
   integer,
   pgEnum,
 } from 'drizzle-orm/pg-core';
+import { getAllTopicIds } from '../utils/math';
 
 // ==================== User Management ====================
 export const user = pgTable('User', {
@@ -21,12 +22,14 @@ export const user = pgTable('User', {
   coins: integer('coins').notNull().default(0),
   preferences: json('preferences')
     .$type<{
-      difficulty: string;
+      difficulty: number;
       topicsEnabled: string[];
     }>()
     .default({
-      difficulty: 'medium',
-      topicsEnabled: ['addition', 'subtraction', 'multiplication', 'division'],
+      difficulty: 1,
+      topicsEnabled: getAllTopicIds().map(
+        (topic) => `${topic.subStrand}-${topic.level}`
+      ),
     }),
 });
 

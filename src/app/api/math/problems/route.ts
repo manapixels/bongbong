@@ -6,8 +6,10 @@ import {
 } from '@/lib/db/schema';
 import { MATH_TOPICS } from '@/types/math';
 import { selectNextQuestion } from '@/lib/math';
-import { getStudentProgress } from '@/lib/db/queries';
+import { getStudentProgress, getOrCreateUser } from '@/lib/db/queries';
 import type { Progress } from '@/types/progress';
+import { NextResponse } from 'next/server';
+import { eq } from 'drizzle-orm';
 
 export async function GET(request: Request) {
   const session = await auth();
@@ -15,7 +17,7 @@ export async function GET(request: Request) {
     return new Response('Unauthorized', { status: 401 });
   }
 
-  const { searchParams } = new URL(request.url);
+  const searchParams = new URL(request.url).searchParams;
   const topicId = searchParams.get('topicId');
 
   if (!topicId) {
@@ -24,33 +26,34 @@ export async function GET(request: Request) {
 
   const topic = MATH_TOPICS.find((t) => t.id === topicId);
   if (!topic) {
-    return new Response('Topic not found', { status: 404 });
+    return new Response('Invalid topic ID', { status: 400 });
   }
 
   try {
+    // Ensure user exists first
+    await getOrCreateUser(session.user.id);
+
     let progress = await getStudentProgress({ userId: session.user.id });
 
     if (!progress) {
       // Create a progress record that matches the schema
-      const defaultProgress: Progress = {
-        id: crypto.randomUUID(),
-        userId: session.user.id,
-        questionId: null,
-        isCorrect: false,
-        timeSpent: null,
-        createdAt: new Date(),
-        subStrandProgress: [],
-      };
+      const [newProgress] = await db
+        .insert(progressTable)
+        .values({
+          userId: session.user.id,
+          isCorrect: false,
+          timeSpent: 0,
+          subStrandProgress: [],
+        })
+        .returning();
 
-      return Response.json(
-        selectNextQuestion(defaultProgress, topic.subStrand)
-      );
+      progress = newProgress;
     }
 
-    // No need for transformation since we're using the correct type
+    // Generate the question
     const question = selectNextQuestion(progress, topic.subStrand);
 
-    // First save the problem
+    // Save the problem
     const [savedProblem] = await db
       .insert(mathQuestionsTable)
       .values({
@@ -66,18 +69,15 @@ export async function GET(request: Request) {
       })
       .returning();
 
-    // Then create an initial progress entry for this problem
-    await db.insert(progressTable).values({
-      id: crypto.randomUUID(),
-      userId: session.user.id,
-      questionId: savedProblem.id,
-      isCorrect: false,
-      timeSpent: 0,
-      createdAt: new Date(),
-      subStrandProgress: [],
-    });
+    // Update the progress with the new question
+    await db
+      .update(progressTable)
+      .set({
+        questionId: savedProblem.id,
+      })
+      .where(eq(progressTable.userId, session.user.id));
 
-    return Response.json(question);
+    return NextResponse.json(question);
   } catch (error) {
     console.error('Error generating question:', error);
     return new Response('Internal Server Error', { status: 500 });

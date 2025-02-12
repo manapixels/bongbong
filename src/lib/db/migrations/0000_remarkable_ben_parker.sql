@@ -66,7 +66,7 @@ CREATE TABLE "User" (
 	"is_student" boolean DEFAULT false NOT NULL,
 	"xp_points" integer DEFAULT 0 NOT NULL,
 	"coins" integer DEFAULT 0 NOT NULL,
-	"preferences" json DEFAULT '{"difficulty":"medium","topicsEnabled":["addition","subtraction","multiplication","division"]}'::json
+	"preferences" json DEFAULT '{"difficulty":1,"topicsEnabled":["whole-numbers-1","money-1","measurement-1","geometry-1","data-representation-and-interpretation-1","whole-numbers-2","fractions-2","money-2","measurement-2","geometry-2","data-representation-and-interpretation-2","whole-numbers-3","fractions-3","money-3","measurement-3","area-and-volume-3","geometry-3","data-representation-and-interpretation-3","whole-numbers-5","whole-numbers-5","fractions-5","decimals-5","percentage-5","rate-5","area-and-volume-5","geometry-6","data-analysis-6"]}'::json
 );
 --> statement-breakpoint
 ALTER TABLE "achievements" ADD CONSTRAINT "achievements_user_id_User_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."User"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint

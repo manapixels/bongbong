@@ -4,8 +4,14 @@ import { useState } from 'react';
 import { ChevronDown, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 import { MATH_TOPICS } from '@/types/math';
+import { Progress } from '@/components/ui/progress';
+import { Progress as UserProgress } from '@/types';
 
-export function MathTopicsSidebar() {
+interface MathTopicsSidebarProps {
+  progress?: UserProgress;
+}
+
+export function MathTopicsSidebar({ progress }: MathTopicsSidebarProps) {
   const [expandedLevels, setExpandedLevels] = useState<number[]>([]);
   const [expandedStrands, setExpandedStrands] = useState<string[]>([]);
 
@@ -35,10 +41,32 @@ export function MathTopicsSidebar() {
     );
   };
 
+  const getSubStrandProgress = (subStrand: string) => {
+    if (!progress?.subStrandProgress) return 0;
+    const subStrandProgress = progress.subStrandProgress.find(
+      (p) => p.subStrand === subStrand
+    );
+    if (!subStrandProgress || subStrandProgress.questionsAttempted === 0)
+      return 0;
+    return Math.round(
+      (subStrandProgress.correctAnswers /
+        subStrandProgress.questionsAttempted) *
+        100
+    );
+  };
+
   return (
     <div className="w-64 bg-gray-100 dark:bg-gray-800 h-full overflow-y-auto">
       <div className="p-4">
-        <h2 className="text-lg font-semibold mb-4">Math Topics</h2>
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-lg font-semibold">Math Topics</h2>
+          <Link
+            href="/math/preferences"
+            className="text-sm text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300"
+          >
+            Edit Topics
+          </Link>
+        </div>
         <div className="space-y-2">
           {Object.entries(topicsByLevel)
             .sort(([a], [b]) => Number(a) - Number(b))
@@ -73,15 +101,28 @@ export function MathTopicsSidebar() {
                         </button>
 
                         {expandedStrands.includes(topic.id) && (
-                          <div className="ml-6 space-y-1">
+                          <div className="ml-6 space-y-2">
                             {topic.subStrandTopics.map((subtopic) => (
-                              <Link
-                                key={subtopic.id}
-                                href={`/math/practice/${subtopic.id}`}
-                                className="block p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded text-sm"
-                              >
-                                {subtopic.name}
-                              </Link>
+                              <div key={subtopic.id} className="space-y-1">
+                                <Link
+                                  href={`/math/practice/${subtopic.id}`}
+                                  className="block p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded text-sm"
+                                >
+                                  {subtopic.name}
+                                </Link>
+                                <div className="px-2">
+                                  <Progress
+                                    value={getSubStrandProgress(
+                                      topic.subStrand
+                                    )}
+                                    className="h-1"
+                                  />
+                                  <div className="text-xs text-gray-500 mt-1">
+                                    {getSubStrandProgress(topic.subStrand)}%
+                                    complete
+                                  </div>
+                                </div>
+                              </div>
                             ))}
                           </div>
                         )}

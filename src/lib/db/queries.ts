@@ -14,6 +14,7 @@ import type {
 import { MATH_TOPICS } from '@/types/math';
 import { Progress, User } from '@/types';
 import { sql } from 'drizzle-orm';
+import { getDefaultPreferences } from '@/lib/utils/math';
 
 export async function getUser(email: string): Promise<User[]> {
   return db.select().from(userTable).where(eq(userTable.email, email));
@@ -45,14 +46,41 @@ export async function getUserProfile(
   return user;
 }
 
-export async function getOrCreateUser(userId: string): Promise<User> {
-  let user = await getUserProfile(userId);
-  if (!user) {
-    // Create a new local user with the userId as the ID
-    user = await createUser(`local_${userId}@local.dev`, '', userId);
-    console.log('Created new local user:', user);
+export async function getOrCreateUser(id: string): Promise<User> {
+  const [existingUser] = await db
+    .select()
+    .from(userTable)
+    .where(eq(userTable.id, id));
+
+  if (existingUser) {
+    // If user exists but doesn't have preferences, update with defaults
+    if (!existingUser.preferences) {
+      const [updatedUser] = await db
+        .update(userTable)
+        .set({
+          preferences: getDefaultPreferences(),
+        })
+        .where(eq(userTable.id, id))
+        .returning();
+      return updatedUser;
+    }
+    return existingUser;
   }
-  return user;
+
+  // Create new user with default preferences
+  const [newUser] = await db
+    .insert(userTable)
+    .values({
+      id,
+      email: '', // You might want to add email if available
+      isStudent: true,
+      xpPoints: 0,
+      coins: 0,
+      preferences: getDefaultPreferences(),
+    })
+    .returning();
+
+  return newUser;
 }
 
 export async function getStudentProgress({
@@ -99,12 +127,33 @@ export async function updateStudentProgress({
   isCorrect: boolean;
   timeSpent: number;
 }) {
-  return await db.insert(progressTable).values({
-    userId,
-    questionId,
-    isCorrect,
-    timeSpent,
-  });
+  // First, check if a progress record exists for this user
+  const existingProgress = await getStudentProgress({ userId });
+
+  if (existingProgress) {
+    // Update existing progress
+    return await db
+      .update(progressTable)
+      .set({
+        questionId,
+        isCorrect,
+        timeSpent,
+      })
+      .where(eq(progressTable.userId, userId))
+      .returning();
+  } else {
+    // Create new progress record
+    return await db
+      .insert(progressTable)
+      .values({
+        userId,
+        questionId,
+        isCorrect,
+        timeSpent,
+        subStrandProgress: [], // Initialize with empty progress
+      })
+      .returning();
+  }
 }
 
 interface MasteryCheck {

@@ -14,11 +14,6 @@ function formatSubStrand(subStrand: string): string {
     .join(' ');
 }
 
-const DEFAULT_PREFERENCES = {
-  difficulty: 1,
-  topicsEnabled: [MathSubStrand.WHOLE_NUMBERS],
-};
-
 export function MathTrainer() {
   const {
     user,
@@ -44,7 +39,7 @@ export function MathTrainer() {
         body: JSON.stringify({
           profile: {
             id: userId,
-            preferences: user?.preferences || DEFAULT_PREFERENCES,
+            preferences: user?.preferences,
           },
           progress,
         }),

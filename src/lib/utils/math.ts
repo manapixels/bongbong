@@ -1,3 +1,5 @@
+import { MATH_TOPICS } from '@/types/math';
+
 export function calculateDifficulty(
   baseLevel: number,
   successRate: number
@@ -59,4 +61,29 @@ export function checkDifficulty(
 export function generateHints(problem: string, step: number): string {
   // Returns progressive hints for each step of problem solving
   return ''; // Implement hint generation
+}
+
+export interface TopicKey {
+  subStrand: string;
+  level: number;
+}
+
+export function getAllTopicIds(): TopicKey[] {
+  return MATH_TOPICS.map((topic) => ({
+    subStrand: topic.subStrand,
+    level: topic.level,
+  }));
+}
+
+export function getDefaultPreferences() {
+  return {
+    difficulty: 1,
+    topicsEnabled: getAllTopicIds().map(
+      (topic) => `${topic.subStrand}-${topic.level}`
+    ),
+  };
+}
+
+export function createTopicKey(subStrand: string, level: number): string {
+  return `${subStrand}-${level}`;
 }
